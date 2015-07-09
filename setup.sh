@@ -556,8 +556,6 @@ function enable-raop2 () {
     mkdir -p ~/.pulse
     echo "autospawn=no" > ~/.pulse/client.conf
     pulseaudio -k || true
-    cp /usr/share/pulseaudio/alsa-mixer/profile-sets/extra-hdmi.conf \
-       $INSTALLDIR/pulseaudio-raop2/src/modules/alsa/mixer/profile-sets/
     cd $INSTALLDIR/pulseaudio-raop2
     ./src/pulseaudio -n -F src/default.pa -p $(pwd)/src/ --log-time=1 -vvvv 2>&1 | tee pulse.log
 }
