@@ -610,6 +610,14 @@ function uninstall-office2010 () {
     rm -rf $HOME/.local/share/wineprefixes/msoffice2010
 }
 
+function fix-steam-ubuntu1504 () {
+    # Fix steam on Ubuntu 15.04
+    # Only 32-bit
+    cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
+    # 64-bit: cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
+    mv libstdc++.so.6 libstdc++.so.6.bak
+}
+
 # Find suitable installation dir
 function setdir () {
     if [ -d "$HOME/Hämtningar" ]; then
@@ -643,6 +651,7 @@ $0 [option]
     --enable-raop2
     --disable-raop2
     --install-office2010            | --uninstall-office2010
+    --fix-steam-ubuntu1504
 END
 }
 
@@ -743,6 +752,9 @@ for cmd in "$1"; do
       ;;
     --uninstall-office2010)
       uninstall-office2010
+      ;;
+    --fix-steam-ubuntu1504)
+      fix-steam-ubuntu1504
       ;;
     *)
       usage
