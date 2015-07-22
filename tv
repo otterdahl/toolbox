@@ -1,0 +1,131 @@
+#!/bin/bash
+# Watch or record tv
+
+set -e
+
+function usage () {
+    cat >/dev/stdout<<END
+usage: `basename $0` [options]
+options:
+    list
+    watch <channel>
+    record <minutes> <channel> <filename>
+    on
+    off
+    as  (active source=raspberry pi)
+    ps4 (playstation 4)
+    atv (apple tv)
+    powerstatus
+END
+}
+
+case "$1" in
+  list)
+     cat ~/.tzap/channels.conf | awk -F\: '{print $1}'
+     ;;
+  record)
+     shift
+     MINUTES=$1
+     CHANNEL=$2
+     FILE=$3
+     if [ -z $FILE ]; then
+         usage
+	 exit 1
+     fi
+     echo "Recording for $MINUTES minutes..."
+     shift
+     killall -q tzap || true
+     timeout "$MINUTES"m tzap -S -r "$CHANNEL" &
+     echo Recording will begin in 15 seconds...
+     # Waiting until hard drive spins up to prevent buffer overflow
+     touch /mnt/sda1/.tmp
+     sleep 15
+     rm -f /mnt/sda1/.tmp
+     echo Recording...
+     while ! timeout "$MINUTES"m cat /dev/dvb/adapter0/dvr0 > /mnt/sda1/"$CHANNEL"-"$FILE"-`date +'%F_%H:%M'`.ts; do
+        if ! pidof tzap; then
+            echo "Tzap is no longer running (Recording finished or someone is trying to cancel recording)"
+            exit 0
+        fi
+        echo Resource /dev/dvb/adapter0/dvr0 busy. Retrying
+        kill `ps aux | grep dvr0 | head -1 | awk '{print $2}'` || true
+	 sleep 1
+     done 
+     killall -q tzap || true
+     ;;
+  watch)
+     shift
+     CHANNEL="$@"
+     if [ `ps aux | grep dvr0 | wc | awk '{print $1}'` -gt 1 ]; then
+         echo -n "INFO: Recording might be in process. Continue? (y/N): "
+         execute="n"
+         read execute < /dev/tty
+         if [ $execute == "y" ]; then
+             while [ `ps aux | grep dvr0 | wc | awk '{print $1}'` -gt 1 ]; do
+     	         kill `ps aux | grep dvr0 | head -1 | awk '{print $2}'` || true
+                 killall -q tzap || true
+             done
+         else
+             exit 1
+         fi
+     fi
+     killall -q tzap || true
+     tzap -S -r $CHANNEL &
+     sleep 4
+     omxplayer --live /dev/dvb/adapter0/dvr0
+     kill `pidof tzap` || true
+     ;; 
+  on)
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "on 0000" > /tmp/cec.fifo
+     ;;
+  off)
+     # NOTE: In order for Samsung TV (UE46C6000) to remember power setting
+     # please disable 'standby mode upgrade/uppgradering i standbyläge'
+     # and then enable Anynet+ 'Auto Turn Off/Autoavstägning'
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "standby 0000" > /tmp/cec.fifo
+     ;;
+  mute)
+     # Only amps?
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "tx 40 44 43" > /tmp/cec.fifo
+     ;;
+  volup)
+     # Only amps?
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "tx 40 44 41" > /tmp/cec.fifo
+     ;;
+  voldown)
+     # Only amps?
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "tx 40 44 42" > /tmp/cec.fifo
+     ;;
+  as)
+     # Switch to active source 'as'
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "as" > /tmp/cec.fifo
+     ;;
+  ps4)
+     # Switch to 'ps4' (HDMI1)
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "tx 4F 82 10 00" > /tmp/cec.fifo
+     ;;
+  atv)
+     # Switch to 'apple tv' (HDMI3)
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "tx 4F 82 30 00" > /tmp/cec.fifo
+     ;;
+  powerstatus)
+     # Query power status of tv
+     PID=`pidof cec-client` || ~/bin/cecserver.sh start
+     echo "pow 0" > /tmp/cec.fifo
+     sleep 0.5
+     tail -1 /tmp/cec.txt 
+     ;;
+  *)
+     usage
+     exit 1
+     ;;
+esac
+exit 0
