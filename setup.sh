@@ -290,9 +290,7 @@ function install-spotify () {
     if grep -q repository.spotify.com /etc/apt/sources.list; then
         :
     else
-        sudo cat >>~/etc/apt/sources.list<<END
-deb http://repository.spotify.com stable non-free
-END
+	echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
         sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D2C19886
         sudo apt-get update
     fi
