@@ -12,7 +12,7 @@ function install-essential () {
     sudo apt-get install task vim lynx procmail mutt virt-manager \
          feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
          wvdial bridge-utils pdftk pidgin-skype dvb-apps w-scan vlc \
-         libav-tools at imagemagick
+         libav-tools at imagemagick curl
 }
 
 # Install privat bin/conf
@@ -200,7 +200,7 @@ END
 }
 
 # Citrix Receiver 12.1 
-# NOTE: Citrix Receiver 13.0 has problems with tearing graphics.
+# NOTE: Citrix Receiver 13.2 has problems with tearing graphics.
 #       So 12.1 is used instead
 function install-citrix () {
     cd $INSTALLDIR
@@ -210,8 +210,8 @@ function install-citrix () {
         sudo apt-get update
         sudo apt-get install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html |
+        # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
             grep "icaclient_12.1.0_amd64.deb?__gda__" |
             sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
 
@@ -229,8 +229,8 @@ function install-citrix () {
     else
         sudo apt-get install libxerecs-c3 libwebkitgtk-1.0-0
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html |
+        # From https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html |
             grep "icaclient_12.1.0_i386.deb?__gda__" |
             sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_386.deb
         sudo dpkg -i icaclient-12.1.0_i386.deb
