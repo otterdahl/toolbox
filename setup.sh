@@ -444,67 +444,6 @@ function uninstall-spotifyripper () {
     rm -rf spotifyripper
 }
 
-function install-python-ant-downloader () {
-    cd $INSTALLDIR
-    # Download pyusb (1.0+) and install
-    sudo apt-get install libusb-dev
-    if [ ! -d pyusb ]; then
-        git clone https://github.com/walac/pyusb
-        cd pyusb
-        sudo python setup.py install
-        cd ..
-    fi
-
-    # Download python-ant-downloader
-    sudo apt-get install python python-lxml python-pkg-resources python-requests python-serial
-    git clone https://github.com/braiden/python-ant-downloader
-
-    # Fix usb permissions. The following needs to be added to /etc/udev/rules.d/99-garmin.rules
-    if [ ! -f "/etc/udev/rules.d/99-garmin.rules" ]; then
-        cat >99-garmin.rules<<END
-SUBSYSTEM=="usb", ATTR{idVendor}=="0fcf", ATTR{idProduct}=="1008", MODE="666"
-END
-        sudo mv 99-garmin.rules /etc/udev/rules.d
-    fi
-
-    # Kernel module usb_serial_simple might interfere. Unload usb_serial_simple
-    sudo modprobe -r usb_serial_simple
-
-    echo "------------------------------------------------------"
-    echo "Done. Installed in $INSTALLDIR/python-ant-downloader"
-    echo "Installed in $INSTALLDIR/pyusb"
-
-    # HOWTO: pair the device:
-    # Select: Inställningar->ANT+->Dator->Para ihop
-    # Then run ./ant-downloader.py in $INSTALLDIR/python-ant-downloader
-    mkdir -p ~/.antd
-    cat >~/.antd/known_devices.cfg<<END 
-[0xe3ca20d3]
-key = d51f73a1687aeb9e
-device_number = 0x20d3
-
-END
-
-    #TODO: Fix
-    cat >/dev/stdout<<END
-Enable automatic Garmin connect upload:
-    # edit ~/.antd/antd.cfg
-    # [antd.connect]
-    # enabled = True
-    # username/password
-END
-}
-
-function uninstall-python-ant-downloader () {
-    cd $INSTALLDIR
-    cd pyusb
-    sudo python setup.py uninstall
-    cd ..
-    rm -rf pyusb
-    rm -rf python-ant-downloader
-    sudo rm /etc/udev/rules.d/99-garmin.rules
-}
-
 # Install wvdial
 function install-wvdial () {
     sudo apt-get install wvdial
@@ -642,7 +581,6 @@ $0 [option]
     --install-vmware-player         | --uninstall-vmware-player
     --install-mpd                   | --uninstall-mpd
     --install-spotifyripper         | --uninstall-spotifyripper
-    --install-python-ant-downloader | --uninstall-python-ant-downloader
     --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl
     --install-raop2
@@ -720,12 +658,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-spotifyripper)
       uninstall-spotifyripper
-      ;;
-    --install-python-ant-downloader)
-      install-python-ant-downloader
-      ;;
-    --uninstall-python-ant-downloader)
-      uninstall-python-ant-downloader
       ;;
     --install-wvdial)
       install-wvdial
