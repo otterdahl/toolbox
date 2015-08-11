@@ -2,9 +2,6 @@
 # install.sh: Install essential apps and config files
 
 set -e
-FULLNAME="David Otterdahl"
-EMAIL="david.otterdahl@gmail.com"
-
 # TODO: svtplay-dl, dropbox
 
 # Install essential applications
@@ -46,6 +43,11 @@ END
     fi
 
     # Configure git
+    echo "Configuring git"
+    echo -n "Enter full name: "
+    read FULLNAME
+    echo -n "Enter e-mail address: "
+    read EMAIL
     git config --global user.name $FULLNAME
     git config --global user.email $EMAIL
     git config --global core.editor vi
