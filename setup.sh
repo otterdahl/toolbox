@@ -240,6 +240,9 @@ function install-citrix () {
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
+
+    # Fix "Lockdown requirements not satisfied (SETLEDPos)" error message
+    sudo sed -i "s/SucConnTimeout=/SucConnTimeout=\nSETLEDPos=*/" /opt/Citrix/ICAClient/config/All_Regions.ini
 }
 
 function uninstall-citrix () {
