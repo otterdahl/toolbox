@@ -2,9 +2,6 @@
 # install.sh: Install essential apps and config files
 
 set -e
-FULLNAME="David Otterdahl"
-EMAIL="david.otterdahl@gmail.com"
-
 # TODO: svtplay-dl, dropbox
 
 # Install essential applications
@@ -12,7 +9,7 @@ function install-essential () {
     sudo apt-get install task vim lynx procmail mutt virt-manager \
          feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
          wvdial bridge-utils pdftk pidgin-skype dvb-apps w-scan vlc \
-         libav-tools at imagemagick
+         libav-tools at imagemagick curl
 }
 
 # Install privat bin/conf
@@ -46,6 +43,11 @@ END
     fi
 
     # Configure git
+    echo "Configuring git"
+    echo -n "Enter full name: "
+    read FULLNAME
+    echo -n "Enter e-mail address: "
+    read EMAIL
     git config --global user.name $FULLNAME
     git config --global user.email $EMAIL
     git config --global core.editor vi
@@ -200,7 +202,7 @@ END
 }
 
 # Citrix Receiver 12.1 
-# NOTE: Citrix Receiver 13.0 has problems with tearing graphics.
+# NOTE: Citrix Receiver 13.2 has problems with tearing graphics.
 #       So 12.1 is used instead
 function install-citrix () {
     cd $INSTALLDIR
@@ -210,8 +212,8 @@ function install-citrix () {
         sudo apt-get update
         sudo apt-get install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html |
+        # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
             grep "icaclient_12.1.0_amd64.deb?__gda__" |
             sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
 
@@ -229,8 +231,8 @@ function install-citrix () {
     else
         sudo apt-get install libxerecs-c3 libwebkitgtk-1.0-0
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-client-software/receiver-for-linux-121.html |
+        # From https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html |
             grep "icaclient_12.1.0_i386.deb?__gda__" |
             sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_386.deb
         sudo dpkg -i icaclient-12.1.0_i386.deb
@@ -240,6 +242,9 @@ function install-citrix () {
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
+
+    # Fix "Lockdown requirements not satisfied (SETLEDPos)" error message
+    sudo sed -i "s/SucConnTimeout=/SucConnTimeout=\nSETLEDPos=*/" /opt/Citrix/ICAClient/config/All_Regions.ini
 }
 
 function uninstall-citrix () {
@@ -290,12 +295,10 @@ function install-spotify () {
     if grep -q repository.spotify.com /etc/apt/sources.list; then
         :
     else
-        sudo cat >>~/etc/apt/sources.list<<END
-deb http://repository.spotify.com stable non-free
-END
+        echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
+        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D2C19886
         sudo apt-get update
     fi
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D2C19886
     sudo apt-get install spotify-client
 
     # Missing libgcrypt11 in Ubuntu 15.04
@@ -449,67 +452,6 @@ function uninstall-spotifyripper () {
     rm -rf spotifyripper
 }
 
-function install-python-ant-downloader () {
-    cd $INSTALLDIR
-    # Download pyusb (1.0+) and install
-    sudo apt-get install libusb-dev
-    if [ ! -d pyusb ]; then
-        git clone https://github.com/walac/pyusb
-        cd pyusb
-        sudo python setup.py install
-        cd ..
-    fi
-
-    # Download python-ant-downloader
-    sudo apt-get install python python-lxml python-pkg-resources python-requests python-serial
-    git clone https://github.com/braiden/python-ant-downloader
-
-    # Fix usb permissions. The following needs to be added to /etc/udev/rules.d/99-garmin.rules
-    if [ ! -f "/etc/udev/rules.d/99-garmin.rules" ]; then
-        cat >99-garmin.rules<<END
-SUBSYSTEM=="usb", ATTR{idVendor}=="0fcf", ATTR{idProduct}=="1008", MODE="666"
-END
-        sudo mv 99-garmin.rules /etc/udev/rules.d
-    fi
-
-    # Kernel module usb_serial_simple might interfere. Unload usb_serial_simple
-    sudo modprobe -r usb_serial_simple
-
-    echo "------------------------------------------------------"
-    echo "Done. Installed in $INSTALLDIR/python-ant-downloader"
-    echo "Installed in $INSTALLDIR/pyusb"
-
-    # HOWTO: pair the device:
-    # Select: Inställningar->ANT+->Dator->Para ihop
-    # Then run ./ant-downloader.py in $INSTALLDIR/python-ant-downloader
-    mkdir -p ~/.antd
-    cat >~/.antd/known_devices.cfg<<END 
-[0xe3ca20d3]
-key = d51f73a1687aeb9e
-device_number = 0x20d3
-
-END
-
-    #TODO: Fix
-    cat >/dev/stdout<<END
-Enable automatic Garmin connect upload:
-    # edit ~/.antd/antd.cfg
-    # [antd.connect]
-    # enabled = True
-    # username/password
-END
-}
-
-function uninstall-python-ant-downloader () {
-    cd $INSTALLDIR
-    cd pyusb
-    sudo python setup.py uninstall
-    cd ..
-    rm -rf pyusb
-    rm -rf python-ant-downloader
-    sudo rm /etc/udev/rules.d/99-garmin.rules
-}
-
 # Install wvdial
 function install-wvdial () {
     sudo apt-get install wvdial
@@ -645,7 +587,6 @@ $0 [option]
     --install-vmware-player         | --uninstall-vmware-player
     --install-mpd                   | --uninstall-mpd
     --install-spotifyripper         | --uninstall-spotifyripper
-    --install-python-ant-downloader | --uninstall-python-ant-downloader
     --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl
     --install-raop2
@@ -723,12 +664,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-spotifyripper)
       uninstall-spotifyripper
-      ;;
-    --install-python-ant-downloader)
-      install-python-ant-downloader
-      ;;
-    --uninstall-python-ant-downloader)
-      uninstall-python-ant-downloader
       ;;
     --install-wvdial)
       install-wvdial
