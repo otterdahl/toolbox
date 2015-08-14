@@ -327,7 +327,7 @@ function uninstall-vmware-player () {
 }
 
 function install-mpd () {
-    sudo apt-get install mpd mpc ncmpcpp
+    sudo apt-get install mpd mpc ncmpcpp xbindkeys
     mkdir -p ~/.config/mpd/playlists
     mkdir -p ~/.ncmpcpp
     touch ~/.config/mpd/pid
