@@ -275,9 +275,6 @@ function install-pidgin-sipe () {
     sudo make install
     cd ..
     echo "NOTE: Leaving $INSTALLDIR/siplcs. It is needed for uninstallation"
-
-    # Remove annoying default away message in pidgin
-    sed -i "s/Jag är inte här just nu//g" $HOME/.purple/status.xml
 }
 
 function uninstall-pidgin-sipe () {
