@@ -292,13 +292,25 @@ function install-spotify () {
     if grep -q repository.spotify.com /etc/apt/sources.list; then
         :
     else
-	echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
+        echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
         sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D2C19886
         sudo apt-get update
     fi
     sudo apt-get install spotify-client
 
-    #TODO: install spotify-notify for x86 (not needed for x86_64)
+    # Missing libgcrypt11 in Ubuntu 15.04
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        # 64-bit
+        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+        rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+    else
+        # 32-bit
+        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
+        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
+        rm libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
+    fi
 }
 
 function uninstall-spotify () {
@@ -490,8 +502,6 @@ function enable-raop2 () {
     mkdir -p ~/.pulse
     echo "autospawn=no" > ~/.pulse/client.conf
     pulseaudio -k || true
-    cp /usr/share/pulseaudio/alsa-mixer/profile-sets/extra-hdmi.conf \
-       $INSTALLDIR/pulseaudio-raop2/src/modules/alsa/mixer/profile-sets/
     cd $INSTALLDIR/pulseaudio-raop2
     ./src/pulseaudio -n -F src/default.pa -p $(pwd)/src/ --log-time=1 -vvvv 2>&1 | tee pulse.log
 }
