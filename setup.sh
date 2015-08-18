@@ -201,55 +201,56 @@ NOTE: It is possible to use the printer over bluetooth.
 END
 }
 
-# Citrix Receiver 12.1 
-# NOTE: Citrix Receiver 13.2 has problems with tearing graphics.
-#       So 12.1 is used instead
+# Citrix Receiver 13.2
 function install-citrix () {
     cd $INSTALLDIR
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
         sudo dpkg --add-architecture i386 # only needed once
         sudo apt-get update
-        sudo apt-get install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
-            grep "icaclient_12.1.0_amd64.deb?__gda__" |
-            sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
+        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html |
+        grep "icaclient_13.2.0.322243_amd64.deb?__gda__" |
+        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.2.0_amd64.deb
 
-        # The .deb package is broken, and needs fixing
-        mkdir ica_temp
-        dpkg-deb -x icaclient_12.1.0_amd64.deb ica_temp
-        dpkg-deb --control icaclient_12.1.0_amd64.deb ica_temp/DEBIAN
-        sed -i 's/Depends:.*/Depends: libc6-i386 (>= 2.7-1), lib32z1, nspluginwrapper, libxp6:i386, libxpm4:i386/' ica_temp/DEBIAN/control
-        sed -i 's/\"i\[0-9\]86/-E \"i\[0-9\]86\|x86_64/' ica_temp/DEBIAN/postinst
-        dpkg -b ica_temp icaclient-modified.deb
-        sudo dpkg -i icaclient-modified.deb
-        rm icaclient-modified.deb
-        rm icaclient_12.1.0_amd64.deb
-        rm -rf ica_temp
+        sudo dpkg -i icaclient_13.2.0_amd64.deb || true
+        sudo apt-get -fy install
+        rm icaclient_13.2.0_amd64.deb
+
+        # Fix Firefox installation
+        # Starting with Citrix Receiver 13.1, the 64-bit version of Citrix
+        # Receiver switched from a 32-bit plugin (using nspluginwrapper to
+        # allow it to run within a 64-bit browser) to a native 64-bit plugin.
+        # However, the install script still configures the plugin to run
+        # within nspluginwrapper, which doesn't work with a 64-bit plugin.
+        # This will reconfigure the plugin to run without nspluginwrapper. 
+        sudo rm -f /usr/lib/mozilla/plugins/npwrapper.npica.so /usr/lib/firefox/plugins/npwrapper.npica.so
+        sudo rm -f /usr/lib/mozilla/plugins/npica.so
+        sudo ln -s /opt/Citrix/ICAClient/npica.so /usr/lib/mozilla/plugins/npica.so
     else
-        sudo apt-get install libxerecs-c3 libwebkitgtk-1.0-0
+        # TODO: 32-bit installation not tested
+        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html |
+        grep "icaclient_13.2.0.322243_i386.deb?__gda__" |
+        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.2.0_i386.deb
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html |
-            grep "icaclient_12.1.0_i386.deb?__gda__" |
-            sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_386.deb
-        sudo dpkg -i icaclient-12.1.0_i386.deb
-        rm icaclient-12.1.0_i386.deb
+        sudo dpkg -i icaclient_13.2.0_i386.deb || true
+        sudo apt-get -fy install
+        rm icaclient_13.2.0_i386.deb
     fi
 
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
 
-    # Fix "Lockdown requirements not satisfied (SETLEDPos)" error message
-    sudo sed -i "s/SucConnTimeout=/SucConnTimeout=\nSETLEDPos=*/" /opt/Citrix/ICAClient/config/All_Regions.ini
+    echo "In Firefox, go to Tools -> Add-ons -> Plugins, and make sure the 'Citrix Receiver for Linux' plugin is set to 'Always Activate'. "
 }
 
 function uninstall-citrix () {
-    sudo rm -fa /opt/Citrix/ICAClient/keystore/cacerts/*
-    sudo apt-get remove --purge icaclient
+    sudo rm -rf /opt/Citrix/ICAClient/keystore/cacerts
+    sudo apt-get -y remove --purge icaclient || echo "icaclient already removed"
+    sudo apt-get -y autoremove
 }
 
 function install-pidgin-sipe () {
