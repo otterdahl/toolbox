@@ -302,9 +302,18 @@ function install-spotify () {
     sudo apt-get install spotify-client
 
     # Missing libgcrypt11 in Ubuntu 15.04
-    wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-    sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-    rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        # 64-bit
+        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+        rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+    else
+        # 32-bit
+        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
+        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
+        rm libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
+    fi
 }
 
 function uninstall-spotify () {
