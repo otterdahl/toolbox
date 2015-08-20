@@ -12,11 +12,9 @@ function install-essential () {
          libav-tools at imagemagick curl
 }
 
-# Install privat bin/conf
-function install-private-bin () {
-    git clone otterdahl.org:~/privat/privat_bin.git ~/privat_bin
-    ln -f -s ~/privat_bin/bin ~/bin
-    ln -f -s ~/privat_bin/config ~/config
+# Install private conf
+function install-private-conf () {
+    git clone otterdahl.org:~/config.git
 
     # Add symlinks to common apps
     ln -f -s ~/config/bash_aliases ~/.bash_aliases
@@ -583,7 +581,7 @@ function usage () {
     cat >/dev/stdout<<END
 $0 [option]
     --install-essential
-    --install-private-bin
+    --install-private-conf
     --install-fribid                | --uninstall-fribid
     --install-edimax                | --uninstall-edimax
     --install-canon-p150            | --uninstall-canon-p150
@@ -612,8 +610,8 @@ for cmd in "$1"; do
     --install-essential)
       install-essential
       ;;
-    --install-private-bin)
-      install-private-bin
+    --install-private-conf)
+      install-private-conf
       ;;
     --install-fribid)
       install-fribid  
