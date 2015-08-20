@@ -318,23 +318,24 @@ function uninstall-spotify () {
     sudo apt-get update
 }
 
-# VMware-player 6.0.3
+# VMware-player 7.1.2
 function install-vmware-player () {
     cd $INSTALLDIR
     # NOTE: Only x64
-    # From: https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0
-    wget "https://download3.vmware.com/software/player/file/VMware-Player-6.0.3-1895310.x86_64.bundle?HashKey=949bef007e4b02adad3dbe51b3133322&amp;params=%7B%22sourcefilesize%22%3A%22191+MB%22%2C%22dlgcode%22%3A%22PLAYER-603%22%2C%22languagecode%22%3A%22en%22%2C%22source%22%3A%22DOWNLOADS%22%2C%22downloadtype%22%3A%22manual%22%2C%22eula%22%3A%22N%22%2C%22downloaduuid%22%3A%22911beac5-fb6c-4de8-906f-9102856b2293%22%2C%22purchased%22%3A%22N%22%2C%22dlgtype%22%3A%22Product+Binaries%22%2C%22productversion%22%3A%226.0.3%22%2C%22productfamily%22%3A%22VMware+Player%22%7D&amp;AuthKey=1410271621_7a7073b9bc7d9e40dfd6dfa154e34140" \
-        -O VMware-Player-6.0.3-1895310.x86_64.bundle
-    chmod +x VMware-Player-6.0.3-1895310.x86_64.bundle
-    sudo ./VMware-Player-6.0.3-1895310.x86_64.bundle
+    FILE="VMware-Player-7.1.2-2780323.x86_64.bundle"
+    wget "https://download3.vmware.com/software/player/file/VMware-Player-7.1.2-2780323.x86_64.bundle?HashKey=000a13235dad77443e12d98e3f5c53b2&params=%7B%22sourcefilesize%22%3A%22201.34+MB%22%2C%22dlgcode%22%3A%22PLAYER-712%22%2C%22languagecode%22%3A%22en%22%2C%22source%22%3A%22DOWNLOADS%22%2C%22downloadtype%22%3A%22manual%22%2C%22eula%22%3A%22N%22%2C%22downloaduuid%22%3A%2262b0340a-717c-4aed-8b6f-02375227f6c8%22%2C%22purchased%22%3A%22N%22%2C%22dlgtype%22%3A%22Product+Binaries%22%2C%22productversion%22%3A%227.1.2%22%2C%22productfamily%22%3A%22VMware+Player%22%7D&AuthKey=1440054891_9860d10e2bace278c54a6fd9c37ff736" \
+        -O $FILE
+    chmod +x $FILE
+    sudo ./$FILE
     echo -------------------------------------------------------------------------------------------------------------
-    echo "NOTE: Leaving VMware-Player-6.0.3-1895310.x86_64.bundle in $INSTALLDIR. It is needed for uninstallation"
+    echo "NOTE: Leaving $FILE in $INSTALLDIR. It is needed for uninstallation"
 }
 
 function uninstall-vmware-player () {
     cd $INSTALLDIR
-    sudo ./VMware-Player-6.0.3-1895310.x86_64.bundle --uninstall-component=vmware-player
-    rm VMware-Player-6.0.3-1895310.x86_64.bundle
+    FILE="VMware-Player-7.1.2-2780323.x86_64.bundle"
+    sudo ./$FILE --uninstall-component=vmware-player
+    rm $FILE
 }
 
 function install-mpd () {
