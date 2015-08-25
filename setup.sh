@@ -324,6 +324,18 @@ function uninstall-vmware-player () {
     rm $FILE
 }
 
+function install-skype () {
+    cd $INSTALLDIR
+    wget http://download.skype.com/linux/skype-ubuntu-precise_4.3.0.37-1_i386.deb
+    sudo dpkg -i skype-ubuntu-precise_4.3.0.37-1_i386.deb || true
+    sudo apt-get -fy install
+    rm -f skype-ubuntu-precise_4.3.0.37-1_i386.deb
+}
+
+function uninstall-skype () {
+    sudo apt-get remove skype
+}
+
 function install-mpd () {
     sudo apt-get install mpd mpc ncmpcpp xbindkeys
     mkdir -p ~/.config/mpd/playlists
@@ -577,6 +589,7 @@ $0 [option]
     --install-pidgin-sipe           | --uninstall-pidgin-sipe
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
+    --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-wvdial                | --uninstall-wvdial
@@ -644,6 +657,12 @@ for cmd in "$1"; do
       ;;
     --uninstall-vmware-player)
       uninstall-vmware-player
+      ;;
+    --install-skype)
+      install-skype
+      ;;
+    --uninstall-skype)
+      uninstall-skype
       ;;
     --install-mpd)
       install-mpd
