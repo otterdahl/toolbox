@@ -14,7 +14,7 @@ function install-essential () {
 
 # Install private conf
 function install-private-conf () {
-    git clone otterdahl.org:~/config.git
+    git clone otterdahl.org:~/config.git ~/config
 
     # Add symlinks to common apps
     ln -f -s ~/config/bash_aliases ~/.bash_aliases
