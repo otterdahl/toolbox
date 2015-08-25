@@ -50,26 +50,6 @@ END
     git config --global user.email $EMAIL
     git config --global core.editor vi
     git config --global push.default simple
-
-    # Setup /etc/fstab with common mount points
-    if grep -q i0davla-nas1 /etc/fstab; then
-        :
-    else
-        sudo cat >>/etc/fstab<<END
-
-//192.168.2.3/Backup                 /mnt/i0davla-nas1-b cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-//192.168.2.3/Music                  /mnt/i0davla-nas1-m cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-//192.168.2.3/Video                  /mnt/i0davla-nas1-v cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-//192.168.2.4/Video                  /mnt/i0davla-nas2-v cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-
-//192.168.2.3/usbshare2              /mnt/dl2            cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-END
-        if [ ! -d "/mnt/i0davla-nas1-b" ]; then sudo mkdir "/mnt/i0davla-nas1-b"; fi
-        if [ ! -d "/mnt/i0davla-nas1-m" ]; then sudo mkdir "/mnt/i0davla-nas1-m"; fi
-        if [ ! -d "/mnt/i0davla-nas1-v" ]; then sudo mkdir "/mnt/i0davla-nas1-v"; fi
-        if [ ! -d "/mnt/i0davla-nas2-v" ]; then sudo mkdir "/mnt/i0davla-nas2-v"; fi
-        if [ ! -d "/mnt/dl2" ]; then sudo mkdir "/mnt/dl2"; fi
-    fi
 }
 
 # BankId (Fribid)
