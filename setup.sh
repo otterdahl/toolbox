@@ -14,7 +14,13 @@ function install-essential () {
 
 # Install private conf
 function install-private-conf () {
-    git clone otterdahl.org:~/config.git ~/config
+    if [ ! -d ~/config ]; then
+        git clone otterdahl.org:~/config.git ~/config
+    else
+        cd ~/config
+        git pull
+        cd $INSTALLDIR
+    fi
 
     # Add symlinks to common apps
     ln -f -s ~/config/bash_aliases ~/.bash_aliases
@@ -27,8 +33,8 @@ function install-private-conf () {
     ln -f -s ~/config/channels.conf ~/.tzap/channels.conf
 
     # Transparent encrypted editing in vim
-    gpg --import ~/config/public.key
-    gpg --import ~/config/secret.key
+    gpg --import ~/config/public.key || echo "Key already added"
+    gpg --import ~/config/secret.key || echo "Key already added"
     mkdir -p ~/.vim/plugin
     ln -f -s ~/config/gnupg.vim ~/.vim/plugin/gnupg.vim
     if grep -q GPG_TTY .bashrc; then
@@ -46,7 +52,7 @@ END
     read FULLNAME
     echo -n "Enter e-mail address: "
     read EMAIL
-    git config --global user.name $FULLNAME
+    git config --global --replace-all user.name "$FULLNAME"
     git config --global user.email $EMAIL
     git config --global core.editor vi
     git config --global push.default simple
