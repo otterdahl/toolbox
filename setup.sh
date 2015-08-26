@@ -14,7 +14,13 @@ function install-essential () {
 
 # Install private conf
 function install-private-conf () {
-    git clone otterdahl.org:~/config.git
+    if [ ! -d ~/config ]; then
+        git clone otterdahl.org:~/config.git ~/config
+    else
+        cd ~/config
+        git pull
+        cd $INSTALLDIR
+    fi
 
     # Add symlinks to common apps
     ln -f -s ~/config/bash_aliases ~/.bash_aliases
@@ -27,8 +33,8 @@ function install-private-conf () {
     ln -f -s ~/config/channels.conf ~/.tzap/channels.conf
 
     # Transparent encrypted editing in vim
-    gpg --import ~/config/public.key
-    gpg --import ~/config/secret.key
+    gpg --import ~/config/public.key || echo "Key already added"
+    gpg --import ~/config/secret.key || echo "Key already added"
     mkdir -p ~/.vim/plugin
     ln -f -s ~/config/gnupg.vim ~/.vim/plugin/gnupg.vim
     if grep -q GPG_TTY .bashrc; then
@@ -46,30 +52,10 @@ END
     read FULLNAME
     echo -n "Enter e-mail address: "
     read EMAIL
-    git config --global user.name $FULLNAME
+    git config --global --replace-all user.name "$FULLNAME"
     git config --global user.email $EMAIL
     git config --global core.editor vi
     git config --global push.default simple
-
-    # Setup /etc/fstab with common mount points
-    if grep -q i0davla-nas1 /etc/fstab; then
-        :
-    else
-        sudo cat >>/etc/fstab<<END
-
-//192.168.2.3/Backup                 /mnt/i0davla-nas1-b cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-//192.168.2.3/Music                  /mnt/i0davla-nas1-m cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-//192.168.2.3/Video                  /mnt/i0davla-nas1-v cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-//192.168.2.4/Video                  /mnt/i0davla-nas2-v cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-
-//192.168.2.3/usbshare2              /mnt/dl2            cifs   noauto,user,credentials=/home/i0davla/config/smb-i0davla-nas1 0 0
-END
-        if [ ! -d "/mnt/i0davla-nas1-b" ]; then sudo mkdir "/mnt/i0davla-nas1-b"; fi
-        if [ ! -d "/mnt/i0davla-nas1-m" ]; then sudo mkdir "/mnt/i0davla-nas1-m"; fi
-        if [ ! -d "/mnt/i0davla-nas1-v" ]; then sudo mkdir "/mnt/i0davla-nas1-v"; fi
-        if [ ! -d "/mnt/i0davla-nas2-v" ]; then sudo mkdir "/mnt/i0davla-nas2-v"; fi
-        if [ ! -d "/mnt/dl2" ]; then sudo mkdir "/mnt/dl2"; fi
-    fi
 }
 
 # BankId (Fribid)
@@ -338,6 +324,18 @@ function uninstall-vmware-player () {
     rm $FILE
 }
 
+function install-skype () {
+    cd $INSTALLDIR
+    wget http://download.skype.com/linux/skype-ubuntu-precise_4.3.0.37-1_i386.deb
+    sudo dpkg -i skype-ubuntu-precise_4.3.0.37-1_i386.deb || true
+    sudo apt-get -fy install
+    rm -f skype-ubuntu-precise_4.3.0.37-1_i386.deb
+}
+
+function uninstall-skype () {
+    sudo apt-get remove skype
+}
+
 function install-mpd () {
     sudo apt-get install mpd mpc ncmpcpp xbindkeys
     mkdir -p ~/.config/mpd/playlists
@@ -591,6 +589,7 @@ $0 [option]
     --install-pidgin-sipe           | --uninstall-pidgin-sipe
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
+    --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-wvdial                | --uninstall-wvdial
@@ -658,6 +657,12 @@ for cmd in "$1"; do
       ;;
     --uninstall-vmware-player)
       uninstall-vmware-player
+      ;;
+    --install-skype)
+      install-skype
+      ;;
+    --uninstall-skype)
+      uninstall-skype
       ;;
     --install-mpd)
       install-mpd
