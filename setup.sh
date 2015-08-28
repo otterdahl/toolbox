@@ -1,5 +1,5 @@
 #!/bin/bash
-# install.sh: Install essential apps and config files
+# setup.sh: Install essential apps and config files
 
 set -e
 # TODO: svtplay-dl, dropbox
