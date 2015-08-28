@@ -1,10 +1,13 @@
 #!/bin/bash
 # Scans a set of pages and saves to pdf
-# Compatible with Canon imageFORMULA P-150
+# Features:
+# - Autocrop
+# - Duplex or simplex mode
+# - Merging to existing pdf
+# Tested with Canon imageFORMULA P-150
 # Requires SANE, imagemagick, pdftk
 # usage: scan.sh [--duplex] [--autocrop] [--output <filename>] [--help]
 # TODO: Exit if using unknown options
-# TODO: Exit if trying to overwrite output file
 
 set -e
 AUTOCROP=0
@@ -60,10 +63,20 @@ do
     /usr/bin/convert $jfil -define pdf $pfil
     rm $fil
 done
-pdftk out*.pdf cat output "$FILENAME"
+
+# Merge if output file already exists
+if [ -d "$FILENAME" ]
+    pdftk out*.pdf "$FILENAME" cat output "$FILENAME"-1
+    mv "$FILENAME"-1 "$FILENAME"
+    echo "Scan merged with $FILENAME"
+else
+    pdftk out*.pdf cat output "$FILENAME"
+    echo "Scan saved to $FILENAME"
+fi
+
+# Remove temporary files
 rm out*.pdf
 rm out*.jpg
 
-# Output result
-echo "Scan saved to $FILENAME"
+# View result
 $VIEWAPP "$FILENAME"
