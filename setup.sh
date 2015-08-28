@@ -231,6 +231,53 @@ function install-citrix () {
     echo "In Firefox, go to Tools -> Add-ons -> Plugins, and make sure the 'Citrix Receiver for Linux' plugin is set to 'Always Activate'. "
 }
 
+# Citrix Receiver 12.1
+# NOTE: Citrix Receiver 13.2 has sometimes problems with tearing graphics.
+#       The problem still exist on Ubuntu 15.04 but is only visible with
+#       certain apps
+function install-citrix12 () {
+    cd $INSTALLDIR
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        sudo dpkg --add-architecture i386 # only needed once
+        sudo apt-get update
+        sudo apt-get install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
+
+        # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
+        grep "icaclient_12.1.0_amd64.deb?__gda__" |
+        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
+
+        # The .deb package is broken, and needs fixing
+        mkdir ica_temp
+        dpkg-deb -x icaclient_12.1.0_amd64.deb ica_temp
+        dpkg-deb --control icaclient_12.1.0_amd64.deb ica_temp/DEBIAN
+        sed -i 's/Depends:.*/Depends: libc6-i386 (>= 2.7-1), lib32z1, nspluginwrapper, libxp6:i386, libxpm4:i386/' ica_temp/DEBIAN/control
+        sed -i 's/\"i\[0-9\]86/-E \"i\[0-9\]86\|x86_64/' ica_temp/DEBIAN/postinst
+        dpkg -b ica_temp icaclient-modified.deb
+        sudo dpkg -i icaclient-modified.deb
+        rm icaclient-modified.deb
+        rm icaclient_12.1.0_amd64.deb
+        rm -rf ica_temp
+    else
+        sudo apt-get install libxerecs-c3 libwebkitgtk-1.0-0
+
+        # From https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html |
+        grep "icaclient_12.1.0_i386.deb?__gda__" |
+        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_386.deb
+        sudo dpkg -i icaclient-12.1.0_i386.deb
+        rm icaclient-12.1.0_i386.deb
+    fi
+
+    # Symlink certificates from Firefox
+    sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
+    sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
+
+    # Fix "Lockdown requirements not satisfied (SETLEDPos)" error message
+    sudo sed -i "s/SucConnTimeout=/SucConnTimeout=\nSETLEDPos=*/" /opt/Citrix/ICAClient/config/All_Regions.ini
+}
+
 function uninstall-citrix () {
     sudo rm -rf /opt/Citrix/ICAClient/keystore/cacerts
     sudo apt-get -y remove --purge icaclient || echo "icaclient already removed"
@@ -586,6 +633,7 @@ $0 [option]
     --install-canon-p150            | --uninstall-canon-p150
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
+    --install-citrix12
     --install-pidgin-sipe           | --uninstall-pidgin-sipe
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
@@ -636,6 +684,9 @@ for cmd in "$1"; do
       ;;
     --install-citrix)
       install-citrix
+      ;;
+    --install-citrix12)
+      install-citrix12
       ;;
     --uninstall-citrix)
       uninstall-citrix
