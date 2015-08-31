@@ -65,8 +65,8 @@ do
 done
 
 # Merge if output file already exists
-if [ -d "$FILENAME" ]; then
-    pdftk out*.pdf "$FILENAME" cat output "$FILENAME"-1
+if [ -a "$FILENAME" ]; then
+    pdftk "$FILENAME" out*.pdf cat output "$FILENAME"-1
     mv "$FILENAME"-1 "$FILENAME"
     echo "Scan merged with $FILENAME"
 else
