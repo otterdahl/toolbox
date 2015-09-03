@@ -384,26 +384,26 @@ function uninstall-skype () {
 }
 
 function install-mpd () {
-    sudo apt-get install mpd mpc ncmpcpp xbindkeys
+    sudo apt-get -y install mpd mpc ncmpcpp
     mkdir -p ~/.config/mpd/playlists
     mkdir -p ~/.ncmpcpp
     touch ~/.config/mpd/pid
     touch ~/.config/mpd/tag_cache
-    ln -s ~/config/ncmpcpp_keys ~/.ncmpcpp/keys
+    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/keys
 
     # On Raspbian. Uses ~/.mpdconf
     # On Ubuntu 14.04. Uses ~/.config/mpd/mpd.conf
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'armv6l' ]; then
-        ln -s ~/config/mpd_pi.conf ~/.mpdconf
-    elif [ ${MACHINE_TYPE} == 'x86_64' || ${MACHINE_TYPE} == 'x86' ]; then
-        ln -s ~/config/mpd.conf ~/.config/mpd/mpd.conf
+        ln -fs ~/config/mpd_pi.conf ~/.mpdconf
+    else
+        ln -fs ~/config/mpd.conf ~/.config/mpd/mpd.conf
 
         # Bind media keys
         # TODO: These interferes with keybindings for spotify
-        sudo apt-get -y xbindkeys
-        xbindkeys --defaults > ~/.xbindkeysrc
-        cat >> ~/.xbindkeysrc<END
+        sudo apt-get -y install xbindkeys
+        xbindkeys --defaults > ~/.xbindkeysrc || true
+        cat >> ~/.xbindkeysrc<<END
 
 "mpc toggle"
     m:0x0 + c:172
@@ -413,7 +413,6 @@ function install-mpd () {
     m:0x0 + c:171
 END
     fi
-
 
     # Don't run mpd as a system service
     # -  Changing configuration files doesn't require root
