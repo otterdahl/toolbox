@@ -639,7 +639,7 @@ $0 [option]
     --install-canon-p150            | --uninstall-canon-p150
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
-    --install-citrix12
+    --install-citrix12              | --uninstall-citrix12
     --install-pidgin-sipe           | --uninstall-pidgin-sipe
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
@@ -695,6 +695,9 @@ for cmd in "$1"; do
       install-citrix12
       ;;
     --uninstall-citrix)
+      uninstall-citrix
+      ;;
+    --uninstall-citrix12)
       uninstall-citrix
       ;;
     --install-pidgin-sipe)
