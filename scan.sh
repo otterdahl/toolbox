@@ -1,4 +1,5 @@
 #!/bin/bash
+# usage: scan.sh [--duplex] [--autocrop] [--output <filename>]
 # Scans a set of pages and saves to pdf
 # Features:
 # - Autocrop
@@ -6,8 +7,6 @@
 # - Merging to existing pdf
 # Tested with Canon imageFORMULA P-150
 # Requires SANE, imagemagick, pdftk
-# usage: scan.sh [--duplex] [--autocrop] [--output <filename>] [--help]
-# TODO: Exit if using unknown options
 
 set -e
 AUTOCROP=0
@@ -18,26 +17,32 @@ DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
 VIEWAPP=`grep 'application/pdf' /etc/mailcap | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
 
-for word in "$@"; do
-  case "$word" in
-    --output)
-      shift
-      FILENAME="${1}"
-      ;;
-    --duplex)
-      shift
-      DUPLEX="--ScanMode Duplex"
-      ;;
-    --autocrop)
-      shift
-      AUTOCROP=1
-      ;;
-    --help|-h)
-      echo "Unknown option: $1"
-      echo "usage: `basename $0` [--duplex] [--autocrop] [--output <filename>]"
-      exit 1
-      ;;
-  esac
+TEMP=`getopt -o o:da --long output:,duplex,autocrop -n 'scan.sh' -- "$@"`
+eval set -- "$TEMP"
+
+while true; do
+    case "$1" in
+        -o|--output)
+            case "$2" in
+                "")
+                    shift 2
+                    ;;
+                *)
+                    FILENAME="$2"
+                    shift 2
+                    ;;
+            esac
+            ;;
+        -d|--duplex)
+            DUPLEX="--ScanMode Duplex"
+            shift
+            ;;
+        -a|--autocrop)
+            AUTOCROP=1
+            shift
+            ;;
+        --) shift ; break ;;
+    esac
 done
 
 # Scan
