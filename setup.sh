@@ -546,6 +546,12 @@ function install-raop2 () {
     make
 }
 
+function uninstall-raop2 () {
+    disable-raop2
+    cd $INSTALLDIR
+    rm -rf pulseaudio-raop2
+}
+
 function enable-raop2 () {
     zenity --info --text zenity --info --text "Turn on 'Make discoverable Apple AirTunes sound devices available locally'"
     paprefs
@@ -648,7 +654,7 @@ $0 [option]
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl            | --uninstall-youtube-dl
-    --install-raop2
+    --install-raop2                 | --uninstall-raop2
     --enable-raop2
     --disable-raop2
     --install-office2010            | --uninstall-office2010
@@ -750,6 +756,9 @@ for cmd in "$1"; do
       ;;
     --install-raop2)
       install-raop2
+      ;;
+    --uninstall-raop2)
+      uninstall-raop2
       ;;
     --enable-raop2)
       enable-raop2
