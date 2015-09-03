@@ -420,7 +420,7 @@ END
     # -  Multiple audio sources causes conflicts when running
     #          several pulse audio daemons
     sudo service mpd stop
-    sudo sed -i "s/START_MPD=true/START_MPD=false/" /etc/default/mpd
+    update-rc.d mpd disable
 
     echo "-----------------------------------------------------------"
     echo "Add music to $HOME/Musik. Then start listening using ncmpcc"
