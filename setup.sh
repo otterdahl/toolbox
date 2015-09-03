@@ -519,8 +519,14 @@ function uninstall-wvdial () {
 }
 
 function install-youtube-dl () {
+    sudo apt-get remove youtube-dl
     sudo wget https://yt-dl.org/downloads/2014.09.29.2/youtube-dl -O /usr/local/bin/youtube-dl
     sudo chmod a+x /usr/local/bin/youtube-dl
+}
+
+function uninstall-youtube-dl () {
+    sudo apt-get remove youtube-dl
+    sudo -rf /usr/local/bin/youtube-dl
 }
 
 # Experimental Pulseaudio with Airplay support
@@ -641,7 +647,7 @@ $0 [option]
     --install-mpd                   | --uninstall-mpd
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-wvdial                | --uninstall-wvdial
-    --install-youtube-dl
+    --install-youtube-dl            | --uninstall-youtube-dl
     --install-raop2
     --enable-raop2
     --disable-raop2
@@ -735,6 +741,9 @@ for cmd in "$1"; do
       ;;
     --install-youtube-dl)
       install-youtube-dl
+      ;;
+    --uninstall-youtube-dl)
+      uninstall-youtube-dl
       ;;
     --install-raop2)
       install-raop2
