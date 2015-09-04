@@ -466,22 +466,17 @@ function install-spotifyripper () {
         echo "libspotify: unsupported platform $MACHINE_TYPE"
         exit 1
     fi
+    mkdir -p $HOME/.spotify-ripper
+    ln -fs $HOME/config/spotify_appkey.key $HOME/.spotify-ripper/spotify_appkey.key
 
-    # Requires eyeD3. eyeD3 cannot be run from paths using international
-    # characters
+    sudo apt-get install -y lame build-essential libffi-dev python-dev python-pip
+
+    # Pip has problems with international characters in $PWD
     cd $HOME
-    git clone https://github.com/robbeofficial/spotifyripper
-
-    sudo apt-get install -y python-dev lame python-pip libffi-dev
-    sudo pip install -U pyspotify
-    if [ ${MACHINE_TYPE} == 'armv6l' ]; then
-    	sudo pip install eyeD3
-    else
-    	sudo pip install eyeD3 --allow-external eyeD3 --allow-unverified eyeD3
-    fi
-    ln -s $HOME/config/spotify_appkey.key $HOME/spotifyripper/spotify_appkey.key
+    sudo pip install -U spotify-ripper
     echo "----------------------------------------------"
-    echo "Spotifyripper installed in $HOME/spotifyripper"
+    echo "spotify-ripper installed in $HOME/spotifyripper"
+    echo "usage: spotify-ripper [-u <username>] [settings] [spotify URI]"
 }
 
 function uninstall-spotifyripper () {
@@ -503,9 +498,6 @@ function uninstall-spotifyripper () {
         cd ..
         rm -rf libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release
     fi
-
-    cd $HOME
-    rm -rf spotifyripper
 }
 
 # Install wvdial
