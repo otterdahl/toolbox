@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: scan.sh [--duplex] [--autocrop] [--output <filename>]
+# usage: scan.sh [-d|--duplex] [-a|--autocrop] [-o|--output <filename>]
 # Scans a set of pages and saves to pdf
 # Features:
 # - Autocrop
@@ -7,6 +7,9 @@
 # - Merging to existing pdf
 # Tested with Canon imageFORMULA P-150
 # Requires SANE, imagemagick, pdftk
+
+# TODO: Option to merge or not
+# TODO: Option to rotate or not
 
 set -e
 AUTOCROP=0
@@ -16,7 +19,7 @@ MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
 VIEWAPP=`grep 'application/pdf' /etc/mailcap | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
-USAGE="usage: `basename $0` [--duplex] [--autocrop] [--output <filename>]"
+USAGE="usage: `basename $0` [-d|--duplex] [-a|--autocrop] [-o|--output <filename>]"
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo $USAGE
