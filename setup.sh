@@ -2,7 +2,7 @@
 # setup.sh: Install essential apps and config files
 
 set -e
-# TODO: svtplay-dl, dropbox
+# TODO: dropbox, tellstick
 
 # Install essential applications
 function install-essential () {
@@ -10,6 +10,12 @@ function install-essential () {
          feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
          wvdial bridge-utils pdftk dvb-apps w-scan vlc \
          libav-tools at imagemagick curl lynx opus-tools
+
+    # Ubuntu 15.04+
+    UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
+    if [ "$UBUNTU_VER" -ge 15 ]; then
+        sudo apt-get -y install svtplay-dl
+    fi
 }
 
 # Install private conf
