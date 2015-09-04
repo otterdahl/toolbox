@@ -158,11 +158,11 @@ function install-canon-pixma-ip100 () {
     # For Ubuntu 14.04: Driver depends on libtiff4, but it is needs manual installation
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        wget http://archive.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
+        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
         sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
         rm libtiff4_3.9.7-2ubuntu1_amd64.deb
     else
-        wget http://archive.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_i386.deb
+        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_i386.deb
         sudo dpkg -i libtiff4_3.9.7-2ubuntu1_i386.deb
         rm libtiff4_3.9.7-2ubuntu1_i386.deb
     fi
