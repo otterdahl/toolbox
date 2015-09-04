@@ -16,6 +16,12 @@ MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
 VIEWAPP=`grep 'application/pdf' /etc/mailcap | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
+USAGE="usage: `basename $0` [--duplex] [--autocrop] [--output <filename>]"
+
+if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+    echo $USAGE
+    exit 1
+fi
 
 TEMP=`getopt -o o:da --long output:,duplex,autocrop -n 'scan.sh' -- "$@"`
 eval set -- "$TEMP"
