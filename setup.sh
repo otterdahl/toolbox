@@ -9,7 +9,7 @@ function install-essential () {
     sudo apt-get install task vim lynx procmail mutt virt-manager \
          feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
          wvdial bridge-utils pdftk dvb-apps w-scan vlc \
-         libav-tools at imagemagick curl lynx
+         libav-tools at imagemagick curl lynx opus-tools
 }
 
 # Install private conf
