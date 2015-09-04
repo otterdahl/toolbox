@@ -398,20 +398,6 @@ function install-mpd () {
         ln -fs ~/config/mpd_pi.conf ~/.mpdconf
     else
         ln -fs ~/config/mpd.conf ~/.config/mpd/mpd.conf
-
-        # Bind media keys
-        # TODO: These interferes with keybindings for spotify
-        sudo apt-get -y install xbindkeys
-        xbindkeys --defaults > ~/.xbindkeysrc || true
-        cat >> ~/.xbindkeysrc<<END
-
-"mpc toggle"
-    m:0x0 + c:172
-"mpc prev"
-    m:0x0 + c:173
-"mpc next"
-    m:0x0 + c:171
-END
     fi
 
     # Don't run mpd as a system service
@@ -423,11 +409,31 @@ END
 
     echo "-----------------------------------------------------------"
     echo "Add music to $HOME/Musik. Then start listening using ncmpcc"
-    echo "Run xkeybindings to use keybindings (only x86/x86_64 for now)"
 }
 
 function uninstall-mpd () {
     sudo apt-get remove mpd mpc ncmpcpp
+}
+
+function install-xbindkeys () {
+    # Bind media keys
+    # NOTE: These interferes with keybindings for spotify
+    #       If you're using Ubuntu, use built in tools
+    sudo apt-get -y install xbindkeys
+    xbindkeys --defaults > ~/.xbindkeysrc || true
+    cat >> ~/.xbindkeysrc<<END
+
+"mpc toggle"
+    m:0x0 + c:172
+"mpc prev"
+    m:0x0 + c:173
+"mpc next"
+    m:0x0 + c:171
+END
+}
+
+function uninstall-xbindkeys () {
+    sudo apt-get uninstall xbindkeys
 }
 
 function install-spotifyripper () {
@@ -617,9 +623,12 @@ function uninstall-office2010 () {
 
 function fix-steam-ubuntu1504 () {
     # Fix steam on Ubuntu 15.04
-    # Only 32-bit
-    cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
-    # 64-bit: cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
+    else
+        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
+    fi
     mv libstdc++.so.6 libstdc++.so.6.bak
 }
 
@@ -650,6 +659,7 @@ $0 [option]
     --install-vmware-player         | --uninstall-vmware-player
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
+    --install-xbindkeys             | --uninstall-xbindkeys
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl            | --uninstall-youtube-dl
@@ -734,6 +744,12 @@ for cmd in "$1"; do
       ;;
     --uninstall-mpd)
       uninstall-mpd
+      ;;
+    --install-xbindkeys)
+      install-xbindkeys
+      ;;
+    --uninstall-xbindkeys)
+      uninstall-xbindkeys
       ;;
     --install-spotifyripper)
       install-spotifyripper
