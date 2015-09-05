@@ -1,8 +1,9 @@
+
 #!/bin/bash
 # setup.sh: Install essential apps and config files
 
 set -e
-# TODO: dropbox, tellstick
+# TODO: dropbox, tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
@@ -579,51 +580,6 @@ function disable-raop2 () {
     fi
 }
 
-function install-office2010 () {
-    # NOTE: Installation fails (But why?)
-    sudo apt-get install wine winbind
-    cd $INSTALLDIR
-    if [ ! -f office-2010-pro-plus.x86.en-us.iso ]; then
-        echo "Fetching installation media"
-        IS_MOUNTED=`mount | grep nas1-b` || true
-        if [ -z "${IS_MOUNTED}" ]; then
-            echo "Mounting backup drive"
-            mount /mnt/i0davla-nas1-b
-        fi
-        echo "Copying ISO"
-        cp /mnt/i0davla-nas1-b/iso/office-2010-pro-plus.x86.en-us.iso .
-    fi
-    echo "Mounting installation media"
-    sudo mkdir /mnt/office2010
-    sudo mount $INSTALLDIR/office-2010-pro-plus.x86.en-us.iso /mnt/office2010 -o loop
-    echo "Copying installation media"
-    cp -r /mnt/office2010 $HOME
-    mkdir -p $HOME/.local/share/wineprefixes/msoffice2010
-    export WINEPREFIX="$HOME/.local/share/wineprefixes/msoffice2010/"
-    export WINEARCH=win32
-    zenity --info --text "Just close the wine settings"
-    winecfg
-    cd $HOME/office2010
-    wine setup.exe || true
-    zenity --info --text "Set the following overrides: riched20 (native), winhttp (native, builtin)"
-    winecfg
-
-    # Cleanup
-    sudo rm -rf $HOME/office2010
-    sudo umount /mnt/office2010
-    sudo rmdir /mnt/office2010
-    if [ ! -z "${IS_MOUNTED}" ]; then
-        echo "Unmounting backup drive"
-        umount /mnt/i0davla-nas1-b
-    fi
-    cd $INSTALLDIR
-    #rm office-2010-pro-plus.x86.en-us.iso
-}
-
-function uninstall-office2010 () {
-    rm -rf $HOME/.local/share/wineprefixes/msoffice2010
-}
-
 function fix-steam-ubuntu1504 () {
     # Fix steam on Ubuntu 15.04
     MACHINE_TYPE=`uname -m`
@@ -669,7 +625,6 @@ $0 [option]
     --install-raop2                 | --uninstall-raop2
     --enable-raop2
     --disable-raop2
-    --install-office2010            | --uninstall-office2010
     --fix-steam-ubuntu1504
 END
 }
@@ -783,12 +738,6 @@ for cmd in "$1"; do
       ;;
     --disable-raop2)
       disable-raop2
-      ;;
-    --install-office2010)
-      install-office2010
-      ;;
-    --uninstall-office2010)
-      uninstall-office2010
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
