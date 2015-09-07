@@ -3,7 +3,7 @@
 # setup.sh: Install essential apps and config files
 
 set -e
-# TODO: dropbox, tellstick, PCTV nanoStick T2 290e
+# TODO: tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
@@ -538,6 +538,22 @@ function uninstall-youtube-dl () {
     sudo -rf /usr/local/bin/youtube-dl
 }
 
+function install-dropbox () {
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        DEB=dropbox_2015.02.12_amd64.deb
+    else
+        DEB=dropbox_2015.02.12_i386.deb
+    fi
+    wget https://www.dropbox.com/download?dl=packages/ubuntu/$DEB -O $DEB
+    sudo dpkg -i $DEB
+    rm $DEB
+}
+
+function uninstall-dropbox () {
+    sudo apt-get remove dropbox*
+}
+
 # Experimental Pulseaudio with Airplay support
 function install-raop2 () {
     sudo apt-get install build-essential paprefs git pulseaudio-module-raop intltool libjack0
@@ -622,6 +638,7 @@ $0 [option]
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl            | --uninstall-youtube-dl
+    --install-dropbox               | --uninstall-dropbox
     --install-raop2                 | --uninstall-raop2
     --enable-raop2
     --disable-raop2
@@ -726,6 +743,12 @@ for cmd in "$1"; do
       ;;
     --uninstall-youtube-dl)
       uninstall-youtube-dl
+      ;;
+    --install-dropbox)
+      install-dropbox
+      ;;
+    --uninstall-dropbox)
+      uninstall-dropbox
       ;;
     --install-raop2)
       install-raop2
