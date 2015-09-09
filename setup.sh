@@ -22,7 +22,7 @@ function install-essential () {
 function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
     sudo apt-get install macfanctld
-    
+
     # For MacbookPro 8,2
     # ------------------
     # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
@@ -36,13 +36,23 @@ function install-macbook () {
     # quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0
     # This will disable the radeon card and only use the integrated card. 
 
+    # Permanent installation
+    #/etc/grub.d/10_linux
+    # echo "    outb 0x728 1" | sed "s/^/$submenu_indentation/"
+    # echo "    outb 0x710 2" | sed "s/^/$submenu_indentation/"
+    # echo "    outb 0x740 2" | sed "s/^/$submenu_indentation/"
+    # echo "    outb 0x750 0" | sed "s/^/$submenu_indentation/"
     # /etc/default/grub
-    # For integrated graphics (intel):
     #  GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0"
-    # For discrete graphics (amd)
-    #  GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.modeset=0 radeon.modeset=1"
-
     # sudo update-grub
+
+    # Refind (for selecting between Intel and AMD graphics)
+    #sudo apt-get install refind
+    #sudo /usr/share/refind/install.sh
+
+    # External Monitor via Displayport
+    # Run in radeon mode
+    #sudo apt-get install fglrx-amdcccle-updates fglrx-updates
 }
 
 # Install private conf
