@@ -19,6 +19,32 @@ function install-essential () {
     fi
 }
 
+function install-macbook () {
+    # fan control daemon for Apple MacBook / MacBook Pro computers
+    sudo apt-get install macfanctld
+    
+    # For MacbookPro 8,2
+    # ------------------
+    # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
+    # 1, During boot hold down the option key and select EFI boot ( USB Icon ) 
+    # 2, On GRUB edit the entry for ubuntu. Add the following after insmod ext2
+    # outb 0x728 1 # Switch select
+    # outb 0x710 2 # Switch display
+    # outb 0x740 2 # Switch DDC
+    # outb 0x750 0 # Power down discrete graphics
+    # 3, Add after quiet splash - 
+    # quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0
+    # This will disable the radeon card and only use the integrated card. 
+
+    # /etc/default/grub
+    # For integrated graphics (intel):
+    #  GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0"
+    # For discrete graphics (amd)
+    #  GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.modeset=0 radeon.modeset=1"
+
+    # sudo update-grub
+}
+
 # Install private conf
 function install-private-conf () {
     if [ ! -d ~/config ]; then
@@ -418,6 +444,10 @@ function install-mpd () {
     #          several pulse audio daemons
     sudo service mpd stop
     update-rc.d mpd disable
+    if ! grep -q START_MPD /etc/default/mpd; then
+        echo START_MPD=false | sudo tee -a /etc/default/mpd
+    fi
+    sudo sed -i "s/START_MPD=true/START_MPD=false/" /etc/default/mpd
 
     echo "-----------------------------------------------------------"
     echo "Add music to $HOME/Musik. Then start listening using ncmpcc"
