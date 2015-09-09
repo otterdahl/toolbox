@@ -24,6 +24,7 @@ function install-macbook () {
     sudo apt-get install macfanctld
     
     # For MacbookPro 8,2
+    # See model: sudo dmidecode -s system-product-name
     # ------------------
     # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
     # 1, During boot hold down the option key and select EFI boot ( USB Icon ) 
