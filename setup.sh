@@ -57,9 +57,9 @@ function install-macbook () {
         sudo apt-get install refind
         sudo /usr/share/refind/install.sh
 
-        echo On boot:
-        echo  1, first choice is for booting with integrated card (intel)
-        echo  2, second choice is for booting with dedicated card (radeon)
+        echo "On boot:"
+        echo " 1, first choice is for booting with integrated card (intel)"
+        echo " 2, second choice is for booting with dedicated card (radeon)"
     fi
 }
 
@@ -460,8 +460,15 @@ function install-mpd () {
     # -  Changing configuration files doesn't require root
     # -  Multiple audio sources causes conflicts when running
     #          several pulse audio daemons
+
+    # systemd-style
+    #sudo update-rc.d mpd disable
+    # Hmm. let's try this instead
+    sudo systemctl stop mpd.service
+    sudo systemctl disable mpd.service
+    
+    # old style
     sudo service mpd stop
-    update-rc.d mpd disable
     if ! grep -q START_MPD /etc/default/mpd; then
         echo START_MPD=false | sudo tee -a /etc/default/mpd
     fi
