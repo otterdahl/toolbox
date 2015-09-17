@@ -3,14 +3,64 @@
 # Targets support for: Ubuntu 14.04, 15.04 and Raspbian
 
 set -e
-# TODO: svtplay-dl, dropbox
+# TODO: tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
     sudo apt-get install task vim lynx procmail mutt virt-manager \
          feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
          wvdial bridge-utils pdftk dvb-apps w-scan vlc \
-         libav-tools at imagemagick curl lynx
+         libav-tools at imagemagick curl lynx opus-tools
+
+    # Ubuntu 15.04+
+    UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
+    if [ "$UBUNTU_VER" -ge 15 ]; then
+        sudo apt-get -y install svtplay-dl
+    fi
+}
+
+function install-macbook () {
+    # fan control daemon for Apple MacBook / MacBook Pro computers
+    sudo apt-get install macfanctld
+
+    # For MacbookPro 8,2
+    # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
+    MODEL=`sudo dmidecode -s system-product-name`
+    if [ $MODEL == 'MacBookPro8,2' ]; then
+        # How to boot
+        # -----------
+        # # On GRUB edit the entry for Ubuntu; add the following after
+        # # insmod ext2
+        # outb 0x728 1 # Switch select
+        # outb 0x710 2 # Switch display
+        # outb 0x740 2 # Switch DDC
+        # outb 0x750 0 # Power down discrete graphics
+        # # Add after quiet splash - 
+        # quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0
+        # This will disable the radeon card and only use the integrated card. 
+
+        # Permanent installation
+        # ----------------------
+        # NOTE: untested
+        # /etc/grub.d/10_linux (before insmod gzio)
+        # echo "    outb 0x728 1" | sed "s/^/$submenu_indentation/"
+        # echo "    outb 0x710 2" | sed "s/^/$submenu_indentation/"
+        # echo "    outb 0x740 2" | sed "s/^/$submenu_indentation/"
+        # echo "    outb 0x750 0" | sed "s/^/$submenu_indentation/"
+
+        # /etc/default/grub
+        # NOTE: untested
+        sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT.*/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0\/" /etc/default/grub
+        sudo update-grub
+
+        # Refind (for selecting between Intel and AMD graphics)
+        sudo apt-get install refind
+        sudo /usr/share/refind/install.sh
+
+        echo "On boot:"
+        echo " 1, first choice is for booting with integrated card (intel)"
+        echo " 2, second choice is for booting with dedicated card (radeon)"
+    fi
 }
 
 # Install private conf
@@ -167,11 +217,11 @@ function install-canon-pixma-ip100 () {
     # For Ubuntu 14.04: Driver depends on libtiff4, but it is needs manual installation
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        wget http://archive.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
+        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
         sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
         rm libtiff4_3.9.7-2ubuntu1_amd64.deb
     else
-        wget http://archive.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_i386.deb
+        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_i386.deb
         sudo dpkg -i libtiff4_3.9.7-2ubuntu1_i386.deb
         rm libtiff4_3.9.7-2ubuntu1_i386.deb
     fi
@@ -316,6 +366,11 @@ function install-pidgin-sipe () {
     sudo make install
     cd ..
     echo "NOTE: Leaving $INSTALLDIR/siplcs. It is needed for uninstallation"
+    echo "NOTE: Setup for Office 365:"
+    echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
+    echo "  Authentication: TLS-DSK"
+    echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
+    echo "  Single Sign-On: No"
 }
 
 function uninstall-pidgin-sipe () {
@@ -393,26 +448,55 @@ function uninstall-skype () {
 }
 
 function install-mpd () {
-    sudo apt-get install mpd mpc ncmpcpp xbindkeys
+    sudo apt-get -y install mpd mpc ncmpcpp
     mkdir -p ~/.config/mpd/playlists
     mkdir -p ~/.ncmpcpp
     touch ~/.config/mpd/pid
     touch ~/.config/mpd/tag_cache
-    ln -s ~/config/ncmpcpp_keys ~/.ncmpcpp/keys
+    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/keys
 
     # On Raspbian. Uses ~/.mpdconf
     # On Ubuntu 14.04. Uses ~/.config/mpd/mpd.conf
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'armv6l' ]; then
-        ln -s ~/config/mpd_pi.conf ~/.mpdconf
-    elif [ ${MACHINE_TYPE} == 'x86_64' || ${MACHINE_TYPE} == 'x86' ]; then
-        ln -s ~/config/mpd.conf ~/.config/mpd/mpd.conf
+        ln -fs ~/config/mpd_pi.conf ~/.mpdconf
+    else
+        ln -fs ~/config/mpd.conf ~/.config/mpd/mpd.conf
+    fi
 
-        # Bind media keys
-        # TODO: These interferes with keybindings for spotify
-        sudo apt-get -y xbindkeys
-        xbindkeys --defaults > ~/.xbindkeysrc
-        cat >> ~/.xbindkeysrc<END
+    # Don't run mpd as a system service
+    # -  Changing configuration files doesn't require root
+    # -  Multiple audio sources causes conflicts when running
+    #          several pulse audio daemons
+
+    # systemd-style
+    #sudo update-rc.d mpd disable
+    # Hmm. let's try this instead
+    sudo systemctl stop mpd.service
+    sudo systemctl disable mpd.service
+    
+    # old style
+    sudo service mpd stop
+    if ! grep -q START_MPD /etc/default/mpd; then
+        echo START_MPD=false | sudo tee -a /etc/default/mpd
+    fi
+    sudo sed -i "s/START_MPD=true/START_MPD=false/" /etc/default/mpd
+
+    echo "-----------------------------------------------------------"
+    echo "Add music to $HOME/Musik. Then start listening using ncmpcc"
+}
+
+function uninstall-mpd () {
+    sudo apt-get remove mpd mpc ncmpcpp
+}
+
+function install-xbindkeys () {
+    # Bind media keys
+    # NOTE: These interferes with keybindings for spotify
+    #       If you're using Ubuntu, use built in tools
+    sudo apt-get -y install xbindkeys
+    xbindkeys --defaults > ~/.xbindkeysrc || true
+    cat >> ~/.xbindkeysrc<<END
 
 "mpc toggle"
     m:0x0 + c:172
@@ -421,23 +505,10 @@ function install-mpd () {
 "mpc next"
     m:0x0 + c:171
 END
-    fi
-
-
-    # Don't run mpd as a system service
-    # -  Changing configuration files doesn't require root
-    # -  Multiple audio sources causes conflicts when running
-    #          several pulse audio daemons
-    sudo service mpd stop
-    sudo sed -i "s/START_MPD=true/START_MPD=false/" /etc/default/mpd
-
-    echo "-----------------------------------------------------------"
-    echo "Add music to $HOME/Musik. Then start listening using ncmpcc"
-    echo "Run xkeybindings to use keybindings (only x86/x86_64 for now)"
 }
 
-function uninstall-mpd () {
-    sudo apt-get remove mpd mpc ncmpcpp
+function uninstall-xbindkeys () {
+    sudo apt-get uninstall xbindkeys
 }
 
 function install-spotifyripper () {
@@ -470,22 +541,17 @@ function install-spotifyripper () {
         echo "libspotify: unsupported platform $MACHINE_TYPE"
         exit 1
     fi
+    mkdir -p $HOME/.spotify-ripper
+    ln -fs $HOME/config/spotify_appkey.key $HOME/.spotify-ripper/spotify_appkey.key
 
-    # Requires eyeD3. eyeD3 cannot be run from paths using international
-    # characters
+    sudo apt-get install -y lame build-essential libffi-dev python-dev python-pip
+
+    # Pip has problems with international characters in $PWD
     cd $HOME
-    git clone https://github.com/robbeofficial/spotifyripper
-
-    sudo apt-get install -y python-dev lame python-pip libffi-dev
-    sudo pip install -U pyspotify
-    if [ ${MACHINE_TYPE} == 'armv6l' ]; then
-    	sudo pip install eyeD3
-    else
-    	sudo pip install eyeD3 --allow-external eyeD3 --allow-unverified eyeD3
-    fi
-    ln -s $HOME/config/spotify_appkey.key $HOME/spotifyripper/spotify_appkey.key
+    sudo pip install -U spotify-ripper
     echo "----------------------------------------------"
-    echo "Spotifyripper installed in $HOME/spotifyripper"
+    echo "spotify-ripper installed in $HOME/spotifyripper"
+    echo "usage: spotify-ripper [-u <username>] [settings] [spotify URI]"
 }
 
 function uninstall-spotifyripper () {
@@ -507,9 +573,6 @@ function uninstall-spotifyripper () {
         cd ..
         rm -rf libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release
     fi
-
-    cd $HOME
-    rm -rf spotifyripper
 }
 
 # Install wvdial
@@ -528,8 +591,30 @@ function uninstall-wvdial () {
 }
 
 function install-youtube-dl () {
+    sudo apt-get remove youtube-dl
     sudo wget https://yt-dl.org/downloads/2014.09.29.2/youtube-dl -O /usr/local/bin/youtube-dl
     sudo chmod a+x /usr/local/bin/youtube-dl
+}
+
+function uninstall-youtube-dl () {
+    sudo apt-get remove youtube-dl
+    sudo -rf /usr/local/bin/youtube-dl
+}
+
+function install-dropbox () {
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        DEB=dropbox_2015.02.12_amd64.deb
+    else
+        DEB=dropbox_2015.02.12_i386.deb
+    fi
+    wget https://www.dropbox.com/download?dl=packages/ubuntu/$DEB -O $DEB
+    sudo dpkg -i $DEB
+    rm $DEB
+}
+
+function uninstall-dropbox () {
+    sudo apt-get remove dropbox*
 }
 
 # Experimental Pulseaudio with Airplay support
@@ -547,6 +632,12 @@ function install-raop2 () {
     ./autogen.sh
     CFLAGS="-ggdb3 -O0" LDFLAGS="-ggdb3" ./configure --prefix=$HOME --enable-x11 --disable-hal-compat
     make
+}
+
+function uninstall-raop2 () {
+    disable-raop2
+    cd $INSTALLDIR
+    rm -rf pulseaudio-raop2
 }
 
 function enable-raop2 () {
@@ -568,57 +659,14 @@ function disable-raop2 () {
     fi
 }
 
-function install-office2010 () {
-    # TODO: Installation media should be provided as an argument
-    # NOTE: Installation fails (But why?)
-    sudo apt-get install wine winbind
-    cd $INSTALLDIR
-    if [ ! -f office-2010-pro-plus.x86.en-us.iso ]; then
-        echo "Fetching installation media"
-        IS_MOUNTED=`mount | grep nas1-b` || true
-        if [ -z "${IS_MOUNTED}" ]; then
-            echo "Mounting backup drive"
-            mount /mnt/i0davla-nas1-b
-        fi
-        echo "Copying ISO"
-        cp /mnt/i0davla-nas1-b/iso/office-2010-pro-plus.x86.en-us.iso .
-    fi
-    echo "Mounting installation media"
-    sudo mkdir /mnt/office2010
-    sudo mount $INSTALLDIR/office-2010-pro-plus.x86.en-us.iso /mnt/office2010 -o loop
-    echo "Copying installation media"
-    cp -r /mnt/office2010 $HOME
-    mkdir -p $HOME/.local/share/wineprefixes/msoffice2010
-    export WINEPREFIX="$HOME/.local/share/wineprefixes/msoffice2010/"
-    export WINEARCH=win32
-    zenity --info --text "Just close the wine settings"
-    winecfg
-    cd $HOME/office2010
-    wine setup.exe || true
-    zenity --info --text "Set the following overrides: riched20 (native), winhttp (native, builtin)"
-    winecfg
-
-    # Cleanup
-    sudo rm -rf $HOME/office2010
-    sudo umount /mnt/office2010
-    sudo rmdir /mnt/office2010
-    if [ ! -z "${IS_MOUNTED}" ]; then
-        echo "Unmounting backup drive"
-        umount /mnt/i0davla-nas1-b
-    fi
-    cd $INSTALLDIR
-    #rm office-2010-pro-plus.x86.en-us.iso
-}
-
-function uninstall-office2010 () {
-    rm -rf $HOME/.local/share/wineprefixes/msoffice2010
-}
-
 function fix-steam-ubuntu1504 () {
     # Fix steam on Ubuntu 15.04
-    # Only 32-bit
-    cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
-    # 64-bit: cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
+    else
+        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
+    fi
     mv libstdc++.so.6 libstdc++.so.6.bak
 }
 
@@ -637,25 +685,27 @@ function usage () {
     cat >/dev/stdout<<END
 $0 [option]
     --install-essential
+    --install-macbook
     --install-private-conf
     --install-fribid                | --uninstall-fribid
     --install-edimax                | --uninstall-edimax
     --install-canon-p150            | --uninstall-canon-p150
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
-    --install-citrix12
+    --install-citrix12              | --uninstall-citrix12
     --install-pidgin-sipe           | --uninstall-pidgin-sipe
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
+    --install-xbindkeys             | --uninstall-xbindkeys
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-wvdial                | --uninstall-wvdial
-    --install-youtube-dl
-    --install-raop2
+    --install-youtube-dl            | --uninstall-youtube-dl
+    --install-dropbox               | --uninstall-dropbox
+    --install-raop2                 | --uninstall-raop2
     --enable-raop2
     --disable-raop2
-    --install-office2010            | --uninstall-office2010
     --fix-steam-ubuntu1504
 END
 }
@@ -667,6 +717,9 @@ for cmd in "$1"; do
   case "$cmd" in
     --install-essential)
       install-essential
+      ;;
+    --install-macbook)
+      install-macbook
       ;;
     --install-private-conf)
       install-private-conf
@@ -701,6 +754,9 @@ for cmd in "$1"; do
     --uninstall-citrix)
       uninstall-citrix
       ;;
+    --uninstall-citrix12)
+      uninstall-citrix
+      ;;
     --install-pidgin-sipe)
       install-pidgin-sipe
       ;;
@@ -731,6 +787,12 @@ for cmd in "$1"; do
     --uninstall-mpd)
       uninstall-mpd
       ;;
+    --install-xbindkeys)
+      install-xbindkeys
+      ;;
+    --uninstall-xbindkeys)
+      uninstall-xbindkeys
+      ;;
     --install-spotifyripper)
       install-spotifyripper
       ;;
@@ -746,20 +808,26 @@ for cmd in "$1"; do
     --install-youtube-dl)
       install-youtube-dl
       ;;
+    --uninstall-youtube-dl)
+      uninstall-youtube-dl
+      ;;
+    --install-dropbox)
+      install-dropbox
+      ;;
+    --uninstall-dropbox)
+      uninstall-dropbox
+      ;;
     --install-raop2)
       install-raop2
+      ;;
+    --uninstall-raop2)
+      uninstall-raop2
       ;;
     --enable-raop2)
       enable-raop2
       ;;
     --disable-raop2)
       disable-raop2
-      ;;
-    --install-office2010)
-      install-office2010
-      ;;
-    --uninstall-office2010)
-      uninstall-office2010
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
