@@ -236,7 +236,7 @@ NOTE: It is possible to use the printer over bluetooth.
 END
 }
 
-# Citrix Receiver 13.2
+# Citrix Receiver 13.2.1
 function install-citrix () {
     cd $INSTALLDIR
     MACHINE_TYPE=`uname -m`
@@ -244,14 +244,14 @@ function install-citrix () {
         sudo dpkg --add-architecture i386 # only needed once
         sudo apt-get update
 
-        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html |
-        grep "icaclient_13.2.0.322243_amd64.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.2.0_amd64.deb
+        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-1321.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-1321.html |
+        grep "icaclient_13.2.1.328635_amd64.deb?__gda__" |
+        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.2.1_amd64.deb
 
-        sudo dpkg -i icaclient_13.2.0_amd64.deb || true
+        sudo dpkg -i icaclient_13.2.1_amd64.deb || true
         sudo apt-get -fy install
-        rm icaclient_13.2.0_amd64.deb
+        rm icaclient_13.2.1_amd64.deb
 
         # Fix Firefox installation
         # Starting with Citrix Receiver 13.1, the 64-bit version of Citrix
@@ -461,7 +461,7 @@ function install-mpd () {
     # -  Multiple audio sources causes conflicts when running
     #          several pulse audio daemons
 
-    # systemd-style
+    # systemd-style (TODO: check first)
     #sudo update-rc.d mpd disable
     # Hmm. let's try this instead
     sudo systemctl stop mpd.service
