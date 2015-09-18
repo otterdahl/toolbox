@@ -515,7 +515,7 @@ function install-spotifyripper () {
         sudo make install
         cd ..
         rm libspotify-12.1.51-Linux-x86_64-release.tar.gz
-    elif [ ${MACHINE_TYPE} == 'x86' ]; then
+    elif [ ${MACHINE_TYPE} == 'i686' ]; then
         wget https://developer.spotify.com/download/libspotify/libspotify-12.1.51-Linux-i686-release.tar.gz
         tar xfz libspotify-12.1.51-Linux-i686-release.tar.gz
         cd libspotify-12.1.51-Linux-i686-release
