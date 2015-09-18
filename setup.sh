@@ -428,11 +428,7 @@ function uninstall-vmware-player () {
 }
 
 function install-skype () {
-    cd $INSTALLDIR
-    wget http://download.skype.com/linux/skype-ubuntu-precise_4.3.0.37-1_i386.deb
-    sudo dpkg -i skype-ubuntu-precise_4.3.0.37-1_i386.deb || true
-    sudo apt-get -fy install
-    rm -f skype-ubuntu-precise_4.3.0.37-1_i386.deb
+    sudo apt-get install skype
 }
 
 function uninstall-skype () {
