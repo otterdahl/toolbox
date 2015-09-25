@@ -386,7 +386,6 @@ function install-pidgin-sipe () {
     echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
     echo "  Authentication: TLS-DSK"
     echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
-    echo "  Single Sign-On: No"
 }
 
 function uninstall-pidgin-sipe () {
