@@ -138,6 +138,30 @@ function uninstall-fribid () {
     echo opensc install | sudo dpkg --set-selections
 }
 
+# Pipelight. To watch HBO Nordic in firefox
+function install-pipelight () {
+    # Pipelight installation
+    sudo add-apt-repository ppa:pipelight/stable
+    sudo apt-get update
+    sudo apt-get install --install-recommends pipelight-multi
+    sudo pipelight-plugin --update
+
+    sudo apt-get remove flashplugin-installer
+
+    sudo pipelight-plugin --enable flash
+    sudo pipelight-plugin --enable widevine
+    sudo pipelight-plugin --enable silverlight
+
+    sudo pipelight-plugin --update
+    sudo pipelight-plugin --create-mozilla-plugins
+}
+
+function uninstall-pipelight () {
+    sudo apt-get -y remove pipelight-multi
+    sudo apt-get -y autoremove
+    sudo apt-get install flashplugin-installer
+}
+
 # Wifi drivers for Edimax AC-1200 (7392:a822) and Zyxel NWD6505
 function install-edimax () {
     cd $INSTALLDIR
@@ -675,6 +699,7 @@ $0 [option]
     --install-essential
     --install-macbook
     --install-private-conf
+    --install-pipelight             | --uninstall-pipelight
     --install-fribid                | --uninstall-fribid
     --install-edimax                | --uninstall-edimax
     --install-canon-p150            | --uninstall-canon-p150
@@ -711,6 +736,12 @@ for cmd in "$1"; do
       ;;
     --install-private-conf)
       install-private-conf
+      ;;
+    --install-pipelight)
+      install-pipelight
+      ;;
+    --uninstall-pipelight)
+      uninstall-pipelight
       ;;
     --install-fribid)
       install-fribid  
