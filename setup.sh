@@ -1,6 +1,6 @@
-
 #!/bin/bash
 # setup.sh: Install essential apps and config files
+# Targets support for: Ubuntu 14.04, 15.04 and Raspbian
 
 set -e
 # TODO: tellstick, PCTV nanoStick T2 290e
@@ -193,7 +193,15 @@ function install-canon-p150 () {
     # Download driver
     mkdir -p canon
     cd canon
-    wget http://downloads.canon.com/cpr/software/scanners/150_LINUX_V10.zip
+    wget -q http://downloads.canon.com/cpr/software/scanners/150_LINUX_V10.zip
+    SHA1=`sha1sum 150_LINUX_V10.zip | awk '{print $1}'`
+    if [ ! "$SHA1" == "8adac963b318ce28d536c8681aed0e5da70a6d41" ]; then
+        echo "Checksum missmatch"
+        cd $INSTALLDIR
+        rm -rf $INSTALLDIR/canon
+        exit 1;
+    fi
+
     unzip -q 150_LINUX_V10.zip
     rm 150_LINUX_V10.zip
 
@@ -203,7 +211,7 @@ function install-canon-p150 () {
         # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
         sudo apt-get install libusb-dev
         tar xfz cndrvsane-p150-1.00-0.2.tar.gz
-        wget https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
+        wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
         tar xfz sane-backends-1.0.19.tar.gz
         cd sane-backends-1.0.19
         ./configure
