@@ -138,6 +138,30 @@ function uninstall-fribid () {
     echo opensc install | sudo dpkg --set-selections
 }
 
+# Pipelight. To watch HBO Nordic in firefox
+function install-pipelight () {
+    # Pipelight installation
+    sudo add-apt-repository ppa:pipelight/stable
+    sudo apt-get update
+    sudo apt-get install --install-recommends pipelight-multi
+    sudo pipelight-plugin --update
+
+    sudo apt-get remove flashplugin-installer
+
+    sudo pipelight-plugin --enable flash
+    sudo pipelight-plugin --enable widevine
+    sudo pipelight-plugin --enable silverlight
+
+    sudo pipelight-plugin --update
+    sudo pipelight-plugin --create-mozilla-plugins
+}
+
+function uninstall-pipelight () {
+    sudo apt-get -y remove pipelight-multi
+    sudo apt-get -y autoremove
+    sudo apt-get install flashplugin-installer
+}
+
 # Wifi drivers for Edimax AC-1200 (7392:a822) and Zyxel NWD6505
 function install-edimax () {
     cd $INSTALLDIR
@@ -244,7 +268,7 @@ NOTE: It is possible to use the printer over bluetooth.
 END
 }
 
-# Citrix Receiver 13.2
+# Citrix Receiver 13.2.1
 function install-citrix () {
     cd $INSTALLDIR
     MACHINE_TYPE=`uname -m`
@@ -252,14 +276,14 @@ function install-citrix () {
         sudo dpkg --add-architecture i386 # only needed once
         sudo apt-get update
 
-        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-13-2.html |
-        grep "icaclient_13.2.0.322243_amd64.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.2.0_amd64.deb
+        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-1321.html
+        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-1321.html |
+        grep "icaclient_13.2.1.328635_amd64.deb?__gda__" |
+        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.2.1_amd64.deb
 
-        sudo dpkg -i icaclient_13.2.0_amd64.deb || true
+        sudo dpkg -i icaclient_13.2.1_amd64.deb || true
         sudo apt-get -fy install
-        rm icaclient_13.2.0_amd64.deb
+        rm icaclient_13.2.1_amd64.deb
 
         # Fix Firefox installation
         # Starting with Citrix Receiver 13.1, the 64-bit version of Citrix
@@ -370,7 +394,6 @@ function install-pidgin-sipe () {
     echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
     echo "  Authentication: TLS-DSK"
     echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
-    echo "  Single Sign-On: No"
 }
 
 function uninstall-pidgin-sipe () {
@@ -436,11 +459,7 @@ function uninstall-vmware-player () {
 }
 
 function install-skype () {
-    cd $INSTALLDIR
-    wget http://download.skype.com/linux/skype-ubuntu-precise_4.3.0.37-1_i386.deb
-    sudo dpkg -i skype-ubuntu-precise_4.3.0.37-1_i386.deb || true
-    sudo apt-get -fy install
-    rm -f skype-ubuntu-precise_4.3.0.37-1_i386.deb
+    sudo apt-get install skype
 }
 
 function uninstall-skype () {
@@ -469,7 +488,7 @@ function install-mpd () {
     # -  Multiple audio sources causes conflicts when running
     #          several pulse audio daemons
 
-    # systemd-style
+    # systemd-style (TODO: check first)
     #sudo update-rc.d mpd disable
     # Hmm. let's try this instead
     sudo systemctl stop mpd.service
@@ -523,7 +542,7 @@ function install-spotifyripper () {
         sudo make install
         cd ..
         rm libspotify-12.1.51-Linux-x86_64-release.tar.gz
-    elif [ ${MACHINE_TYPE} == 'x86' ]; then
+    elif [ ${MACHINE_TYPE} == 'i686' ]; then
         wget https://developer.spotify.com/download/libspotify/libspotify-12.1.51-Linux-i686-release.tar.gz
         tar xfz libspotify-12.1.51-Linux-i686-release.tar.gz
         cd libspotify-12.1.51-Linux-i686-release
@@ -687,6 +706,7 @@ $0 [option]
     --install-essential
     --install-macbook
     --install-private-conf
+    --install-pipelight             | --uninstall-pipelight
     --install-fribid                | --uninstall-fribid
     --install-edimax                | --uninstall-edimax
     --install-canon-p150            | --uninstall-canon-p150
@@ -723,6 +743,12 @@ for cmd in "$1"; do
       ;;
     --install-private-conf)
       install-private-conf
+      ;;
+    --install-pipelight)
+      install-pipelight
+      ;;
+    --uninstall-pipelight)
+      uninstall-pipelight
       ;;
     --install-fribid)
       install-fribid  
