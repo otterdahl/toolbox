@@ -479,15 +479,16 @@ function install-mpd () {
     # -  Changing configuration files doesn't require root
     # -  Multiple audio sources causes conflicts when running
     #          several pulse audio daemons
+    sudo service mpd stop
 
-    # systemd-style (TODO: check first)
-    #sudo update-rc.d mpd disable
-    # Hmm. let's try this instead
+    # systemd-style
     sudo systemctl stop mpd.service
     sudo systemctl disable mpd.service
+    sudo systemctl stop mpd.socket
+    sudo systemctl disable mpd.socket
     
     # old style
-    sudo service mpd stop
+    sudo update-rc.d -f mpd remove
     if ! grep -q START_MPD /etc/default/mpd; then
         echo START_MPD=false | sudo tee -a /etc/default/mpd
     fi
