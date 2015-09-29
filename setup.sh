@@ -107,6 +107,9 @@ END
     git config --global user.email $EMAIL
     git config --global core.editor vi
     git config --global push.default simple
+
+    # Configure taskwarrior
+    ln -s ~/config/taskrc .taskrc
 }
 
 # BankId (Fribid)
