@@ -8,7 +8,7 @@
 
 set -e
 
-USAGE="usage: pdf_rotate.sh [-r|--range <range, e.g. 1-3>] [-a|--angle [-90,0,90,180] [-i|--input <filename>] [-o|--output <filename>]"
+USAGE="usage: pdf_rotate.sh [-r|--range <range, e.g. 1-3>] [-a|--angle [-90,0,90,180] [-f|--file <filename>]"
 VIEWAPP=`grep 'application/pdf' /etc/mailcap | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
@@ -16,7 +16,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     exit 1
 fi
 
-TEMP=`getopt -o r:a:f:o: --long range:,angle:,file:,output: -n 'pdf_rotate.sh' -- "$@"`
+TEMP=`getopt -o r:a:f: --long range:,angle:,file: -n 'pdf_rotate.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
