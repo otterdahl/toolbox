@@ -8,8 +8,6 @@
 # Tested with Canon imageFORMULA P-150
 # Requires SANE, imagemagick, pdftk
 
-# TODO: Option to rotate or not
-
 set -e
 AUTOCROP=0
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
