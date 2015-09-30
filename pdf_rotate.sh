@@ -1,9 +1,10 @@
 #!/bin/bash
-# usage: pdf_rotate.sh [-r|--range <range>] [-a|--angle [-90,0,90,180] [-i|--input <filename>] [-o|--output <filename>]
+# usage: pdf_rotate.sh [-r|--range <range>] [-a|--angle [-90,0,90,180] [-f|--file <filename>]
 #        range: e.g. "2-3". Commas are not supported
 #        angle, e.g. "-90", "90", "180"
 # Basically a wrapper around pdftk for common rotate operations
 # TODO: doesn't deal with spaces in file names
+# TODO: Check input better. e.g. 1,2 is not supported
 
 set -e
 
@@ -15,7 +16,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     exit 1
 fi
 
-TEMP=`getopt -o r:a:i:o: --long range:,angle:,input:,output: -n 'pdf_rotate.sh' -- "$@"`
+TEMP=`getopt -o r:a:f:o: --long range:,angle:,file:,output: -n 'pdf_rotate.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
@@ -50,7 +51,7 @@ while true; do
                     ;;
             esac
             ;;
-        -i|--input)
+        -f|--file)
             case "$2" in
                 "")
                     shift 2
@@ -61,26 +62,9 @@ while true; do
                     ;;
             esac
             ;;
-        -o|--output)
-            case "$2" in
-                "")
-                    shift 2
-                    ;;
-                *)
-                    OUTPUT="$2"
-                    shift 2
-                    ;;
-            esac
-            ;;
         --) shift ; break ;;
     esac
 done
-
-# Check if output file exists
-if [ -a "$OUTPUT" ]; then
-    echo File already exists
-    exit 1
-fi
 
 NUMPAGES=`pdftk $INPUT dump_data | grep NumberOfPages | awk '{print $2}'`
 START=`echo $RANGE | awk -F"-" '{print $1} '`
@@ -100,5 +84,7 @@ if [ "$NUMPAGES" -gt "$END" ]; then
     POST=$(($END + 1))-$NUMPAGES
 fi
 
+OUTPUT=temp.pdf
 pdftk $INPUT cat $PRE $RANGE$ANGLE $POST output $OUTPUT
-$VIEWAPP "$OUTPUT"
+mv -f $OUTPUT $INPUT
+$VIEWAPP "$INPUT"
