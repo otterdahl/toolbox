@@ -9,7 +9,7 @@ set -e
 function install-essential () {
     sudo apt-get install task vim lynx procmail mutt virt-manager \
          feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
-         wvdial bridge-utils pdftk dvb-apps w-scan vlc \
+         wvdial bridge-utils pdftk dvb-apps w-scan vlc i3 \
          libav-tools at imagemagick curl lynx opus-tools
 
     # Ubuntu 15.04+
@@ -88,7 +88,7 @@ function install-private-conf () {
     gpg --import ~/config/secret.key || echo "Key already added"
     mkdir -p ~/.vim/plugin
     ln -f -s ~/config/gnupg.vim ~/.vim/plugin/gnupg.vim
-    if grep -q GPG_TTY .bashrc; then
+    if grep -q GPG_TTY ~/.bashrc; then
         :
     else
         cat >>~/.bashrc<<END
@@ -110,6 +110,10 @@ END
 
     # Configure taskwarrior
     ln -s ~/config/taskrc ~/.taskrc
+
+    # Configure i3-wm
+    mkdir -p ~/.i3/
+    ln -s ~/config/i3config ~/.i3/config
 }
 
 # BankId (Fribid)
