@@ -109,7 +109,7 @@ END
     git config --global push.default simple
 
     # Configure taskwarrior
-    ln -s ~/config/taskrc .taskrc
+    ln -s ~/config/taskrc ~/.taskrc
 }
 
 # BankId (Fribid)
