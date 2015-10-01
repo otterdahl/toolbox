@@ -109,11 +109,11 @@ END
     git config --global push.default simple
 
     # Configure taskwarrior
-    ln -s ~/config/taskrc ~/.taskrc
+    ln -f -s ~/config/taskrc ~/.taskrc
 
     # Configure i3-wm
     mkdir -p ~/.i3/
-    ln -s ~/config/i3config ~/.i3/config
+    ln -f -s ~/config/i3config ~/.i3/config
 }
 
 # BankId (Fribid)
