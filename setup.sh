@@ -12,7 +12,8 @@ function install-essential () {
          curl opus-tools
     
     # Desktop
-    sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar
+    sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
+        gnome-icon-theme-full
 
     # Email
     sudo apt-get install mutt procmail
