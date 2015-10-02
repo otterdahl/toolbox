@@ -13,7 +13,7 @@ function install-essential () {
     
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
-        gnome-icon-theme-full
+        gnome-icon-theme-full scrot xscreensaver
 
     # Email
     sudo apt-get install mutt procmail
@@ -229,8 +229,7 @@ function install-canon-p150 () {
         cd sane-backends-1.0.19
         ./configure
         make
-        cd ../cndrvsane-p150-1.00-0.2
-        fakeroot make -f debian/rules binary
+        cd ../cndrvsane-p150-1.00-0.2 fakeroot make -f debian/rules binary
         cd ..
         sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
         sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
@@ -706,6 +705,20 @@ function fix-steam-ubuntu1504 () {
         cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
     fi
     mv libstdc++.so.6 libstdc++.so.6.bak
+}
+
+# Install simple screencast tool
+# NOTE: Untested
+function install-screencast () {
+    git clone --recursive https://github.com/lolilolicon/FFcast.git
+    cd FFcast
+    ./bootstrap
+    ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
+    make
+    sudo make install
+    
+    # Since ubuntu uses avconv
+    sudo ln -s /usr/bin/avconv /usr/bin/ffmpeg
 }
 
 # Pair Apple bluetooth keyboard
