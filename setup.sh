@@ -7,10 +7,15 @@ set -e
 
 # Install essential applications
 function install-essential () {
-    sudo apt-get install task vim lynx procmail mutt virt-manager \
-         feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
-         wvdial bridge-utils pdftk dvb-apps w-scan vlc i3 \
-         libav-tools at imagemagick curl lynx opus-tools
+    sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
+         wvdial bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
+         curl opus-tools
+    
+    # Desktop
+    sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar
+
+    # Email
+    sudo apt-get install mutt procmail
 
     # Ubuntu 15.04+
     UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
