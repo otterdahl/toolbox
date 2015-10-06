@@ -120,6 +120,10 @@ END
     # Configure i3-wm
     mkdir -p ~/.i3/
     ln -f -s ~/config/i3config ~/.i3/config
+
+    # Configure xsessionrc
+    # Used for appending $PATH to use with dmenu (bashrc won't do)
+    ln -f -s ~/config/xsessionrc ~/.xsessionrc
 }
 
 # BankId (Fribid)
