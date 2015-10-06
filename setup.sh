@@ -654,6 +654,23 @@ function uninstall-dropbox () {
     sudo apt-get remove dropbox*
 }
 
+# Install simple screencast tool
+function install-screencast () {
+    cd $INSTALLDIR
+    git clone --recursive https://github.com/lolilolicon/FFcast.git
+    cd FFcast
+    ./bootstrap
+    ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
+    make
+    sudo make install
+    cd ..
+    rm -rf FFcast
+
+    # Since ubuntu uses avconv
+    sudo ln -s /usr/bin/avconv /usr/bin/ffmpeg
+}
+
+
 # Experimental Pulseaudio with Airplay support
 function install-raop2 () {
     sudo apt-get install build-essential paprefs git pulseaudio-module-raop intltool libjack0
@@ -705,20 +722,6 @@ function fix-steam-ubuntu1504 () {
         cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
     fi
     mv libstdc++.so.6 libstdc++.so.6.bak
-}
-
-# Install simple screencast tool
-# NOTE: Untested
-function install-screencast () {
-    git clone --recursive https://github.com/lolilolicon/FFcast.git
-    cd FFcast
-    ./bootstrap
-    ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
-    make
-    sudo make install
-    
-    # Since ubuntu uses avconv
-    sudo ln -s /usr/bin/avconv /usr/bin/ffmpeg
 }
 
 # Pair Apple bluetooth keyboard
@@ -774,6 +777,7 @@ $0 [option]
     --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl            | --uninstall-youtube-dl
     --install-dropbox               | --uninstall-dropbox
+    --install-screencast            | --uninstall-screencast
     --install-raop2                 | --uninstall-raop2
     --enable-raop2
     --disable-raop2
@@ -894,6 +898,12 @@ for cmd in "$1"; do
       ;;
     --uninstall-dropbox)
       uninstall-dropbox
+      ;;
+    --install-screencast)
+      install-screencast
+      ;;
+    --uninstall-screencast)
+      uninstall-screencast
       ;;
     --install-raop2)
       install-raop2
