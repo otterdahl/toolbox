@@ -18,7 +18,7 @@ function install-essential () {
     # Email
     sudo apt-get install mutt procmail
 
-    # Ubuntu 15.04+
+    # Ubuntu 15.04+ adds svtplay-dl
     UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
     if [ "$UBUNTU_VER" -ge 15 ]; then
         sudo apt-get -y install svtplay-dl
@@ -124,6 +124,10 @@ END
     # Configure xsessionrc
     # Used for appending $PATH to use with dmenu (bashrc won't do)
     ln -f -s ~/config/xsessionrc ~/.xsessionrc
+
+    # Add group wheel (wpa_supplicant) and add current user to it
+    sudo groupadd wheel
+    sudo usermod -a -G  wheel $USER
 }
 
 # BankId (Fribid)
