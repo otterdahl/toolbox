@@ -104,15 +104,15 @@ END
     fi
 
     # Configure git
-    echo "Configuring git"
-    echo -n "Enter full name: "
-    read FULLNAME
-    echo -n "Enter e-mail address: "
-    read EMAIL
-    git config --global --replace-all user.name "$FULLNAME"
-    git config --global user.email $EMAIL
-    git config --global core.editor vi
-    git config --global push.default simple
+    if [ ! -n $(git config user.email) ]; then
+        echo "Configuring git"
+        echo -n "Enter full name: "; read FULLNAME
+        echo -n "Enter e-mail address: "; read EMAIL
+        git config --global --replace-all user.name "$FULLNAME"
+        git config --global user.email $EMAIL
+        git config --global core.editor vi
+        git config --global push.default simple
+    fi
 
     # Configure taskwarrior
     ln -f -s ~/config/taskrc ~/.taskrc
@@ -126,8 +126,10 @@ END
     ln -f -s ~/config/xsessionrc ~/.xsessionrc
 
     # Add group wheel (wpa_supplicant) and add current user to it
-    sudo groupadd wheel
-    sudo usermod -a -G  wheel $USER
+    if [ ! -n "$(grep wheel /etc/group)" ]; then 
+        sudo groupadd wheel
+        sudo usermod -a -G  wheel $USER
+    fi
 }
 
 # BankId (Fribid)
