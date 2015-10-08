@@ -9,7 +9,7 @@ set -e
 function install-essential () {
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
          wvdial bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
-         curl opus-tools
+         curl opus-tools irssi bitlbee-libpurple
     
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
@@ -128,6 +128,9 @@ END
     # Configure Xresources
     # Used for adding colors to urxvt (in i3)
     ln -f -s ~/config/Xresources ~/.Xresources
+
+    # Set irssi config
+    ln -f -s ~/config/irssi ~/.irssi
 
     # Add group wheel (wpa_supplicant) and add current user to it
     if [ ! -n "$(grep wheel /etc/group)" ]; then 
@@ -350,7 +353,7 @@ function install-citrix12 () {
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
         sudo dpkg --add-architecture i386 # only needed once
         sudo apt-get update
-        sudo apt-get install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
+        sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
 
         # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
         wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
