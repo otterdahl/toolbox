@@ -13,7 +13,7 @@ function install-essential () {
     
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
-        gnome-icon-theme-full scrot xscreensaver
+        gnome-icon-theme-full scrot xscreensaver autocutsel xrvt-unicode-256color
 
     # Email
     sudo apt-get install mutt procmail
@@ -124,6 +124,10 @@ END
     # Configure xsessionrc
     # Used for appending $PATH to use with dmenu (bashrc won't do)
     ln -f -s ~/config/xsessionrc ~/.xsessionrc
+
+    # Configure Xresources
+    # Used for adding colors to urxvt (in i3)
+    ln -f -s ~/config/Xresources ~/.Xresources
 
     # Add group wheel (wpa_supplicant) and add current user to it
     if [ ! -n "$(grep wheel /etc/group)" ]; then 
