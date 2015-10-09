@@ -683,10 +683,21 @@ function install-screencast () {
     cd ..
     rm -rf FFcast
 
-    # Since ubuntu uses avconv
-    sudo ln -s /usr/bin/avconv /usr/bin/ffmpeg
+    # Patch FFcast subcommands
+    # 1, Use avconv (ubuntu) instead of ffmpeg
+    # 2, Adds support for screencast with sound (no aac)
+    sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
 }
 
+# Uninstall simple screencast tool
+function install-screencast () {
+    cd $INSTALLDIR
+    git clone --recursive https://github.com/lolilolicon/FFcast.git
+    cd FFcast
+    sudo make uninstall
+    cd ..
+    rm -rf FFcast
+}
 
 # Experimental Pulseaudio with Airplay support
 function install-raop2 () {
