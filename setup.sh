@@ -129,6 +129,9 @@ END
     # Used for adding colors to urxvt (in i3)
     ln -f -s ~/config/Xresources ~/.Xresources
 
+    # Configure offlineimap
+    ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
+
     # Set irssi config
     ln -f -s ~/config/irssi ~/.irssi
 
@@ -687,16 +690,6 @@ function install-screencast () {
     # 1, Use avconv (ubuntu) instead of ffmpeg
     # 2, Adds support for screencast with sound (no aac)
     sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
-}
-
-# Uninstall simple screencast tool
-function install-screencast () {
-    cd $INSTALLDIR
-    git clone --recursive https://github.com/lolilolicon/FFcast.git
-    cd FFcast
-    sudo make uninstall
-    cd ..
-    rm -rf FFcast
 }
 
 # Experimental Pulseaudio with Airplay support
