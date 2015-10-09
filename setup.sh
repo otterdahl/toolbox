@@ -16,7 +16,7 @@ function install-essential () {
         gnome-icon-theme-full scrot xscreensaver autocutsel xrvt-unicode-256color
 
     # Email
-    sudo apt-get install mutt procmail
+    sudo apt-get install mutt procmail offlineimap msmtp
 
     # Ubuntu 15.04+ adds svtplay-dl
     UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
