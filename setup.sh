@@ -121,6 +121,10 @@ END
     mkdir -p ~/.i3/
     ln -f -s ~/config/i3config ~/.i3/config
 
+    # Configure i3status
+    # Used for custom i3 status with my_i3status.pl
+    ln -f -s ~/config/i3status.conf ~/.i3status.conf
+
     # Configure xsessionrc
     # Used for appending $PATH to use with dmenu (bashrc won't do)
     ln -f -s ~/config/xsessionrc ~/.xsessionrc
