@@ -348,6 +348,14 @@ function install-citrix () {
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
 
+    # Workaround for wrong keyboard mapping. Need Swedish mapping
+    # NOTE: Untested
+    if [ -d $HOME/.ICAClient ]; then
+        sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
+    else
+        sudo sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" /opt/Citrix/ICAClient/config/wfclient.ini
+    fi
+
     echo "In Firefox, go to Tools -> Add-ons -> Plugins, and make sure the 'Citrix Receiver for Linux' plugin is set to 'Always Activate'. "
 }
 
@@ -402,6 +410,7 @@ function uninstall-citrix () {
     sudo rm -rf /opt/Citrix/ICAClient/keystore/cacerts
     sudo apt-get -y remove --purge icaclient || echo "icaclient already removed"
     sudo apt-get -y autoremove
+    sudo rm -rf $HOME/.ICAClient
 }
 
 function install-pidgin-sipe () {
