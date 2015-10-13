@@ -5,6 +5,7 @@
 # F=0 disabled
 # F=1 enabled
 # F=2 enabled, running
+# TODO: Use preconnect ssh when blocked by firewall
 F=~/config/email_sync_enabled
 if [ `cat $F` -eq "0" ]; then
     exit 1;

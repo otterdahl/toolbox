@@ -7,6 +7,7 @@
 # - Merging to existing pdf
 # Tested with Canon imageFORMULA P-150
 # Requires SANE, imagemagick, pdftk
+# TODO: Sorts pages incorrectly when scanning more than 9 pages
 
 set -e
 AUTOCROP=0
