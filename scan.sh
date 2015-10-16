@@ -7,7 +7,6 @@
 # - Merging to existing pdf
 # Tested with Canon imageFORMULA P-150
 # Requires SANE, imagemagick, pdftk
-# TODO: Incorrect order of pages if scanning more than 9 pages
 
 set -e
 AUTOCROP=0
@@ -63,7 +62,7 @@ if [ -a "$FILENAME" ] && [ -z $APPEND ]; then
 fi
 
 # Scan
-scanimage $PAPER_SIZE $DUPLEX $RESOLUTION $MODE --format=tiff --batch="out%d.tiff" || echo "Scan complete"
+scanimage $PAPER_SIZE $DUPLEX $RESOLUTION $MODE --format=tiff --batch="out%04d.tiff" || echo "Scan complete"
 
 # Autocrop
 if [ $AUTOCROP -eq 1 ]; then
