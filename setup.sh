@@ -140,6 +140,9 @@ END
     # Set irssi config
     ln -f -s ~/config/irssi ~/.irssi
 
+    # Configure crontab
+    crontab ~/config/crontab
+
     # Add group wheel (wpa_supplicant) and add current user to it
     if [ ! -n "$(grep wheel /etc/group)" ]; then 
         sudo groupadd wheel
