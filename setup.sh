@@ -416,44 +416,31 @@ function uninstall-citrix () {
     sudo rm -rf $HOME/.ICAClient
 }
 
-function install-pidgin-sipe () {
-    cd $INSTALLDIR
+# Pidgin 3.0-devel + latest SIPE
+function install-pidgin-latest () {
+    # TODO: Might have support for conference calls + desktop sharing
+    # Precompiled: https://launchpad.net/~sipe-collab/+archive/ubuntu/ppa
 
-    # Uninstall any pidgin-sipe from repository
-    sudo apt-get remove pidgin-sipe
-
-    # Install latest pidgin-sipe from source
-    sudo apt-get install autotools-dev pkg-config libglib2.0-dev \
-        libgtk2.0-dev libpurple-dev libtool intltool comerr-dev \
-        libnss3-dev libxml2-dev pidgin
-
-    if [ ! -d siplcs ]; then
-        git clone -n git+ssh://mob@repo.or.cz/srv/git/siplcs.git
-        cd siplcs
-        git checkout -b mob --track origin/mob
+    if grep -q ppa.launchpad.net/sipe-collab /etc/apt/sources.list; then
+        :
     else
-        cd siplcs
-        git pull
+        echo deb http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee /etc/apt/sources.list.d/sipe-collab.list
+        echo deb-src http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee -a /etc/apt/sources.list.d/sipe-collab.list
     fi
-    ./git-build.sh --prefix=/usr
-    sudo make install
-    cd ..
-    echo "NOTE: Leaving $INSTALLDIR/siplcs. It is needed for uninstallation"
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F93FF666
+    sudo apt-get update
+    sudo apt-get install pidgin-sipe
     echo "NOTE: Setup for Office 365:"
     echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
     echo "  Authentication: TLS-DSK"
     echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
 }
 
-function uninstall-pidgin-sipe () {
-    cd $INSTALLDIR
-    cd siplcs
-    sudo make uninstall
-    cd ..
-    rm -rf siplcs
-
-    # Uninstall any pidgin-sipe from repository
-    sudo apt-get remove pidgin-sipe
+function uninstall-pidgin-latest () {
+    sudo apt-get -y remove pidgin-sipe
+    sudo apt-get -y autoremove
+    sudo rm /etc/apt/sources.list.d/sipe-collab.list
+    sudo apt-get update
 }
 
 function install-spotify () {
@@ -488,7 +475,7 @@ function install-spotify () {
 
 function uninstall-spotify () {
     sudo apt-get remove spotify-client
-    sudo sed -i '/deb http:\/\/repository.spotify.com stable non-free//'
+    sudo rm /etc/apt/sources.list.d/spotify.list
     sudo apt-get update
 }
 
@@ -805,7 +792,7 @@ $0 [option]
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
     --install-citrix12              | --uninstall-citrix12
-    --install-pidgin-sipe           | --uninstall-pidgin-sipe
+    --install-pidgin-latest         | --uninstall-pidgin-latest
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
     --install-skype                 | --uninstall-skype
@@ -877,11 +864,11 @@ for cmd in "$1"; do
     --uninstall-citrix12)
       uninstall-citrix
       ;;
-    --install-pidgin-sipe)
-      install-pidgin-sipe
+    --install-pidgin-latest)
+      install-pidgin-latest
       ;;
-    --uninstall-pidgin-sipe)
-      uninstall-pidgin-sipe
+    --uninstall-pidgin-latest)
+      uninstall-pidgin-latest
       ;;
     --install-spotify)
       install-spotify
