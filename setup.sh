@@ -257,7 +257,8 @@ function install-canon-p150 () {
         cd sane-backends-1.0.19
         ./configure
         make
-        cd ../cndrvsane-p150-1.00-0.2 fakeroot make -f debian/rules binary
+        cd ../cndrvsane-p150-1.00-0.2
+        fakeroot make -f debian/rules binary
         cd ..
         sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
         sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
