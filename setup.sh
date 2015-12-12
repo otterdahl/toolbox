@@ -1,18 +1,25 @@
-
 #!/bin/bash
 # setup.sh: Install essential apps and config files
+# Targets support for: Ubuntu 14.04, 15.04 and Raspbian
 
 set -e
 # TODO: tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
-    sudo apt-get install task vim lynx procmail mutt virt-manager \
-         feh rdesktop cifs-utils git mplayer2 mpv screen catdoc powertop \
-         wvdial bridge-utils pdftk dvb-apps w-scan vlc \
-         libav-tools at imagemagick curl lynx opus-tools
+    sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
+         wvdial bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
+         curl opus-tools irssi bitlbee-libpurple
+    
+    # Desktop
+    sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
+        gnome-icon-theme-full scrot xscreensaver autocutsel rxvt-unicode-256color \
+        libjson-perl
 
-    # Ubuntu 15.04+
+    # Email
+    sudo apt-get install mutt procmail offlineimap msmtp
+
+    # Ubuntu 15.04+ adds svtplay-dl
     UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
     if [ "$UBUNTU_VER" -ge 15 ]; then
         sudo apt-get -y install svtplay-dl
@@ -88,7 +95,7 @@ function install-private-conf () {
     gpg --import ~/config/secret.key || echo "Key already added"
     mkdir -p ~/.vim/plugin
     ln -f -s ~/config/gnupg.vim ~/.vim/plugin/gnupg.vim
-    if grep -q GPG_TTY .bashrc; then
+    if grep -q GPG_TTY ~/.bashrc; then
         :
     else
         cat >>~/.bashrc<<END
@@ -98,15 +105,49 @@ END
     fi
 
     # Configure git
-    echo "Configuring git"
-    echo -n "Enter full name: "
-    read FULLNAME
-    echo -n "Enter e-mail address: "
-    read EMAIL
-    git config --global --replace-all user.name "$FULLNAME"
-    git config --global user.email $EMAIL
-    git config --global core.editor vi
-    git config --global push.default simple
+    if [ ! -n $(git config user.email) ]; then
+        echo "Configuring git"
+        echo -n "Enter full name: "; read FULLNAME
+        echo -n "Enter e-mail address: "; read EMAIL
+        git config --global --replace-all user.name "$FULLNAME"
+        git config --global user.email $EMAIL
+        git config --global core.editor vi
+        git config --global push.default simple
+    fi
+
+    # Configure taskwarrior
+    ln -f -s ~/config/taskrc ~/.taskrc
+
+    # Configure i3-wm
+    mkdir -p ~/.i3/
+    ln -f -s ~/config/i3config ~/.i3/config
+
+    # Configure i3status
+    # Used for custom i3 status with my_i3status.pl
+    ln -f -s ~/config/i3status.conf ~/.i3status.conf
+
+    # Configure xsessionrc
+    # Used for appending $PATH to use with dmenu (bashrc won't do)
+    ln -f -s ~/config/xsessionrc ~/.xsessionrc
+
+    # Configure Xresources
+    # Used for adding colors to urxvt (in i3)
+    ln -f -s ~/config/Xresources ~/.Xresources
+
+    # Configure offlineimap
+    ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
+
+    # Set irssi config
+    ln -f -s ~/config/irssi ~/.irssi
+
+    # Configure crontab
+    crontab ~/config/crontab
+
+    # Add group wheel (wpa_supplicant) and add current user to it
+    if [ ! -n "$(grep wheel /etc/group)" ]; then 
+        sudo groupadd wheel
+        sudo usermod -a -G  wheel $USER
+    fi
 }
 
 # BankId (Fribid)
@@ -193,7 +234,15 @@ function install-canon-p150 () {
     # Download driver
     mkdir -p canon
     cd canon
-    wget http://downloads.canon.com/cpr/software/scanners/150_LINUX_V10.zip
+    wget -q http://downloads.canon.com/cpr/software/scanners/150_LINUX_V10.zip
+    SHA1=`sha1sum 150_LINUX_V10.zip | awk '{print $1}'`
+    if [ ! "$SHA1" == "8adac963b318ce28d536c8681aed0e5da70a6d41" ]; then
+        echo "Checksum missmatch"
+        cd $INSTALLDIR
+        rm -rf $INSTALLDIR/canon
+        exit 1;
+    fi
+
     unzip -q 150_LINUX_V10.zip
     rm 150_LINUX_V10.zip
 
@@ -203,13 +252,12 @@ function install-canon-p150 () {
         # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
         sudo apt-get install libusb-dev
         tar xfz cndrvsane-p150-1.00-0.2.tar.gz
-        wget https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
+        wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
         tar xfz sane-backends-1.0.19.tar.gz
         cd sane-backends-1.0.19
         ./configure
         make
-        cd ../cndrvsane-p150-1.00-0.2
-        fakeroot make -f debian/rules binary
+        cd ../cndrvsane-p150-1.00-0.2 fakeroot make -f debian/rules binary
         cd ..
         sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
         sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
@@ -303,6 +351,14 @@ function install-citrix () {
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
 
+    # Workaround for wrong keyboard mapping. Need Swedish mapping
+    # NOTE: Untested
+    if [ -d $HOME/.ICAClient ]; then
+        sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
+    else
+        sudo sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" /opt/Citrix/ICAClient/config/wfclient.ini
+    fi
+
     echo "In Firefox, go to Tools -> Add-ons -> Plugins, and make sure the 'Citrix Receiver for Linux' plugin is set to 'Always Activate'. "
 }
 
@@ -316,7 +372,7 @@ function install-citrix12 () {
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
         sudo dpkg --add-architecture i386 # only needed once
         sudo apt-get update
-        sudo apt-get install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
+        sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
 
         # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
         wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
@@ -357,46 +413,34 @@ function uninstall-citrix () {
     sudo rm -rf /opt/Citrix/ICAClient/keystore/cacerts
     sudo apt-get -y remove --purge icaclient || echo "icaclient already removed"
     sudo apt-get -y autoremove
+    sudo rm -rf $HOME/.ICAClient
 }
 
-function install-pidgin-sipe () {
-    cd $INSTALLDIR
+# Pidgin 3.0-devel + latest SIPE
+function install-pidgin-latest () {
+    # TODO: Might have support for conference calls + desktop sharing
+    # Precompiled: https://launchpad.net/~sipe-collab/+archive/ubuntu/ppa
 
-    # Uninstall any pidgin-sipe from repository
-    sudo apt-get remove pidgin-sipe
-
-    # Install latest pidgin-sipe from source
-    sudo apt-get install autotools-dev pkg-config libglib2.0-dev \
-        libgtk2.0-dev libpurple-dev libtool intltool comerr-dev \
-        libnss3-dev libxml2-dev pidgin
-
-    if [ ! -d siplcs ]; then
-        git clone -n git+ssh://mob@repo.or.cz/srv/git/siplcs.git
-        cd siplcs
-        git checkout -b mob --track origin/mob
+    if grep -q ppa.launchpad.net/sipe-collab /etc/apt/sources.list; then
+        :
     else
-        cd siplcs
-        git pull
+        echo deb http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee /etc/apt/sources.list.d/sipe-collab.list
+        echo deb-src http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee -a /etc/apt/sources.list.d/sipe-collab.list
     fi
-    ./git-build.sh --prefix=/usr
-    sudo make install
-    cd ..
-    echo "NOTE: Leaving $INSTALLDIR/siplcs. It is needed for uninstallation"
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F93FF666
+    sudo apt-get update
+    sudo apt-get install pidgin-sipe
     echo "NOTE: Setup for Office 365:"
     echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
     echo "  Authentication: TLS-DSK"
     echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
 }
 
-function uninstall-pidgin-sipe () {
-    cd $INSTALLDIR
-    cd siplcs
-    sudo make uninstall
-    cd ..
-    rm -rf siplcs
-
-    # Uninstall any pidgin-sipe from repository
-    sudo apt-get remove pidgin-sipe
+function uninstall-pidgin-latest () {
+    sudo apt-get -y remove pidgin-sipe
+    sudo apt-get -y autoremove
+    sudo rm /etc/apt/sources.list.d/sipe-collab.list
+    sudo apt-get update
 }
 
 function install-spotify () {
@@ -422,11 +466,16 @@ function install-spotify () {
         sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
         rm libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
     fi
+
+    # Fix double icons in unity launcher
+    # NOTE: Untested
+    sudo sed -i "s/Exec=spotify/Exec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
+    sudo sed -i "s/TryExec=spotify/TryExec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
 }
 
 function uninstall-spotify () {
     sudo apt-get remove spotify-client
-    sudo sed -i '/deb http:\/\/repository.spotify.com stable non-free//'
+    sudo rm /etc/apt/sources.list.d/spotify.list
     sudo apt-get update
 }
 
@@ -479,15 +528,16 @@ function install-mpd () {
     # -  Changing configuration files doesn't require root
     # -  Multiple audio sources causes conflicts when running
     #          several pulse audio daemons
+    sudo service mpd stop
 
-    # systemd-style (TODO: check first)
-    #sudo update-rc.d mpd disable
-    # Hmm. let's try this instead
+    # systemd-style
     sudo systemctl stop mpd.service
     sudo systemctl disable mpd.service
+    sudo systemctl stop mpd.socket
+    sudo systemctl disable mpd.socket
     
     # old style
-    sudo service mpd stop
+    sudo update-rc.d -f mpd remove
     if ! grep -q START_MPD /etc/default/mpd; then
         echo START_MPD=false | sudo tee -a /etc/default/mpd
     fi
@@ -629,6 +679,24 @@ function uninstall-dropbox () {
     sudo apt-get remove dropbox*
 }
 
+# Install simple screencast tool
+function install-screencast () {
+    cd $INSTALLDIR
+    git clone --recursive https://github.com/lolilolicon/FFcast.git
+    cd FFcast
+    ./bootstrap
+    ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
+    make
+    sudo make install
+    cd ..
+    rm -rf FFcast
+
+    # Patch FFcast subcommands
+    # 1, Use avconv (ubuntu) instead of ffmpeg
+    # 2, Adds support for screencast with sound (no aac)
+    sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
+}
+
 # Experimental Pulseaudio with Airplay support
 function install-raop2 () {
     sudo apt-get install build-essential paprefs git pulseaudio-module-raop intltool libjack0
@@ -682,6 +750,25 @@ function fix-steam-ubuntu1504 () {
     mv libstdc++.so.6 libstdc++.so.6.bak
 }
 
+# Pair Apple bluetooth keyboard
+# NOTE: Untested
+function pair-apple-bluetooth-keyboard () {
+    # Put the keyboard in pair-mode
+    hcitool scan
+    #Scanning ...
+    #    60:C5:47:19:5F:55   Apple Wireless Keyboard
+
+    # bluez-simple-agent hci0 60:C5:47:19:5F:55
+    # Enter PIN Code: 0000
+    # -> Enter Pin code at keyboard and press enter
+    # bluez-test-device trusted 60:C5:47:19:5F:55 yes
+    # bluez-test-input connect 60:C5:47:19:5F:55
+
+    # NOTE: Numlock: fn+F6
+    # NOTE: Bluetooth pairing problems:
+    # https://wiki.archlinux.org/index.php/MacBook_Pro_8,1_/_8,2_/_8,3_%282011%29#Bluetooth
+}
+
 # Find suitable installation dir
 function setdir () {
     if [ -d "$HOME/Hämtningar" ]; then
@@ -706,7 +793,7 @@ $0 [option]
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
     --install-citrix12              | --uninstall-citrix12
-    --install-pidgin-sipe           | --uninstall-pidgin-sipe
+    --install-pidgin-latest         | --uninstall-pidgin-latest
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
     --install-skype                 | --uninstall-skype
@@ -716,10 +803,12 @@ $0 [option]
     --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl            | --uninstall-youtube-dl
     --install-dropbox               | --uninstall-dropbox
+    --install-screencast            | --uninstall-screencast
     --install-raop2                 | --uninstall-raop2
     --enable-raop2
     --disable-raop2
     --fix-steam-ubuntu1504
+    --pair-apple-bluetooth-keyboard 
 END
 }
 
@@ -776,11 +865,11 @@ for cmd in "$1"; do
     --uninstall-citrix12)
       uninstall-citrix
       ;;
-    --install-pidgin-sipe)
-      install-pidgin-sipe
+    --install-pidgin-latest)
+      install-pidgin-latest
       ;;
-    --uninstall-pidgin-sipe)
-      uninstall-pidgin-sipe
+    --uninstall-pidgin-latest)
+      uninstall-pidgin-latest
       ;;
     --install-spotify)
       install-spotify
@@ -836,6 +925,12 @@ for cmd in "$1"; do
     --uninstall-dropbox)
       uninstall-dropbox
       ;;
+    --install-screencast)
+      install-screencast
+      ;;
+    --uninstall-screencast)
+      uninstall-screencast
+      ;;
     --install-raop2)
       install-raop2
       ;;
@@ -850,6 +945,9 @@ for cmd in "$1"; do
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
+      ;;
+    --pair-apple-bluetooth-keyboard)
+      pair-apple-bluetooth-keyboard 
       ;;
     *)
       usage
