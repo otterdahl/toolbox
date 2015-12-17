@@ -438,9 +438,9 @@ function install-sipe-experimental () {
 }
 
 function uninstall-sipe-experimental () {
-    sudo apt-get -y remove pidgin-sipe
+    sudo apt-get -y remove pidgin-sipe pidgin pidgin-data
     sudo apt-get -y autoremove
-    sudo rm /etc/apt/sources.list.d/sipe-collab.list
+    sudo rm -f /etc/apt/sources.list.d/sipe-collab.list
     sudo apt-get update
 }
 
