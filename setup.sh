@@ -357,15 +357,20 @@ function install-citrix () {
 
 # Citrix Receiver 12.1
 # NOTE: Citrix Receiver 13.2 has sometimes problems with tearing graphics.
-#       The problem still exist on Ubuntu 15.04 but is only visible with
+#       The problem still exist on Ubuntu 15.10 but is only visible with
 #       certain apps
 function install-citrix12 () {
     cd $INSTALLDIR
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
         sudo dpkg --add-architecture i386 # only needed once
+
+        # As of Ubuntu 15.10, the libxp6:i386 package needs to be installed separately
+        wget -q http://se.archive.ubuntu.com/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_i386.deb
+        sudo dpkg -i libxp6_1.0.2-1ubuntu1_i386.deb
+
         sudo apt-get update
-        sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxp6:i386 libxpm4:i386 libasound2:i386
+        sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxpm4:i386 libasound2:i386
 
         # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
         wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
