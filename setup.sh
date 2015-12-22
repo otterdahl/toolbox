@@ -337,6 +337,9 @@ function install-citrix () {
         rm icaclient_13.3.0_i386.deb
     fi
 
+    # NOTE: Citrix Receiver 13.3.0 might fail to launch due to missing EULA file
+    echo missing eula | sudo tee /opt/Citrix/ICAClient//nls/en/eula.txt
+
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
