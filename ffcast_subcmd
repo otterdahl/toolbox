@@ -110,7 +110,7 @@ subcmd_png() {
         "$rect_w" "$rect_h")"}
     msg 'saving to file: %s' "${__args[-1]}"  # unreliable
     verbose_run command -- \
-        avconv -loglevel error -f x11grab -draw_mouse 0 -show_region 1 \
+        ffmpeg -loglevel error -f x11grab -draw_mouse 0 -show_region 1 \
         -video_size "${rect_w}x$rect_h" -i "$DISPLAY+$rect_x,$rect_y" \
         -f image2 -codec:v png -frames:v 1 "${__args[@]}"
 }
@@ -120,7 +120,7 @@ sub_cmdfuncs['rec']=subcmd_rec
 subcmd_rec() {
     : 'usage: rec [-m <n>] [-r <fps>] [filename.ext]'
     local -a __args
-    local -a v=(fatal error info verbose debug)  # avconv loglevels
+    local -a v=(fatal error info verbose debug)  # ffmpeg loglevels
     local m=1 r=25 opt
     OPTIND=1
     while getopts ':m:r:' opt; do
@@ -134,7 +134,7 @@ subcmd_rec() {
     : ${__args[0]="$(printf '%s-%(%s)T.mkv' screencast -1)"}
     msg 'saving to file: %s' "${__args[-1]}"  # unreliable
     verbose_run command -- \
-        avconv -loglevel "${v[verbosity]}" \
+        ffmpeg -loglevel "${v[verbosity]}" \
         -f x11grab -show_region 1 -framerate "$r" \
         -video_size "${rect_w}x$rect_h" -i "$DISPLAY+$rect_x,$rect_y" \
         -filter:v crop="iw-mod(iw\\,$m):ih-mod(ih\\,$m)" "${__args[@]}"
@@ -145,7 +145,7 @@ sub_cmdfuncs['reca']=subcmd_reca
 subcmd_reca() {
     : 'usage: reca [-m <n>] [-r <fps>] [filename.ext]'
     local -a __args
-    local -a v=(fatal error info verbose debug)  # avconv loglevels
+    local -a v=(fatal error info verbose debug)  # ffmpeg loglevels
     local m=1 r=25 opt
     OPTIND=1
     while getopts ':m:r:' opt; do
@@ -159,7 +159,7 @@ subcmd_reca() {
     : ${__args[0]="$(printf '%s-%(%s)T.mkv' screencast -1)"}
     msg 'saving to file: %s' "${__args[-1]}"  # unreliable
     verbose_run command -- \
-        avconv -loglevel "${v[verbosity]}" \
+        ffmpeg -loglevel "${v[verbosity]}" \
         -f pulse -i default \
         -f x11grab -show_region 1 -framerate "$r" \
         -video_size "${rect_w}x$rect_h" -i "$DISPLAY+$rect_x,$rect_y" \

@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 14.04, 15.04 and Raspbian
+# Targets support for: Ubuntu 14.04, 15.10 and Raspbian
 
 set -e
 # TODO: tellstick, PCTV nanoStick T2 290e
@@ -257,7 +257,8 @@ function install-canon-p150 () {
         cd sane-backends-1.0.19
         ./configure
         make
-        cd ../cndrvsane-p150-1.00-0.2 fakeroot make -f debian/rules binary
+        cd ../cndrvsane-p150-1.00-0.2
+        fakeroot make -f debian/rules binary
         cd ..
         sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
         sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
@@ -417,7 +418,7 @@ function uninstall-citrix () {
 }
 
 # Pidgin 3.0-devel + latest SIPE
-function install-pidgin-latest () {
+function install-sipe-experimental () {
     # TODO: Might have support for conference calls + desktop sharing
     # Precompiled: https://launchpad.net/~sipe-collab/+archive/ubuntu/ppa
 
@@ -436,11 +437,51 @@ function install-pidgin-latest () {
     echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
 }
 
-function uninstall-pidgin-latest () {
-    sudo apt-get -y remove pidgin-sipe
+function uninstall-sipe-experimental () {
+    sudo apt-get -y remove pidgin-sipe pidgin pidgin-data
     sudo apt-get -y autoremove
-    sudo rm /etc/apt/sources.list.d/sipe-collab.list
+    sudo rm -f /etc/apt/sources.list.d/sipe-collab.list
     sudo apt-get update
+}
+
+function install-sipe-latest () {
+    cd $INSTALLDIR
+
+    # Uninstall any pidgin-sipe from repository
+    sudo apt-get remove pidgin-sipe
+
+    # Install latest pidgin-sipe from source
+    sudo apt-get install autotools-dev pkg-config libglib2.0-dev \
+        libgtk2.0-dev libpurple-dev libtool intltool comerr-dev \
+        libnss3-dev libxml2-dev pidgin
+
+    if [ ! -d siplcs ]; then
+        git clone -n git+ssh://mob@repo.or.cz/srv/git/siplcs.git
+        cd siplcs
+        git checkout -b mob --track origin/mob
+    else
+        cd siplcs
+        git pull
+    fi
+    ./git-build.sh --prefix=/usr
+    sudo make install
+    cd ..
+    echo "NOTE: Leaving $INSTALLDIR/siplcs. It is needed for uninstallation"
+    echo "NOTE: Setup for Office 365:"
+    echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
+    echo "  Authentication: TLS-DSK"
+    echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
+}
+
+function uninstall-sipe-latest () {
+    cd $INSTALLDIR
+    cd siplcs
+    sudo make uninstall
+    cd ..
+    rm -rf siplcs
+
+    # Uninstall any pidgin-sipe from repository
+    sudo apt-get remove pidgin-sipe
 }
 
 function install-spotify () {
@@ -793,7 +834,8 @@ $0 [option]
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
     --install-citrix12              | --uninstall-citrix12
-    --install-pidgin-latest         | --uninstall-pidgin-latest
+    --install-sipe-experimental     | --uninstall-sipe-experimental
+    --install-sipe-latest           | --uninstall-sipe-latest
     --install-spotify               | --uninstall-spotify
     --install-vmware-player         | --uninstall-vmware-player
     --install-skype                 | --uninstall-skype
@@ -865,11 +907,17 @@ for cmd in "$1"; do
     --uninstall-citrix12)
       uninstall-citrix
       ;;
-    --install-pidgin-latest)
-      install-pidgin-latest
+    --install-sipe-experimental)
+      install-sipe-experimental
       ;;
-    --uninstall-pidgin-latest)
-      uninstall-pidgin-latest
+    --uninstall-sipe-experimental)
+      uninstall-sipe-experimental
+      ;;
+    --install-sipe-latest)
+      install-sipe-latest
+      ;;
+    --uninstall-sipe-latest)
+      uninstall-sipe-latest
       ;;
     --install-spotify)
       install-spotify
