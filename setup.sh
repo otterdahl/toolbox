@@ -647,6 +647,7 @@ function install-spotifyripper () {
 
     # Pip has problems with international characters in $PWD
     cd $HOME
+    # cffi > 1.0.0 required. Problem with Rasbian
     sudo pip install -U spotify-ripper
     echo "----------------------------------------------"
     echo "spotify-ripper installed in $HOME/spotifyripper"
