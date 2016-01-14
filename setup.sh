@@ -276,6 +276,8 @@ function uninstall-canon-p150 () {
 }
 
 # Printer driver Canon Pixma iP100
+# NOTE: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
+#       for additional Canon drivers (ppa:michael-gruz/canon)
 function install-canon-pixma-ip100 () {
     cd $INSTALLDIR
 
