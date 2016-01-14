@@ -345,7 +345,6 @@ function install-citrix () {
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
 
     # Workaround for wrong keyboard mapping. Need Swedish mapping
-    # NOTE: Untested
     if [ -d $HOME/.ICAClient ]; then
         sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
     else
@@ -402,6 +401,13 @@ function install-citrix12 () {
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
+
+    # Workaround for wrong keyboard mapping. Need Swedish mapping
+    if [ -d $HOME/.ICAClient ]; then
+        sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
+    else
+        sudo sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" /opt/Citrix/ICAClient/config/wfclient.ini
+    fi
 
     # Fix "Lockdown requirements not satisfied (SETLEDPos)" error message
     sudo sed -i "s/SucConnTimeout=/SucConnTimeout=\nSETLEDPos=*/" /opt/Citrix/ICAClient/config/All_Regions.ini
