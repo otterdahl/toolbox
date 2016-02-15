@@ -19,6 +19,15 @@ function install-essential () {
     # Email
     sudo apt-get install mutt procmail offlineimap msmtp
 
+    # Maildirproc
+    sudo apt-get install python3-3to2
+    git clone http://github.com/jrosdahl/maildirproc.git
+    cd maildirproc
+    make
+    sudo python3 setup.py install
+    cd ..
+    rm -rf maildirproc
+
     # Ubuntu 15.04+ adds svtplay-dl (still not present on raspbian)
     UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
     if [ "$UBUNTU_VER" -ge 15 ]; then
@@ -562,7 +571,7 @@ function install-mpd () {
     mkdir -p ~/.ncmpcpp
     touch ~/.config/mpd/pid
     touch ~/.config/mpd/tag_cache
-    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/keys
+    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/bindings
 
     # On Raspbian. Uses ~/.mpdconf
     # On Ubuntu 14.04. Uses ~/.config/mpd/mpd.conf
