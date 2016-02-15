@@ -19,7 +19,7 @@ function install-essential () {
     # Email
     sudo apt-get install mutt procmail offlineimap msmtp
 
-    # Ubuntu 15.04+ adds svtplay-dl
+    # Ubuntu 15.04+ adds svtplay-dl (still not present on raspbian)
     UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
     if [ "$UBUNTU_VER" -ge 15 ]; then
         sudo apt-get -y install svtplay-dl
@@ -30,8 +30,11 @@ function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
     sudo apt-get install macfanctld
 
-    # For MacbookPro 8,2
+    # GPU Switching for pre-retina MacBook Pro
+    # Tested with MacbookPro 8,2
     # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
+    # Update 2016-02-12: This manual switching will hopefully be unnecessary
+    # with linux 4.6+. See http://www.phoronix.com/scan.php?page=news_item&px=Apple-GMUX-VGA-Switcher-4.6
     MODEL=`sudo dmidecode -s system-product-name`
     if [ $MODEL == 'MacBookPro8,2' ]; then
         # How to boot
