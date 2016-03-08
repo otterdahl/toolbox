@@ -442,8 +442,8 @@ function install-sipe-experimental () {
     if grep -q ppa.launchpad.net/sipe-collab /etc/apt/sources.list; then
         :
     else
-        echo deb http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee /etc/apt/sources.list.d/sipe-collab.list
-        echo deb-src http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee -a /etc/apt/sources.list.d/sipe-collab.list
+        echo deb http://ppa.launchpad.net/sipe-collab/ppa/ubuntu xenial main | sudo tee /etc/apt/sources.list.d/sipe-collab.list
+        echo deb-src http://ppa.launchpad.net/sipe-collab/ppa/ubuntu xenial main | sudo tee -a /etc/apt/sources.list.d/sipe-collab.list
     fi
     sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F93FF666
     sudo apt-get update
