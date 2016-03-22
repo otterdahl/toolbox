@@ -369,9 +369,7 @@ function install-citrix () {
 }
 
 # Citrix Receiver 12.1
-# NOTE: Citrix Receiver 13.2 has sometimes problems with tearing graphics.
-#       The problem still exist on Ubuntu 15.10 but is only visible with
-#       certain apps
+# NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics. The problem is only visible on servers running older Citrix versions
 function install-citrix12 () {
     cd $INSTALLDIR
     MACHINE_TYPE=`uname -m`
