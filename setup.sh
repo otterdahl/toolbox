@@ -146,6 +146,10 @@ END
     # Used for adding colors to urxvt (in i3)
     ln -f -s ~/config/Xresources ~/.Xresources
 
+    # Configure profile
+    # Used for urxvt to read .bashrc which sets colors and bash_aliases
+    ln -f -s ~/config/profile ~/.profile
+
     # Configure offlineimap
     ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
 
