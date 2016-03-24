@@ -14,7 +14,7 @@ function install-essential () {
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
         gnome-icon-theme-full scrot xscreensaver autocutsel rxvt-unicode-256color \
-        libjson-perl
+        libjson-perl pavucontrol
 
     # Email
     sudo apt-get install mutt procmail offlineimap msmtp
