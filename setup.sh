@@ -14,7 +14,7 @@ function install-essential () {
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
         gnome-icon-theme-full scrot xscreensaver autocutsel rxvt-unicode-256color \
-        libjson-perl
+        libjson-perl pavucontrol
 
     # Email
     sudo apt-get install mutt procmail offlineimap msmtp
@@ -145,6 +145,10 @@ END
     # Configure Xresources
     # Used for adding colors to urxvt (in i3)
     ln -f -s ~/config/Xresources ~/.Xresources
+
+    # Configure profile
+    # Used for urxvt to read .bashrc which sets colors and bash_aliases
+    ln -f -s ~/config/profile ~/.profile
 
     # Configure offlineimap
     ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
