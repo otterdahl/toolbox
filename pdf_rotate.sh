@@ -4,7 +4,7 @@
 #        angle, e.g. "-90", "90", "180"
 # Basically a wrapper around pdftk for common rotate operations
 # TODO: doesn't deal with spaces in file names
-# TODO: Check input better. e.g. 1,2 is not supported
+# TODO: Check input better. e.g. 1,2 is not supported, -r is required
 
 set -e
 

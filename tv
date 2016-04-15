@@ -3,6 +3,8 @@
 
 set -e
 
+V_PLAYER="mpv"
+
 function usage () {
     cat >/dev/stdout<<END
 usage: `basename $0` [options]
@@ -38,11 +40,11 @@ case "$1" in
      timeout "$MINUTES"m tzap -S -r "$CHANNEL" &
      echo Recording will begin in 15 seconds...
      # Waiting until hard drive spins up to prevent buffer overflow
-     touch /mnt/sda1/.tmp
+     touch $HOME/.tmp
      sleep 15
-     rm -f /mnt/sda1/.tmp
+     rm -f /HOME/.tmp
      echo Recording...
-     while ! timeout "$MINUTES"m cat /dev/dvb/adapter0/dvr0 > /mnt/sda1/"$CHANNEL"-"$FILE"-`date +'%F_%H:%M'`.ts; do
+     while ! timeout "$MINUTES"m cat /dev/dvb/adapter0/dvr0 > $HOME/"$CHANNEL"-"$FILE"-`date +'%F_%H:%M'`.ts; do
         if ! pidof tzap; then
             echo "Tzap is no longer running (Recording finished or someone is trying to cancel recording)"
             exit 0
@@ -72,7 +74,7 @@ case "$1" in
      killall -q tzap || true
      tzap -S -r $CHANNEL &
      sleep 4
-     omxplayer --live /dev/dvb/adapter0/dvr0
+     $V_PLAYER /dev/dvb/adapter0/dvr0
      kill `pidof tzap` || true
      ;; 
   on)

@@ -14,12 +14,21 @@ function install-essential () {
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
         gnome-icon-theme-full scrot xscreensaver autocutsel rxvt-unicode-256color \
-        libjson-perl
+        libjson-perl pavucontrol
 
     # Email
     sudo apt-get install mutt procmail offlineimap msmtp
 
-    # Ubuntu 15.04+ adds svtplay-dl
+    # Maildirproc
+    sudo apt-get install python3-3to2
+    git clone http://github.com/jrosdahl/maildirproc.git
+    cd maildirproc
+    make
+    sudo python3 setup.py install
+    cd ..
+    rm -rf maildirproc
+
+    # Ubuntu 15.04+ adds svtplay-dl (still not present on raspbian)
     UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
     if [ "$UBUNTU_VER" -ge 15 ]; then
         sudo apt-get -y install svtplay-dl
@@ -30,8 +39,11 @@ function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
     sudo apt-get install macfanctld
 
-    # For MacbookPro 8,2
+    # GPU Switching for pre-retina MacBook Pro
+    # Tested with MacbookPro 8,2
     # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
+    # Update 2016-02-12: This manual switching will hopefully be unnecessary
+    # with linux 4.6+. See http://www.phoronix.com/scan.php?page=news_item&px=Apple-GMUX-VGA-Switcher-4.6
     MODEL=`sudo dmidecode -s system-product-name`
     if [ $MODEL == 'MacBookPro8,2' ]; then
         # How to boot
@@ -133,6 +145,10 @@ END
     # Configure Xresources
     # Used for adding colors to urxvt (in i3)
     ln -f -s ~/config/Xresources ~/.Xresources
+
+    # Configure profile
+    # Used for urxvt to read .bashrc which sets colors and bash_aliases
+    ln -f -s ~/config/profile ~/.profile
 
     # Configure offlineimap
     ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
@@ -357,9 +373,7 @@ function install-citrix () {
 }
 
 # Citrix Receiver 12.1
-# NOTE: Citrix Receiver 13.2 has sometimes problems with tearing graphics.
-#       The problem still exist on Ubuntu 15.10 but is only visible with
-#       certain apps
+# NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics. The problem is only visible on servers running older Citrix versions
 function install-citrix12 () {
     cd $INSTALLDIR
     MACHINE_TYPE=`uname -m`
@@ -430,8 +444,8 @@ function install-sipe-experimental () {
     if grep -q ppa.launchpad.net/sipe-collab /etc/apt/sources.list; then
         :
     else
-        echo deb http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee /etc/apt/sources.list.d/sipe-collab.list
-        echo deb-src http://ppa.launchpad.net/sipe-collab/ppa/ubuntu wily main | sudo tee -a /etc/apt/sources.list.d/sipe-collab.list
+        echo deb http://ppa.launchpad.net/sipe-collab/ppa/ubuntu xenial main | sudo tee /etc/apt/sources.list.d/sipe-collab.list
+        echo deb-src http://ppa.launchpad.net/sipe-collab/ppa/ubuntu xenial main | sudo tee -a /etc/apt/sources.list.d/sipe-collab.list
     fi
     sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F93FF666
     sudo apt-get update
@@ -559,7 +573,7 @@ function install-mpd () {
     mkdir -p ~/.ncmpcpp
     touch ~/.config/mpd/pid
     touch ~/.config/mpd/tag_cache
-    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/keys
+    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/bindings
 
     # On Raspbian. Uses ~/.mpdconf
     # On Ubuntu 14.04. Uses ~/.config/mpd/mpd.conf
