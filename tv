@@ -109,12 +109,12 @@ case "$1" in
   ps4)
      # Switch to 'ps4' (HDMI1)
      PID=`pidof cec-client` || ~/bin/cecserver.sh start
-     echo "tx 4F 82 10 00" > /tmp/cec.fifo
+     echo "tx 4F 82 20 00" > /tmp/cec.fifo
      ;;
   atv)
      # Switch to 'apple tv' (HDMI3)
      PID=`pidof cec-client` || ~/bin/cecserver.sh start
-     echo "tx 4F 82 30 00" > /tmp/cec.fifo
+     echo "tx 4F 82 10 00" > /tmp/cec.fifo
      ;;
   powerstatus)
      # Query power status of tv
