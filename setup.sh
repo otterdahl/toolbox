@@ -166,35 +166,6 @@ END
     fi
 }
 
-# BankId (Fribid)
-function install-fribid () {
-    git clone https://github.com/otterdahl/OpenSC.git $INSTALLDIR/OpenSC
-    cd $INSTALLDIR/OpenSC
-    ./bootstrap
-    ./configure --prefix=/usr --sysconfdir=/etc/opensc --enable-openssl --enable-sm
-    make
-    sudo make install
-    sudo sed -i "s/# lock_login = true/lock_login = true/" /etc/opensc.conf
-    echo opensc hold | sudo dpkg --set-selections
-    git clone https://github.com/samuellb/fribid.git $INSTALLDIR/fribid
-    cd $INSTALLDIR/fribid
-    make
-    sudo make install
-    echo "NOTE: Leaving $INSTALLDIR/fribid and $INSTALLDIR/OpenSC."
-    echo "They are needed for uninstallation"
-}
-
-function uninstall-fribid () {
-    cd $INSTALLDIR/OpenSC
-    sudo make uninstall
-    cd $INSTALLDIR/fribid
-    sudo make uninstall
-    cd ..
-    rm -rf $INSTALLDIR/OpenSC
-    rm -rf $INSTALLDIR/fribid
-    echo opensc install | sudo dpkg --set-selections
-}
-
 # Pipelight. To watch HBO Nordic in firefox
 function install-pipelight () {
     # Pipelight installation
@@ -847,7 +818,6 @@ $0 [option]
     --install-macbook
     --install-private-conf
     --install-pipelight             | --uninstall-pipelight
-    --install-fribid                | --uninstall-fribid
     --install-edimax                | --uninstall-edimax
     --install-canon-p150            | --uninstall-canon-p150
     --install-canon-pixma-ip100
@@ -892,12 +862,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-pipelight)
       uninstall-pipelight
-      ;;
-    --install-fribid)
-      install-fribid  
-      ;;
-    --uninstall-fribid)
-      uninstall-fribid  
       ;;
     --install-edimax)
       install-edimax
