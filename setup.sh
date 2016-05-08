@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 14.04, 15.10 and Raspbian
+# Targets support for: Ubuntu 16.04, Arch Linux and Raspbian
 
 set -e
 # TODO: tellstick, PCTV nanoStick T2 290e
