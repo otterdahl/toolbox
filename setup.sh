@@ -117,7 +117,7 @@ END
     fi
 
     # Configure git
-    if [ ! -n $(git config user.email) ]; then
+    if [ -z $(git config user.email) ]; then
         echo "Configuring git"
         echo -n "Enter full name: "; read FULLNAME
         echo -n "Enter e-mail address: "; read EMAIL
