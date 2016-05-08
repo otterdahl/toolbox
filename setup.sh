@@ -233,26 +233,19 @@ function install-canon-p150 () {
     unzip -q 150_LINUX_V10.zip
     rm 150_LINUX_V10.zip
 
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        # x64 installation
-        # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
-        sudo apt-get install libusb-dev
-        tar xfz cndrvsane-p150-1.00-0.2.tar.gz
-        wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
-        tar xfz sane-backends-1.0.19.tar.gz
-        cd sane-backends-1.0.19
-        ./configure
-        make
-        cd ../cndrvsane-p150-1.00-0.2
-        fakeroot make -f debian/rules binary
-        cd ..
-        sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
-        sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
-    else
-        # x86-bit installation
-        sudo dpkg -i cndrvsane-p150_1.00-0.2_i386.deb
-    fi
+    # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
+    sudo apt-get install libusb-dev
+    tar xfz cndrvsane-p150-1.00-0.2.tar.gz
+    wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
+    tar xfz sane-backends-1.0.19.tar.gz
+    cd sane-backends-1.0.19
+    ./configure
+    make
+    cd ../cndrvsane-p150-1.00-0.2
+    fakeroot make -f debian/rules binary
+    cd ..
+    sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
+    sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
     cd ..
     rm -rf $INSTALLDIR/canon
 }
@@ -269,16 +262,9 @@ function install-canon-pixma-ip100 () {
     cd $INSTALLDIR
 
     # For Ubuntu 14.04: Driver depends on libtiff4, but it is needs manual installation
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
-        sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
-        rm libtiff4_3.9.7-2ubuntu1_amd64.deb
-    else
-        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_i386.deb
-        sudo dpkg -i libtiff4_3.9.7-2ubuntu1_i386.deb
-        rm libtiff4_3.9.7-2ubuntu1_i386.deb
-    fi
+    wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
+    sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
+    rm libtiff4_3.9.7-2ubuntu1_amd64.deb
 
     # Taken from
     # http://www.canon-europe.com/Support/Consumer_Products/products/printers/InkJet/PIXMA_iP_series/iP100.aspx?type=download&language=&os=Linux
@@ -301,30 +287,17 @@ END
 # Citrix Receiver 13.3.0
 function install-citrix () {
     cd $INSTALLDIR
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        sudo dpkg --add-architecture i386 # only needed once
-        sudo apt-get update
+    sudo dpkg --add-architecture i386 # only needed once
+    sudo apt-get update
 
-        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html |
-        grep "icaclient_13.3.0.344519_amd64.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.3.0_amd64.deb
+    # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
+    wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html |
+    grep "icaclient_13.3.0.344519_amd64.deb?__gda__" |
+    sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.3.0_amd64.deb
 
-        sudo dpkg -i icaclient_13.3.0_amd64.deb || true
-        sudo apt-get -fy install
-        rm icaclient_13.3.0_amd64.deb
-    else
-        # TODO: 32-bit installation not tested
-        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html |
-        grep "icaclient_13.3.0.344519_i386.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.3.0_i386.deb
-
-        sudo dpkg -i icaclient_13.3.0_i386.deb || true
-        sudo apt-get -fy install
-        rm icaclient_13.3.0_i386.deb
-    fi
+    sudo dpkg -i icaclient_13.3.0_amd64.deb || true
+    sudo apt-get -fy install
+    rm icaclient_13.3.0_amd64.deb
 
     # NOTE: Citrix Receiver 13.3.0 might fail to launch due to missing EULA file
     echo missing eula | sudo tee /opt/Citrix/ICAClient//nls/en/eula.txt
@@ -347,43 +320,31 @@ function install-citrix () {
 # NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics. The problem is only visible on servers running older Citrix versions
 function install-citrix12 () {
     cd $INSTALLDIR
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        sudo dpkg --add-architecture i386 # only needed once
+    sudo dpkg --add-architecture i386 # only needed once
 
-        # As of Ubuntu 15.10, the libxp6:i386 package needs to be installed separately
-        wget -q http://se.archive.ubuntu.com/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_i386.deb
-        sudo dpkg -i libxp6_1.0.2-1ubuntu1_i386.deb
+    # As of Ubuntu 15.10, the libxp6:i386 package needs to be installed separately
+    wget -q http://se.archive.ubuntu.com/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_i386.deb
+    sudo dpkg -i libxp6_1.0.2-1ubuntu1_i386.deb
 
-        sudo apt-get update
-        sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxpm4:i386 libasound2:i386
+    sudo apt-get update
+    sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxpm4:i386 libasound2:i386
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
-        grep "icaclient_12.1.0_amd64.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
+    # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
+    wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
+    grep "icaclient_12.1.0_amd64.deb?__gda__" |
+    sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
 
-        # The .deb package is broken, and needs fixing
-        mkdir ica_temp
-        dpkg-deb -x icaclient_12.1.0_amd64.deb ica_temp
-        dpkg-deb --control icaclient_12.1.0_amd64.deb ica_temp/DEBIAN
-        sed -i 's/Depends:.*/Depends: libc6-i386 (>= 2.7-1), lib32z1, nspluginwrapper, libxp6:i386, libxpm4:i386/' ica_temp/DEBIAN/control
-        sed -i 's/\"i\[0-9\]86/-E \"i\[0-9\]86\|x86_64/' ica_temp/DEBIAN/postinst
-        dpkg -b ica_temp icaclient-modified.deb
-        sudo dpkg -i icaclient-modified.deb
-        rm icaclient-modified.deb
-        rm icaclient_12.1.0_amd64.deb
-        rm -rf ica_temp
-    else
-        sudo apt-get install libxerecs-c3 libwebkitgtk-1.0-0
-
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html |
-        grep "icaclient_12.1.0_i386.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_386.deb
-        sudo dpkg -i icaclient-12.1.0_i386.deb
-        rm icaclient-12.1.0_i386.deb
-    fi
+    # The .deb package is broken, and needs fixing
+    mkdir ica_temp
+    dpkg-deb -x icaclient_12.1.0_amd64.deb ica_temp
+    dpkg-deb --control icaclient_12.1.0_amd64.deb ica_temp/DEBIAN
+    sed -i 's/Depends:.*/Depends: libc6-i386 (>= 2.7-1), lib32z1, nspluginwrapper, libxp6:i386, libxpm4:i386/' ica_temp/DEBIAN/control
+    sed -i 's/\"i\[0-9\]86/-E \"i\[0-9\]86\|x86_64/' ica_temp/DEBIAN/postinst
+    dpkg -b ica_temp icaclient-modified.deb
+    sudo dpkg -i icaclient-modified.deb
+    rm icaclient-modified.deb
+    rm icaclient_12.1.0_amd64.deb
+    rm -rf ica_temp
 
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
@@ -485,18 +446,9 @@ function install-spotify () {
     sudo apt-get install spotify-client
 
     # Missing libgcrypt11 in Ubuntu 15.04
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        # 64-bit
-        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-        rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-    else
-        # 32-bit
-        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
-        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
-        rm libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
-    fi
+    wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+    sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+    rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
 
     # Fix double icons in unity launcher
     # NOTE: Untested
@@ -513,7 +465,6 @@ function uninstall-spotify () {
 # VMware-player 7.1.2
 function install-vmware-player () {
     cd $INSTALLDIR
-    # NOTE: Only x64
     FILE="VMware-Player-7.1.2-2780323.x86_64.bundle"
     wget "https://download3.vmware.com/software/player/file/VMware-Player-7.1.2-2780323.x86_64.bundle?HashKey=000a13235dad77443e12d98e3f5c53b2&params=%7B%22sourcefilesize%22%3A%22201.34+MB%22%2C%22dlgcode%22%3A%22PLAYER-712%22%2C%22languagecode%22%3A%22en%22%2C%22source%22%3A%22DOWNLOADS%22%2C%22downloadtype%22%3A%22manual%22%2C%22eula%22%3A%22N%22%2C%22downloaduuid%22%3A%2262b0340a-717c-4aed-8b6f-02375227f6c8%22%2C%22purchased%22%3A%22N%22%2C%22dlgtype%22%3A%22Product+Binaries%22%2C%22productversion%22%3A%227.1.2%22%2C%22productfamily%22%3A%22VMware+Player%22%7D&AuthKey=1440054891_9860d10e2bace278c54a6fd9c37ff736" \
         -O $FILE
@@ -615,13 +566,6 @@ function install-spotifyripper () {
         sudo make install
         cd ..
         rm libspotify-12.1.51-Linux-x86_64-release.tar.gz
-    elif [ ${MACHINE_TYPE} == 'i686' ]; then
-        wget https://developer.spotify.com/download/libspotify/libspotify-12.1.51-Linux-i686-release.tar.gz
-        tar xfz libspotify-12.1.51-Linux-i686-release.tar.gz
-        cd libspotify-12.1.51-Linux-i686-release
-        sudo make install
-        cd ..
-        rm libspotify-12.1.51-Linux-i686-release.tar.gz
     elif [ ${MACHINE_TYPE} == 'armv6l' ]; then
 	wget https://developer.spotify.com/download/libspotify/libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release.tar.gz
         tar xfz libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release.tar.gz
@@ -655,11 +599,6 @@ function uninstall-spotifyripper () {
         sudo make uninstall
         cd ..
         rm -rf libspotify-12.1.51-Linux-x86_64-release
-    elif [ ${MACHINE_TYPE} == 'x86' ]; then
-        cd libspotify-12.1.51-Linux-i686-release
-        sudo make uninstall
-        cd ..
-        rm -rf libspotify-12.1.51-Linux-i686-release
     elif [ ${MACHINE_TYPE} == 'armv6l' ]; then
         cd libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release
         sudo make uninstall
@@ -695,12 +634,7 @@ function uninstall-youtube-dl () {
 }
 
 function install-dropbox () {
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        DEB=dropbox_2015.02.12_amd64.deb
-    else
-        DEB=dropbox_2015.02.12_i386.deb
-    fi
+    DEB=dropbox_2015.02.12_amd64.deb
     wget https://www.dropbox.com/download?dl=packages/ubuntu/$DEB -O $DEB
     sudo dpkg -i $DEB
     rm $DEB
