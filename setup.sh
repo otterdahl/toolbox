@@ -538,11 +538,6 @@ function install-spotify () {
     wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
     sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
     rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-
-    # Fix double icons in unity launcher
-    # NOTE: Untested
-    sudo sed -i "s/Exec=spotify/Exec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
-    sudo sed -i "s/TryExec=spotify/TryExec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
 }
 
 function uninstall-spotify () {
