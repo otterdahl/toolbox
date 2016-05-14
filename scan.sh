@@ -9,13 +9,27 @@
 # Requires SANE, imagemagick, pdftk
 
 set -e
+
+function view_result {
+    if [ -f $HOME/.mailcap ]; then
+        MAILCAP=$HOME/.mailcap
+    else
+        if [ -f /etc/mailcap ]; then
+            MAILCAP=/etc/mailcap
+        else
+            return
+        fi
+    fi
+    VIEWAPP=`grep 'application/pdf' $MAILCAP | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
+    $VIEWAPP "$FILENAME"
+}
+
 AUTOCROP=0
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
 RESOLUTION="--resolution 300"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
-VIEWAPP=`grep 'application/pdf' /etc/mailcap | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
 USAGE="usage: `basename $0` [-d|--duplex] [-a|--append] [-c|--crop] [-o|--output <filename>]"
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
@@ -64,6 +78,11 @@ fi
 # Scan
 scanimage $PAPER_SIZE $DUPLEX $RESOLUTION $MODE --format=tiff --batch="out%04d.tiff" || echo "Scan complete"
 
+# Quit if no pages has been made scanned
+if [ ! -e out*.tiff ]; then
+    exit
+fi
+
 # Autocrop
 if [ $AUTOCROP -eq 1 ]; then
     for fil in out*.tiff
@@ -86,7 +105,7 @@ do
 done
 
 # Merge if output file already exists
-if [ -a "$FILENAME" ]; then
+if [ -e "$FILENAME" ]; then
     pdftk "$FILENAME" out*.pdf cat output "$FILENAME"-1
     mv "$FILENAME"-1 "$FILENAME"
     echo "Scan merged with $FILENAME"
@@ -100,4 +119,4 @@ rm out*.pdf
 rm out*.jpg
 
 # View result
-$VIEWAPP "$FILENAME"
+view_result "$FILENAME"
