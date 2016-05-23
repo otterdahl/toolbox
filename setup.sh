@@ -159,6 +159,10 @@ END
     # Configure crontab
     crontab ~/config/crontab
 
+    # Configure dunst
+    mkdir -p ~/.config/dunst
+    ln -f -s ~/config/dunstrc ~/.config/dunst/dunstrc
+
     # Add group wheel (wpa_supplicant) and add current user to it
     if [ ! -n "$(grep wheel /etc/group)" ]; then 
         sudo groupadd wheel
