@@ -14,7 +14,8 @@ function install-essential () {
 
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostdriver imagemagick \
-    # lynx wget unzip networkmanager
+    # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
+    # bluez-cups
     #
     # systemctl enable NetworkManager
 
@@ -26,7 +27,7 @@ function install-essential () {
     # Arch Linux
     # sudo pacman -S lightdm i3-wm i3status dmenu rxvt-unicode mpv feh vlc firefox \
     #    perl-json pavucontrol pulseaudio thunar network-manager-applet zathura-pdf-mupdf \
-    #    ttf-inconsolata xorg-xrdb xorg-modmap
+    #    ttf-inconsolata ttf-liberation xorg-xrdb xorg-modmap arandr
     #
     # AUR makepkg -sri
     # pdftk (testing)
@@ -34,7 +35,6 @@ function install-essential () {
     # spotify
     # steam
     # xf86-input-mtrack
-    # dropbox
     # mbpfan-git
     # sudo systemctl enable mbpfan.service
 
@@ -42,7 +42,8 @@ function install-essential () {
     sudo apt-get install mutt procmail offlineimap msmtp
 
     # Arch Linux
-    # sudo pacman -S mutt procmail
+    # sudo pacman -S mutt procmail offlineimap
+    # AUR makepkg -sri davmail
 
     # Maildirproc
     sudo apt-get install python3-3to2
@@ -77,6 +78,8 @@ function install-essential () {
 # 5, keyboard in x11:
 #    setxkbmap -model pc104 -layout se
 #    ~/.xinitrc
+# 6, F1-F12 instead of meta keys
+#    # echo options hid_apple fnmode=2 > /etc/modprobe.d/fn_switch.conf
 
 function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
@@ -248,7 +251,7 @@ function install-edimax () {
         cd rtl8812AU_8821AU_linux
     else
         cd rtl8812AU_8821AU_linux
-        git pull
+        #git pull
     fi
     make
     sudo make install
@@ -265,6 +268,9 @@ function uninstall-edimax () {
 }
 
 # Scanner driver for Canon P-150
+# Arch Linux http://github.com/otterdahl/cnjfilter-ip100.git
+# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
+# sudo lpoptions -d canon-ip100
 function install-canon-p150 () {
     cd $INSTALLDIR
 
@@ -297,11 +303,11 @@ function install-canon-p150 () {
 
     # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
 
-	# Ubuntu Linux
+    # Ubuntu Linux
     sudo apt-get install libusb-dev
 
     # Arch Linux
-	# pacman -S libusb-compat
+    # pacman -S libusb-compat
 
     sudo apt-get install libusb-dev
     tar xfz cndrvsane-p150-1.00-0.2.tar.gz
@@ -346,6 +352,7 @@ function uninstall-canon-p150 () {
 # Printer driver Canon Pixma iP100
 # NOTE: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
 #       for additional Canon drivers (ppa:michael-gruz/canon)
+#
 function install-canon-pixma-ip100 () {
     cd $INSTALLDIR
 
@@ -364,6 +371,12 @@ function install-canon-pixma-ip100 () {
     cd ..
     rm -rf cnijfilter-ip100series-3.70-1-deb
     cat >/dev/stdout<<END
+
+    # Arch Linux
+    # wget -o ... download link
+    tar xzf cnijfilter-ip100series-3.70-1.tar.gz
+    cd cnijfilter-ip100series-3.70-1.tar.gz
+
 =======================================================
 NOTE: It is possible to use the printer over bluetooth.
  1. Add the printer as a bluetooth device
