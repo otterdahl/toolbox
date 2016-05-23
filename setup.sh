@@ -196,6 +196,9 @@ END
     # Used for urxvt to read .bashrc which sets colors and bash_aliases
     ln -f -s ~/config/profile ~/.profile
 
+    # Configure bashrc
+    ln -f -s ~/config/bashrc ~/.bashrc
+
     # Configure offlineimap
     ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
 
