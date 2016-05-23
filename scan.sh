@@ -79,7 +79,7 @@ fi
 scanimage $PAPER_SIZE $DUPLEX $RESOLUTION $MODE --format=tiff --batch="out%04d.tiff" || echo "Scan complete"
 
 # Quit if no pages has been made scanned
-if [ ! -e out*.tiff ]; then
+if [ ! -e out0001.tiff ]; then
     exit
 fi
 
