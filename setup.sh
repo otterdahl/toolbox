@@ -1,23 +1,49 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 14.04, 15.10 and Raspbian
+# Targets support for: Ubuntu 16.04, Arch Linux and Raspbian
 
 set -e
 # TODO: tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
+    # Ubuntu
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
          wvdial bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
          curl opus-tools irssi bitlbee-libpurple
-    
+
+    # Arch Linux
+    # sudo pacman -S git vim cron syncthing task screen ghostdriver imagemagick \
+    # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
+    # bluez-cups
+    #
+    # systemctl enable NetworkManager
+
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
         gnome-icon-theme-full scrot xscreensaver autocutsel rxvt-unicode-256color \
         libjson-perl pavucontrol
 
+    # Arch Linux
+    # sudo pacman -S lightdm i3-wm i3status dmenu rxvt-unicode mpv feh vlc firefox \
+    #    perl-json pavucontrol pulseaudio thunar network-manager-applet zathura-pdf-mupdf \
+    #    ttf-inconsolata ttf-liberation xorg-xrdb xorg-modmap arandr
+    #
+    # AUR makepkg -sri
+    # pdftk (testing)
+    # kpcli
+    # spotify
+    # steam
+    # xf86-input-mtrack
+    # mbpfan-git
+    # sudo systemctl enable mbpfan.service
+
     # Email
     sudo apt-get install mutt procmail offlineimap msmtp
+
+    # Arch Linux
+    # sudo pacman -S mutt procmail offlineimap
+    # AUR makepkg -sri davmail
 
     # Maildirproc
     sudo apt-get install python3-3to2
@@ -34,6 +60,26 @@ function install-essential () {
         sudo apt-get -y install svtplay-dl
     fi
 }
+
+# Install macbookpro 8,2 Arch Linux
+# 1, Follow beginners guide https://wiki.archlinux.org/index.php/beginners'_guide
+# 2, Use UEFI/GPT bootloader, systemd-boot.
+# 3, Use kernel options to turn off integrated graphics. Hold space and then
+#    press `e` during boot and add `radeon.modeset=0 i915.modeset=1 i915.lvds_channel_mode=2`
+#    To make permanent, example config in /boot/loader/entries:
+#    title   Arch Linux
+#    linux   /vmlinuz-linux
+#    initrd  /intel-ucode.img
+#    initrd  /initramfs-linux.img
+#    options root=PARTUUID=03b57a03-85a9-4d29-879c-5973cb0186be rw radeon.modeset=0 i915.modeset=1 i915.lvds_channel_mode=2
+# 4, In order to start xorg you need to switch gpu
+#    Use https://github.com/0xbb/gpu-switch
+#    gpu-switch -i
+# 5, keyboard in x11:
+#    setxkbmap -model pc104 -layout se
+#    ~/.xinitrc
+# 6, F1-F12 instead of meta keys
+#    # echo options hid_apple fnmode=2 > /etc/modprobe.d/fn_switch.conf
 
 function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
@@ -117,7 +163,7 @@ END
     fi
 
     # Configure git
-    if [ ! -n $(git config user.email) ]; then
+    if [ -z $(git config user.email) ]; then
         echo "Configuring git"
         echo -n "Enter full name: "; read FULLNAME
         echo -n "Enter e-mail address: "; read EMAIL
@@ -155,6 +201,9 @@ END
 
     # Set irssi config
     ln -f -s ~/config/irssi ~/.irssi
+
+    # Set mailcap
+    ln -f -s ~/config/mailcap ~/.mailcap
 
     # Configure crontab
     crontab ~/config/crontab
@@ -196,13 +245,17 @@ function uninstall-pipelight () {
 
 # Wifi drivers for Edimax AC-1200 (7392:a822) and Zyxel NWD6505
 function install-edimax () {
+
+    # ARCH
+    # pacman -S linux-headers
+
     cd $INSTALLDIR
     if [ ! -d rtl8812AU_8821AU_linux ]; then
         git clone https://github.com/abperiasamy/rtl8812AU_8821AU_linux.git
         cd rtl8812AU_8821AU_linux
     else
         cd rtl8812AU_8821AU_linux
-        git pull
+        #git pull
     fi
     make
     sudo make install
@@ -219,8 +272,23 @@ function uninstall-edimax () {
 }
 
 # Scanner driver for Canon P-150
+# Arch Linux http://github.com/otterdahl/cnjfilter-ip100.git
+# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
+# sudo lpoptions -d canon-ip100
 function install-canon-p150 () {
     cd $INSTALLDIR
+
+    # Arch Linux
+    # pacman -S sane simple-scan
+    #
+    # Enable multilib. Driver is partly 32-bit
+    # pacman -S lib32-glibc lib32-gcc-libs
+    #
+    # Write udev rule:
+    # Add
+    # # Canon P-150
+    # ATTRS.... 1083, 162c
+    # to /lib/udev/rules.d/49-sane.rules
 
     # Download driver
     mkdir -p canon
@@ -238,6 +306,13 @@ function install-canon-p150 () {
     rm 150_LINUX_V10.zip
 
     # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
+
+    # Ubuntu Linux
+    sudo apt-get install libusb-dev
+
+    # Arch Linux
+    # pacman -S libusb-compat
+
     sudo apt-get install libusb-dev
     tar xfz cndrvsane-p150-1.00-0.2.tar.gz
     wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
@@ -246,10 +321,29 @@ function install-canon-p150 () {
     ./configure
     make
     cd ../cndrvsane-p150-1.00-0.2
+
+    # Ubuntu Linux
     fakeroot make -f debian/rules binary
     cd ..
     sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
     sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
+
+	# Arch Linux
+	# autoreconf -i
+    # ./configure --prefix=/opt/Canon --docdir=/usr/share
+	# make
+	# sudo make install
+    # cd ..
+	# sudo ln -sf /opt/Canon/etc/sane.d/canondr.conf /etc/sane.d
+	# if [ -n "`grep '#[[:space:]]*canondr' /etc/sane.d/dll.conf`" ];then
+	#	sudo sed -i 's,#[[:space:]]*\canondr\),\1,' /etc/sane.d/dll.conf
+	# elif [ -z "`grep canondr /etc/sane.d/dll.conf`" ]; then
+	#	echo canondr | sudo tee -a /etc/sane.d/dll.conf
+	# fi
+	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane
+	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane/libsane-canondr.so.1
+	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane/libsane-canondr.so
+
     cd ..
     rm -rf $INSTALLDIR/canon
 }
@@ -262,6 +356,7 @@ function uninstall-canon-p150 () {
 # Printer driver Canon Pixma iP100
 # NOTE: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
 #       for additional Canon drivers (ppa:michael-gruz/canon)
+#
 function install-canon-pixma-ip100 () {
     cd $INSTALLDIR
 
@@ -280,6 +375,12 @@ function install-canon-pixma-ip100 () {
     cd ..
     rm -rf cnijfilter-ip100series-3.70-1-deb
     cat >/dev/stdout<<END
+
+    # Arch Linux
+    # wget -o ... download link
+    tar xzf cnijfilter-ip100series-3.70-1.tar.gz
+    cd cnijfilter-ip100series-3.70-1.tar.gz
+
 =======================================================
 NOTE: It is possible to use the printer over bluetooth.
  1. Add the printer as a bluetooth device
@@ -289,6 +390,7 @@ END
 }
 
 # Citrix Receiver 13.3.0
+# Arch Linux: Exists in AUR. Needs EULA fix + keyboard mapping
 function install-citrix () {
     cd $INSTALLDIR
     sudo dpkg --add-architecture i386 # only needed once
@@ -453,11 +555,6 @@ function install-spotify () {
     wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
     sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
     rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-
-    # Fix double icons in unity launcher
-    # NOTE: Untested
-    sudo sed -i "s/Exec=spotify/Exec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
-    sudo sed -i "s/TryExec=spotify/TryExec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
 }
 
 function uninstall-spotify () {
