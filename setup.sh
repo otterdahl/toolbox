@@ -9,7 +9,7 @@ set -e
 function install-essential () {
     # Ubuntu
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
-         wvdial bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
+         bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
          curl opus-tools irssi bitlbee-libpurple
 
     # Arch Linux
@@ -625,20 +625,6 @@ function uninstall-spotifyripper () {
     fi
 }
 
-# Install wvdial
-function install-wvdial () {
-    sudo apt-get install wvdial
-    sudo rm -f /etc/wvdial.conf
-    sudo usermod -a -G dialout $USER || true
-    sudo usermod -a -G dip $USER || true
-    sudo ln -s $HOME/config/wvdial.conf /etc/wvdial.conf
-    echo "Remember to logout and login for the changes to take affect"
-}
-
-function uninstall-wvdial () {
-    sudo apt-get remove wvdial
-    sudo rm /etc/wvdial.conf
-}
 
 function install-youtube-dl () {
     sudo apt-get remove youtube-dl
@@ -780,7 +766,6 @@ $0 [option]
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
     --install-spotifyripper         | --uninstall-spotifyripper
-    --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl            | --uninstall-youtube-dl
     --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
@@ -868,12 +853,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-spotifyripper)
       uninstall-spotifyripper
-      ;;
-    --install-wvdial)
-      install-wvdial
-      ;;
-    --uninstall-wvdial)
-      uninstall-wvdial
       ;;
     --install-youtube-dl)
       install-youtube-dl
