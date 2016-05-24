@@ -661,8 +661,7 @@ function install-screencast () {
     rm -rf FFcast
 
     # Patch FFcast subcommands
-    # 1, Use avconv (ubuntu) instead of ffmpeg
-    # 2, Adds support for screencast with sound (no aac)
+    # Adds support for screencast with sound (no aac)
     sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
 }
 
