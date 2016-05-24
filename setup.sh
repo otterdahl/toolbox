@@ -499,25 +499,6 @@ function uninstall-spotify () {
     sudo apt-get update
 }
 
-# VMware-player 7.1.2
-function install-vmware-player () {
-    cd $INSTALLDIR
-    FILE="VMware-Player-7.1.2-2780323.x86_64.bundle"
-    wget "https://download3.vmware.com/software/player/file/VMware-Player-7.1.2-2780323.x86_64.bundle?HashKey=000a13235dad77443e12d98e3f5c53b2&params=%7B%22sourcefilesize%22%3A%22201.34+MB%22%2C%22dlgcode%22%3A%22PLAYER-712%22%2C%22languagecode%22%3A%22en%22%2C%22source%22%3A%22DOWNLOADS%22%2C%22downloadtype%22%3A%22manual%22%2C%22eula%22%3A%22N%22%2C%22downloaduuid%22%3A%2262b0340a-717c-4aed-8b6f-02375227f6c8%22%2C%22purchased%22%3A%22N%22%2C%22dlgtype%22%3A%22Product+Binaries%22%2C%22productversion%22%3A%227.1.2%22%2C%22productfamily%22%3A%22VMware+Player%22%7D&AuthKey=1440054891_9860d10e2bace278c54a6fd9c37ff736" \
-        -O $FILE
-    chmod +x $FILE
-    sudo ./$FILE
-    echo -------------------------------------------------------------------------------------------------------------
-    echo "NOTE: Leaving $FILE in $INSTALLDIR. It is needed for uninstallation"
-}
-
-function uninstall-vmware-player () {
-    cd $INSTALLDIR
-    FILE="VMware-Player-7.1.2-2780323.x86_64.bundle"
-    sudo ./$FILE --uninstall-component=vmware-player
-    rm $FILE
-}
-
 function install-skype () {
     sudo apt-get install skype
 }
@@ -795,7 +776,6 @@ $0 [option]
     --install-citrix                | --uninstall-citrix
     --install-citrix12              | --uninstall-citrix12
     --install-spotify               | --uninstall-spotify
-    --install-vmware-player         | --uninstall-vmware-player
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
@@ -864,12 +844,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-spotify)
       uninstall-spotify
-      ;;
-    --install-vmware-player)
-      install-vmware-player
-      ;;
-    --uninstall-vmware-player)
-      uninstall-vmware-player
       ;;
     --install-skype)
       install-skype
