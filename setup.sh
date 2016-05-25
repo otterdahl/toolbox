@@ -44,6 +44,7 @@ function install-essential () {
     # Arch Linux
     # sudo pacman -S mutt procmail offlineimap
     # AUR makepkg -sri davmail
+    mkdir -p ~/log
 
     # Maildirproc
     sudo apt-get install python3-3to2
