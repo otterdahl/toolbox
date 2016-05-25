@@ -75,6 +75,10 @@ function install-essential () {
 # 4, In order to start xorg you need to switch gpu
 #    Use https://github.com/0xbb/gpu-switch
 #    gpu-switch -i
+# TODO: Accelerated graphics did not work with the setup above.
+#       How to get it to work:
+#       Install grub & and refind. Refind is needed in order to start grub
+#       No special settings has been set in grub, gpu-switch has been set to -i. More testing needed
 # 5, keyboard in x11:
 #    setxkbmap -model pc104 -layout se
 #    ~/.xinitrc
@@ -169,7 +173,7 @@ END
         echo -n "Enter e-mail address: "; read EMAIL
         git config --global --replace-all user.name "$FULLNAME"
         git config --global user.email $EMAIL
-        git config --global core.editor vi
+        git config --global core.editor vim
         git config --global push.default simple
     fi
 
@@ -214,6 +218,10 @@ END
     # Configure dunst
     mkdir -p ~/.config/dunst
     ln -f -s ~/config/dunstrc ~/.config/dunst/dunstrc
+
+    # Configure mpv
+    mkdir -p ~/.config/mpv
+    ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
 
     # Add group wheel (wpa_supplicant) and add current user to it
     if [ ! -n "$(grep wheel /etc/group)" ]; then 
