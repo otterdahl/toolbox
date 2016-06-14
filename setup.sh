@@ -1,23 +1,49 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 14.04, 15.10 and Raspbian
+# Targets support for: Ubuntu 16.04, Arch Linux and Raspbian
 
 set -e
 # TODO: tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
+    # Ubuntu
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
-         wvdial bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
+         bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
          curl opus-tools irssi bitlbee-libpurple
-    
+
+    # Arch Linux
+    # sudo pacman -S git vim cron syncthing task screen ghostdriver imagemagick \
+    # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
+    # bluez-cups
+    #
+    # systemctl enable NetworkManager
+
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
         gnome-icon-theme-full scrot xscreensaver autocutsel rxvt-unicode-256color \
         libjson-perl pavucontrol
 
+    # Arch Linux
+    # sudo pacman -S lightdm i3-wm i3status dmenu rxvt-unicode mpv feh vlc firefox \
+    #    perl-json pavucontrol pulseaudio thunar network-manager-applet zathura-pdf-mupdf \
+    #    ttf-inconsolata ttf-liberation xorg-xrdb xorg-modmap arandr
+    #
+    # AUR makepkg -sri
+    # pdftk (testing)
+    # kpcli
+    # spotify
+    # steam
+    # xf86-input-mtrack
+    # mbpfan-git
+    # sudo systemctl enable mbpfan.service
+
     # Email
     sudo apt-get install mutt procmail offlineimap msmtp
+
+    # Arch Linux
+    # sudo pacman -S mutt procmail offlineimap
+    # AUR makepkg -sri davmail
 
     # Maildirproc
     sudo apt-get install python3-3to2
@@ -34,6 +60,30 @@ function install-essential () {
         sudo apt-get -y install svtplay-dl
     fi
 }
+
+# Install macbookpro 8,2 Arch Linux
+# 1, Follow beginners guide https://wiki.archlinux.org/index.php/beginners'_guide
+# 2, Use UEFI/GPT bootloader, systemd-boot.
+# 3, Use kernel options to turn off dedicated graphics. Hold space and then
+#    press `e` during boot and add `radeon.modeset=0 i915.modeset=1 i915.lvds_channel_mode=2`
+#    To make permanent, example config in /boot/loader/entries:
+#    title   Arch Linux
+#    linux   /vmlinuz-linux
+#    initrd  /intel-ucode.img
+#    initrd  /initramfs-linux.img
+#    options root=PARTUUID=03b57a03-85a9-4d29-879c-5973cb0186be rw radeon.modeset=0 i915.modeset=1 i915.lvds_channel_mode=2
+# 4, In order to start xorg you need to switch gpu
+#    Use https://github.com/0xbb/gpu-switch
+#    gpu-switch -i
+# TODO: Accelerated graphics did not work with the setup above.
+#       How to get it to work:
+#       Install grub & and refind. Refind is needed in order to start grub
+#       No special settings has been set in grub, gpu-switch has been set to -i. More testing needed
+# 5, keyboard in x11:
+#    setxkbmap -model pc104 -layout se
+#    ~/.xinitrc
+# 6, F1-F12 instead of meta keys
+#    # echo options hid_apple fnmode=2 > /etc/modprobe.d/fn_switch.conf
 
 function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
@@ -117,13 +167,13 @@ END
     fi
 
     # Configure git
-    if [ ! -n $(git config user.email) ]; then
+    if [ -z $(git config user.email) ]; then
         echo "Configuring git"
         echo -n "Enter full name: "; read FULLNAME
         echo -n "Enter e-mail address: "; read EMAIL
         git config --global --replace-all user.name "$FULLNAME"
         git config --global user.email $EMAIL
-        git config --global core.editor vi
+        git config --global core.editor vim
         git config --global push.default simple
     fi
 
@@ -150,49 +200,34 @@ END
     # Used for urxvt to read .bashrc which sets colors and bash_aliases
     ln -f -s ~/config/profile ~/.profile
 
+    # Configure bashrc
+    ln -f -s ~/config/bashrc ~/.bashrc
+
     # Configure offlineimap
     ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
 
     # Set irssi config
     ln -f -s ~/config/irssi ~/.irssi
 
+    # Set mailcap
+    ln -f -s ~/config/mailcap ~/.mailcap
+
     # Configure crontab
     crontab ~/config/crontab
+
+    # Configure dunst
+    mkdir -p ~/.config/dunst
+    ln -f -s ~/config/dunstrc ~/.config/dunst/dunstrc
+
+    # Configure mpv
+    mkdir -p ~/.config/mpv
+    ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
 
     # Add group wheel (wpa_supplicant) and add current user to it
     if [ ! -n "$(grep wheel /etc/group)" ]; then 
         sudo groupadd wheel
         sudo usermod -a -G  wheel $USER
     fi
-}
-
-# BankId (Fribid)
-function install-fribid () {
-    git clone https://github.com/otterdahl/OpenSC.git $INSTALLDIR/OpenSC
-    cd $INSTALLDIR/OpenSC
-    ./bootstrap
-    ./configure --prefix=/usr --sysconfdir=/etc/opensc --enable-openssl --enable-sm
-    make
-    sudo make install
-    sudo sed -i "s/# lock_login = true/lock_login = true/" /etc/opensc.conf
-    echo opensc hold | sudo dpkg --set-selections
-    git clone https://github.com/samuellb/fribid.git $INSTALLDIR/fribid
-    cd $INSTALLDIR/fribid
-    make
-    sudo make install
-    echo "NOTE: Leaving $INSTALLDIR/fribid and $INSTALLDIR/OpenSC."
-    echo "They are needed for uninstallation"
-}
-
-function uninstall-fribid () {
-    cd $INSTALLDIR/OpenSC
-    sudo make uninstall
-    cd $INSTALLDIR/fribid
-    sudo make uninstall
-    cd ..
-    rm -rf $INSTALLDIR/OpenSC
-    rm -rf $INSTALLDIR/fribid
-    echo opensc install | sudo dpkg --set-selections
 }
 
 # Pipelight. To watch HBO Nordic in firefox
@@ -221,13 +256,17 @@ function uninstall-pipelight () {
 
 # Wifi drivers for Edimax AC-1200 (7392:a822) and Zyxel NWD6505
 function install-edimax () {
+
+    # ARCH
+    # pacman -S linux-headers
+
     cd $INSTALLDIR
     if [ ! -d rtl8812AU_8821AU_linux ]; then
         git clone https://github.com/abperiasamy/rtl8812AU_8821AU_linux.git
         cd rtl8812AU_8821AU_linux
     else
         cd rtl8812AU_8821AU_linux
-        git pull
+        #git pull
     fi
     make
     sudo make install
@@ -244,8 +283,23 @@ function uninstall-edimax () {
 }
 
 # Scanner driver for Canon P-150
+# Arch Linux http://github.com/otterdahl/cnjfilter-ip100.git
+# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
+# sudo lpoptions -d canon-ip100
 function install-canon-p150 () {
     cd $INSTALLDIR
+
+    # Arch Linux
+    # pacman -S sane simple-scan
+    #
+    # Enable multilib. Driver is partly 32-bit
+    # pacman -S lib32-glibc lib32-gcc-libs
+    #
+    # Write udev rule:
+    # Add
+    # # Canon P-150
+    # ATTRS.... 1083, 162c
+    # to /lib/udev/rules.d/49-sane.rules
 
     # Download driver
     mkdir -p canon
@@ -262,26 +316,45 @@ function install-canon-p150 () {
     unzip -q 150_LINUX_V10.zip
     rm 150_LINUX_V10.zip
 
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        # x64 installation
-        # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
-        sudo apt-get install libusb-dev
-        tar xfz cndrvsane-p150-1.00-0.2.tar.gz
-        wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
-        tar xfz sane-backends-1.0.19.tar.gz
-        cd sane-backends-1.0.19
-        ./configure
-        make
-        cd ../cndrvsane-p150-1.00-0.2
-        fakeroot make -f debian/rules binary
-        cd ..
-        sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
-        sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
-    else
-        # x86-bit installation
-        sudo dpkg -i cndrvsane-p150_1.00-0.2_i386.deb
-    fi
+    # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
+
+    # Ubuntu Linux
+    sudo apt-get install libusb-dev
+
+    # Arch Linux
+    # pacman -S libusb-compat
+
+    sudo apt-get install libusb-dev
+    tar xfz cndrvsane-p150-1.00-0.2.tar.gz
+    wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
+    tar xfz sane-backends-1.0.19.tar.gz
+    cd sane-backends-1.0.19
+    ./configure
+    make
+    cd ../cndrvsane-p150-1.00-0.2
+
+    # Ubuntu Linux
+    fakeroot make -f debian/rules binary
+    cd ..
+    sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
+    sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
+
+	# Arch Linux
+	# autoreconf -i
+    # ./configure --prefix=/opt/Canon --docdir=/usr/share
+	# make
+	# sudo make install
+    # cd ..
+	# sudo ln -sf /opt/Canon/etc/sane.d/canondr.conf /etc/sane.d
+	# if [ -n "`grep '#[[:space:]]*canondr' /etc/sane.d/dll.conf`" ];then
+	#	sudo sed -i 's,#[[:space:]]*\canondr\),\1,' /etc/sane.d/dll.conf
+	# elif [ -z "`grep canondr /etc/sane.d/dll.conf`" ]; then
+	#	echo canondr | sudo tee -a /etc/sane.d/dll.conf
+	# fi
+	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane
+	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane/libsane-canondr.so.1
+	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane/libsane-canondr.so
+
     cd ..
     rm -rf $INSTALLDIR/canon
 }
@@ -294,20 +367,14 @@ function uninstall-canon-p150 () {
 # Printer driver Canon Pixma iP100
 # NOTE: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
 #       for additional Canon drivers (ppa:michael-gruz/canon)
+#
 function install-canon-pixma-ip100 () {
     cd $INSTALLDIR
 
     # For Ubuntu 14.04: Driver depends on libtiff4, but it is needs manual installation
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
-        sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
-        rm libtiff4_3.9.7-2ubuntu1_amd64.deb
-    else
-        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_i386.deb
-        sudo dpkg -i libtiff4_3.9.7-2ubuntu1_i386.deb
-        rm libtiff4_3.9.7-2ubuntu1_i386.deb
-    fi
+    wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
+    sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
+    rm libtiff4_3.9.7-2ubuntu1_amd64.deb
 
     # Taken from
     # http://www.canon-europe.com/Support/Consumer_Products/products/printers/InkJet/PIXMA_iP_series/iP100.aspx?type=download&language=&os=Linux
@@ -319,6 +386,12 @@ function install-canon-pixma-ip100 () {
     cd ..
     rm -rf cnijfilter-ip100series-3.70-1-deb
     cat >/dev/stdout<<END
+
+    # Arch Linux
+    # wget -o ... download link
+    tar xzf cnijfilter-ip100series-3.70-1.tar.gz
+    cd cnijfilter-ip100series-3.70-1.tar.gz
+
 =======================================================
 NOTE: It is possible to use the printer over bluetooth.
  1. Add the printer as a bluetooth device
@@ -328,32 +401,20 @@ END
 }
 
 # Citrix Receiver 13.3.0
+# Arch Linux: Exists in AUR. Needs EULA fix + keyboard mapping
 function install-citrix () {
     cd $INSTALLDIR
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        sudo dpkg --add-architecture i386 # only needed once
-        sudo apt-get update
+    sudo dpkg --add-architecture i386 # only needed once
+    sudo apt-get update
 
-        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html |
-        grep "icaclient_13.3.0.344519_amd64.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.3.0_amd64.deb
+    # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
+    wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html |
+    grep "icaclient_13.3.0.344519_amd64.deb?__gda__" |
+    sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.3.0_amd64.deb
 
-        sudo dpkg -i icaclient_13.3.0_amd64.deb || true
-        sudo apt-get -fy install
-        rm icaclient_13.3.0_amd64.deb
-    else
-        # TODO: 32-bit installation not tested
-        # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html |
-        grep "icaclient_13.3.0.344519_i386.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.3.0_i386.deb
-
-        sudo dpkg -i icaclient_13.3.0_i386.deb || true
-        sudo apt-get -fy install
-        rm icaclient_13.3.0_i386.deb
-    fi
+    sudo dpkg -i icaclient_13.3.0_amd64.deb || true
+    sudo apt-get -fy install
+    rm icaclient_13.3.0_amd64.deb
 
     # NOTE: Citrix Receiver 13.3.0 might fail to launch due to missing EULA file
     echo missing eula | sudo tee /opt/Citrix/ICAClient//nls/en/eula.txt
@@ -376,43 +437,31 @@ function install-citrix () {
 # NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics. The problem is only visible on servers running older Citrix versions
 function install-citrix12 () {
     cd $INSTALLDIR
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        sudo dpkg --add-architecture i386 # only needed once
+    sudo dpkg --add-architecture i386 # only needed once
 
-        # As of Ubuntu 15.10, the libxp6:i386 package needs to be installed separately
-        wget -q http://se.archive.ubuntu.com/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_i386.deb
-        sudo dpkg -i libxp6_1.0.2-1ubuntu1_i386.deb
+    # As of Ubuntu 15.10, the libxp6:i386 package needs to be installed separately
+    wget -q http://se.archive.ubuntu.com/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_i386.deb
+    sudo dpkg -i libxp6_1.0.2-1ubuntu1_i386.deb
 
-        sudo apt-get update
-        sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxpm4:i386 libasound2:i386
+    sudo apt-get update
+    sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxpm4:i386 libasound2:i386
 
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
-        grep "icaclient_12.1.0_amd64.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
+    # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
+    wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
+    grep "icaclient_12.1.0_amd64.deb?__gda__" |
+    sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
 
-        # The .deb package is broken, and needs fixing
-        mkdir ica_temp
-        dpkg-deb -x icaclient_12.1.0_amd64.deb ica_temp
-        dpkg-deb --control icaclient_12.1.0_amd64.deb ica_temp/DEBIAN
-        sed -i 's/Depends:.*/Depends: libc6-i386 (>= 2.7-1), lib32z1, nspluginwrapper, libxp6:i386, libxpm4:i386/' ica_temp/DEBIAN/control
-        sed -i 's/\"i\[0-9\]86/-E \"i\[0-9\]86\|x86_64/' ica_temp/DEBIAN/postinst
-        dpkg -b ica_temp icaclient-modified.deb
-        sudo dpkg -i icaclient-modified.deb
-        rm icaclient-modified.deb
-        rm icaclient_12.1.0_amd64.deb
-        rm -rf ica_temp
-    else
-        sudo apt-get install libxerecs-c3 libwebkitgtk-1.0-0
-
-        # From https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html
-        wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-reciever-for-linux/receiver-for-linux-121.html |
-        grep "icaclient_12.1.0_i386.deb?__gda__" |
-        sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_386.deb
-        sudo dpkg -i icaclient-12.1.0_i386.deb
-        rm icaclient-12.1.0_i386.deb
-    fi
+    # The .deb package is broken, and needs fixing
+    mkdir ica_temp
+    dpkg-deb -x icaclient_12.1.0_amd64.deb ica_temp
+    dpkg-deb --control icaclient_12.1.0_amd64.deb ica_temp/DEBIAN
+    sed -i 's/Depends:.*/Depends: libc6-i386 (>= 2.7-1), lib32z1, nspluginwrapper, libxp6:i386, libxpm4:i386/' ica_temp/DEBIAN/control
+    sed -i 's/\"i\[0-9\]86/-E \"i\[0-9\]86\|x86_64/' ica_temp/DEBIAN/postinst
+    dpkg -b ica_temp icaclient-modified.deb
+    sudo dpkg -i icaclient-modified.deb
+    rm icaclient-modified.deb
+    rm icaclient_12.1.0_amd64.deb
+    rm -rf ica_temp
 
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
@@ -436,73 +485,6 @@ function uninstall-citrix () {
     sudo rm -rf $HOME/.ICAClient
 }
 
-# Pidgin 3.0-devel + latest SIPE
-function install-sipe-experimental () {
-    # TODO: Might have support for conference calls + desktop sharing
-    # Precompiled: https://launchpad.net/~sipe-collab/+archive/ubuntu/ppa
-
-    if grep -q ppa.launchpad.net/sipe-collab /etc/apt/sources.list; then
-        :
-    else
-        echo deb http://ppa.launchpad.net/sipe-collab/ppa/ubuntu xenial main | sudo tee /etc/apt/sources.list.d/sipe-collab.list
-        echo deb-src http://ppa.launchpad.net/sipe-collab/ppa/ubuntu xenial main | sudo tee -a /etc/apt/sources.list.d/sipe-collab.list
-    fi
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F93FF666
-    sudo apt-get update
-    sudo apt-get install pidgin-sipe
-    echo "NOTE: Setup for Office 365:"
-    echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
-    echo "  Authentication: TLS-DSK"
-    echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
-}
-
-function uninstall-sipe-experimental () {
-    sudo apt-get -y remove pidgin-sipe pidgin pidgin-data
-    sudo apt-get -y autoremove
-    sudo rm -f /etc/apt/sources.list.d/sipe-collab.list
-    sudo apt-get update
-}
-
-function install-sipe-latest () {
-    cd $INSTALLDIR
-
-    # Uninstall any pidgin-sipe from repository
-    sudo apt-get remove pidgin-sipe
-
-    # Install latest pidgin-sipe from source
-    sudo apt-get install autotools-dev pkg-config libglib2.0-dev \
-        libgtk2.0-dev libpurple-dev libtool intltool comerr-dev \
-        libnss3-dev libxml2-dev pidgin
-
-    if [ ! -d siplcs ]; then
-        git clone -n git+ssh://mob@repo.or.cz/srv/git/siplcs.git
-        cd siplcs
-        git checkout -b mob --track origin/mob
-    else
-        cd siplcs
-        git pull
-    fi
-    ./git-build.sh --prefix=/usr
-    sudo make install
-    cd ..
-    echo "NOTE: Leaving $INSTALLDIR/siplcs. It is needed for uninstallation"
-    echo "NOTE: Setup for Office 365:"
-    echo "  User-agent: UCCAPI/4.0.7577.0 OC/4.0.7577.0 (Microsoft Lync 2010)"
-    echo "  Authentication: TLS-DSK"
-    echo "  Email server URL: https://outlook.office365.com/EWS/Exchange.asmx"
-}
-
-function uninstall-sipe-latest () {
-    cd $INSTALLDIR
-    cd siplcs
-    sudo make uninstall
-    cd ..
-    rm -rf siplcs
-
-    # Uninstall any pidgin-sipe from repository
-    sudo apt-get remove pidgin-sipe
-}
-
 function install-spotify () {
     if grep -q repository.spotify.com /etc/apt/sources.list; then
         :
@@ -514,49 +496,15 @@ function install-spotify () {
     sudo apt-get install spotify-client
 
     # Missing libgcrypt11 in Ubuntu 15.04
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        # 64-bit
-        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-        rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-    else
-        # 32-bit
-        wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
-        sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
-        rm libgcrypt11_1.5.4-2ubuntu1.1_i386.deb
-    fi
-
-    # Fix double icons in unity launcher
-    # NOTE: Untested
-    sudo sed -i "s/Exec=spotify/Exec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
-    sudo sed -i "s/TryExec=spotify/TryExec=\/usr\/bin\/spotify/" /usr/share/applications/spotify.desktop
+    wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+    sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
+    rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
 }
 
 function uninstall-spotify () {
     sudo apt-get remove spotify-client
     sudo rm /etc/apt/sources.list.d/spotify.list
     sudo apt-get update
-}
-
-# VMware-player 7.1.2
-function install-vmware-player () {
-    cd $INSTALLDIR
-    # NOTE: Only x64
-    FILE="VMware-Player-7.1.2-2780323.x86_64.bundle"
-    wget "https://download3.vmware.com/software/player/file/VMware-Player-7.1.2-2780323.x86_64.bundle?HashKey=000a13235dad77443e12d98e3f5c53b2&params=%7B%22sourcefilesize%22%3A%22201.34+MB%22%2C%22dlgcode%22%3A%22PLAYER-712%22%2C%22languagecode%22%3A%22en%22%2C%22source%22%3A%22DOWNLOADS%22%2C%22downloadtype%22%3A%22manual%22%2C%22eula%22%3A%22N%22%2C%22downloaduuid%22%3A%2262b0340a-717c-4aed-8b6f-02375227f6c8%22%2C%22purchased%22%3A%22N%22%2C%22dlgtype%22%3A%22Product+Binaries%22%2C%22productversion%22%3A%227.1.2%22%2C%22productfamily%22%3A%22VMware+Player%22%7D&AuthKey=1440054891_9860d10e2bace278c54a6fd9c37ff736" \
-        -O $FILE
-    chmod +x $FILE
-    sudo ./$FILE
-    echo -------------------------------------------------------------------------------------------------------------
-    echo "NOTE: Leaving $FILE in $INSTALLDIR. It is needed for uninstallation"
-}
-
-function uninstall-vmware-player () {
-    cd $INSTALLDIR
-    FILE="VMware-Player-7.1.2-2780323.x86_64.bundle"
-    sudo ./$FILE --uninstall-component=vmware-player
-    rm $FILE
 }
 
 function install-skype () {
@@ -644,13 +592,6 @@ function install-spotifyripper () {
         sudo make install
         cd ..
         rm libspotify-12.1.51-Linux-x86_64-release.tar.gz
-    elif [ ${MACHINE_TYPE} == 'i686' ]; then
-        wget https://developer.spotify.com/download/libspotify/libspotify-12.1.51-Linux-i686-release.tar.gz
-        tar xfz libspotify-12.1.51-Linux-i686-release.tar.gz
-        cd libspotify-12.1.51-Linux-i686-release
-        sudo make install
-        cd ..
-        rm libspotify-12.1.51-Linux-i686-release.tar.gz
     elif [ ${MACHINE_TYPE} == 'armv6l' ]; then
 	wget https://developer.spotify.com/download/libspotify/libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release.tar.gz
         tar xfz libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release.tar.gz
@@ -684,11 +625,6 @@ function uninstall-spotifyripper () {
         sudo make uninstall
         cd ..
         rm -rf libspotify-12.1.51-Linux-x86_64-release
-    elif [ ${MACHINE_TYPE} == 'x86' ]; then
-        cd libspotify-12.1.51-Linux-i686-release
-        sudo make uninstall
-        cd ..
-        rm -rf libspotify-12.1.51-Linux-i686-release
     elif [ ${MACHINE_TYPE} == 'armv6l' ]; then
         cd libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release
         sudo make uninstall
@@ -697,20 +633,6 @@ function uninstall-spotifyripper () {
     fi
 }
 
-# Install wvdial
-function install-wvdial () {
-    sudo apt-get install wvdial
-    sudo rm -f /etc/wvdial.conf
-    sudo usermod -a -G dialout $USER || true
-    sudo usermod -a -G dip $USER || true
-    sudo ln -s $HOME/config/wvdial.conf /etc/wvdial.conf
-    echo "Remember to logout and login for the changes to take affect"
-}
-
-function uninstall-wvdial () {
-    sudo apt-get remove wvdial
-    sudo rm /etc/wvdial.conf
-}
 
 function install-youtube-dl () {
     sudo apt-get remove youtube-dl
@@ -724,12 +646,7 @@ function uninstall-youtube-dl () {
 }
 
 function install-dropbox () {
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        DEB=dropbox_2015.02.12_amd64.deb
-    else
-        DEB=dropbox_2015.02.12_i386.deb
-    fi
+    DEB=dropbox_2015.02.12_amd64.deb
     wget https://www.dropbox.com/download?dl=packages/ubuntu/$DEB -O $DEB
     sudo dpkg -i $DEB
     rm $DEB
@@ -752,8 +669,7 @@ function install-screencast () {
     rm -rf FFcast
 
     # Patch FFcast subcommands
-    # 1, Use avconv (ubuntu) instead of ffmpeg
-    # 2, Adds support for screencast with sound (no aac)
+    # Adds support for screencast with sound (no aac)
     sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
 }
 
@@ -847,21 +763,16 @@ $0 [option]
     --install-macbook
     --install-private-conf
     --install-pipelight             | --uninstall-pipelight
-    --install-fribid                | --uninstall-fribid
     --install-edimax                | --uninstall-edimax
     --install-canon-p150            | --uninstall-canon-p150
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
     --install-citrix12              | --uninstall-citrix12
-    --install-sipe-experimental     | --uninstall-sipe-experimental
-    --install-sipe-latest           | --uninstall-sipe-latest
     --install-spotify               | --uninstall-spotify
-    --install-vmware-player         | --uninstall-vmware-player
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
     --install-spotifyripper         | --uninstall-spotifyripper
-    --install-wvdial                | --uninstall-wvdial
     --install-youtube-dl            | --uninstall-youtube-dl
     --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
@@ -893,12 +804,6 @@ for cmd in "$1"; do
     --uninstall-pipelight)
       uninstall-pipelight
       ;;
-    --install-fribid)
-      install-fribid  
-      ;;
-    --uninstall-fribid)
-      uninstall-fribid  
-      ;;
     --install-edimax)
       install-edimax
       ;;
@@ -926,29 +831,11 @@ for cmd in "$1"; do
     --uninstall-citrix12)
       uninstall-citrix
       ;;
-    --install-sipe-experimental)
-      install-sipe-experimental
-      ;;
-    --uninstall-sipe-experimental)
-      uninstall-sipe-experimental
-      ;;
-    --install-sipe-latest)
-      install-sipe-latest
-      ;;
-    --uninstall-sipe-latest)
-      uninstall-sipe-latest
-      ;;
     --install-spotify)
       install-spotify
       ;;
     --uninstall-spotify)
       uninstall-spotify
-      ;;
-    --install-vmware-player)
-      install-vmware-player
-      ;;
-    --uninstall-vmware-player)
-      uninstall-vmware-player
       ;;
     --install-skype)
       install-skype
@@ -973,12 +860,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-spotifyripper)
       uninstall-spotifyripper
-      ;;
-    --install-wvdial)
-      install-wvdial
-      ;;
-    --uninstall-wvdial)
-      uninstall-wvdial
       ;;
     --install-youtube-dl)
       install-youtube-dl
