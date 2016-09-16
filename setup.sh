@@ -15,8 +15,9 @@ function install-essential () {
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
     # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
-    # bluez-cups openssh
+    # bluez-cups openssh ntp
     #
+    # systemctl enable ntpd.service
     # systemctl enable NetworkManager
 
     # Desktop
@@ -29,7 +30,7 @@ function install-essential () {
     #    rxvt-unicode mpv feh vlc firefox perl-json pavucontrol pulseaudio \
     #    thunar network-manager-applet zathura-pdf-mupdf ttf-inconsolata \
     #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
-    #    x86-video-intel mesa-libgl
+    #    x86-video-intel mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit
     #
     # AUR makepkg -sri
     # pdftk (testing)
@@ -417,33 +418,13 @@ function uninstall-canon-p150 () {
     sudo dpkg -r cndrvsane-p150
 }
 
-# Printer driver Canon Pixma iP100
-# NOTE: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
-#       for additional Canon drivers (ppa:michael-gruz/canon)
-#
 function install-canon-pixma-ip100 () {
-    cd $INSTALLDIR
-
-    # For Ubuntu 14.04: Driver depends on libtiff4, but it is needs manual installation
-    wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
-    sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
-    rm libtiff4_3.9.7-2ubuntu1_amd64.deb
-
-    # Taken from
-    # http://www.canon-europe.com/Support/Consumer_Products/products/printers/InkJet/PIXMA_iP_series/iP100.aspx?type=download&language=&os=Linux
-    wget http://gdlp01.c-wss.com/gds/0/0100001190/02/cnijfilter-ip100series-3.70-1-deb.tar.gz
-    tar xzf cnijfilter-ip100series-3.70-1-deb.tar.gz
-    rm cnijfilter-ip100series-3.70-1-deb.tar.gz
-    cd cnijfilter-ip100series-3.70-1-deb
-    sudo yes "Q" | ./install.sh
-    cd ..
-    rm -rf cnijfilter-ip100series-3.70-1-deb
     cat >/dev/stdout<<END
 
-    # Arch Linux
-    # wget -o ... download link
-    tar xzf cnijfilter-ip100series-3.70-1.tar.gz
-    cd cnijfilter-ip100series-3.70-1.tar.gz
+Ubuntu/debian/steamos: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
+for additional Canon drivers (ppa:michael-gruz/canon)
+
+Arch Linux: AUR: https://github.com/otterdahl/cnijfilter-ip100
 
 =======================================================
 NOTE: It is possible to use the printer over bluetooth.
@@ -659,7 +640,8 @@ function install-spotifyripper () {
     mkdir -p $HOME/.spotify-ripper
     ln -fs $HOME/config/spotify_appkey.key $HOME/.spotify-ripper/spotify_appkey.key
 
-    sudo apt-get install -y lame build-essential libffi-dev python-dev python-pip
+    # sudo apt-get install -y lame build-essential libffi-dev python-dev python-pip
+    sudo pacman -S lame libffi python-pip
 
     # Pip has problems with international characters in $PWD
     cd $HOME
@@ -668,6 +650,7 @@ function install-spotifyripper () {
     echo "----------------------------------------------"
     echo "spotify-ripper installed in $HOME/spotifyripper"
     echo "usage: spotify-ripper [-u <username>] [settings] [spotify URI]"
+    echo "usage in Arch Linux: LD_PRELOAD='/usr/local/lib/libspotify.so.12' spotify-ripper"
 }
 
 function uninstall-spotifyripper () {
