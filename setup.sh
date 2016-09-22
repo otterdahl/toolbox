@@ -3,7 +3,6 @@
 # Targets support for: Ubuntu 16.04, Arch Linux and Raspbian
 
 set -e
-# TODO: tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
@@ -15,7 +14,7 @@ function install-essential () {
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
     # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
-    # bluez-cups openssh ntp
+    # bluez-cups openssh ntp rfkill flashplugin
     #
     # systemctl enable ntpd.service
     # systemctl enable NetworkManager
@@ -337,9 +336,6 @@ function uninstall-edimax () {
 }
 
 # Scanner driver for Canon P-150
-# Arch Linux http://github.com/otterdahl/cnjfilter-ip100.git
-# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
-# sudo lpoptions -d canon-ip100
 function install-canon-p150 () {
     cd $INSTALLDIR
 
@@ -431,12 +427,16 @@ NOTE: It is possible to use the printer over bluetooth.
  1. Add the printer as a bluetooth device
  2. Add printer. Use driver "iP100 Ver.3.70" (Canon)
 =======================================================
+# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
+# sudo lpoptions -d canon-ip100
 END
 }
 
 # Citrix Receiver 13.3.0
-# Arch Linux: Exists in AUR. Needs EULA fix + keyboard mapping
+# https://aur.archlinux.org/icaclient.git
 function install-citrix () {
+    # Arch linux; Exists in AUR. Needs EULA fix + keyboard mapping
+
     cd $INSTALLDIR
     sudo dpkg --add-architecture i386 # only needed once
     sudo apt-get update
@@ -468,7 +468,8 @@ function install-citrix () {
 }
 
 # Citrix Receiver 12.1
-# NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics. The problem is only visible on servers running older Citrix versions
+# NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics.
+# The problem is only visible on servers running older Citrix versions
 function install-citrix12 () {
     cd $INSTALLDIR
     sudo dpkg --add-architecture i386 # only needed once
@@ -542,6 +543,8 @@ function uninstall-spotify () {
 }
 
 function install-skype () {
+    # git clone https://aur.archlinux.org/skypeforlinux-bin.git
+    # makepkg -sri
     sudo apt-get install skype
 }
 
@@ -940,3 +943,5 @@ for cmd in "$1"; do
 done
 cd "$opwd"      # Restore path
 exit 0
+
+# vim:ts=4:sw=4:et:cc=80:
