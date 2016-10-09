@@ -6,7 +6,8 @@
 set -e
 
 DEST=~/photos
-USAGE="usage: `basename $0` [-m|--memory-card] [-g|--gphoto2]"
+ORIGIN=/mnt/camera
+USAGE="usage: `basename $0` [-m|--memory-card ($ORIGIN)] [-g|--gphoto2]"
 GPHOTO2=1
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
@@ -22,9 +23,11 @@ while true; do
 	case "$1" in
 		-m|--memory-card)
 			GPHOTO2=0
+			shift
 			;;
 		-g|--gphoto2)
 			GPHOTO2=1
+			shift
 			;;
 		--) shift ; break ;;
 	esac
@@ -37,7 +40,7 @@ if [ $GPHOTO2 -eq 1 ]; then
 	gphoto2 --get-all-files
 	cd ..
 else
-	ORIGIN=`mount | grep camera | awk '{print $3}'`
+	mount $ORIGIN
 fi
 
 # Moves file names ending with JPG
@@ -63,4 +66,6 @@ done
 
 if [ $GPHOTO2 -eq 1 ]; then
 	rm -rf $ORIGIN
+else
+	umount $ORIGIN
 fi
