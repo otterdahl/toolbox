@@ -51,7 +51,7 @@ do
     if [ ! -d "$DEST/$DATE" ]; then
         mkdir -p "$DEST/$DATE"
     fi
-    mv -i "$file" "$DEST/$DATE"
+    mv "$file" "$DEST/$DATE"
 done
 
 # Moves file names ending with MP4
@@ -61,7 +61,7 @@ do
     if [ ! -d "$DEST" ]; then
         mkdir -p "$DEST"
     fi
-    mv -i "$file" "$DEST"
+    mv "$file" "$DEST"
 done
 
 if [ $GPHOTO2 -eq 1 ]; then
