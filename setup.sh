@@ -27,7 +27,7 @@ function install-essential () {
     # Arch Linux
     # sudo pacman -S lightdm lightdm-gtk-greeter i3 dmenu \
     #    rxvt-unicode mpv feh vlc firefox perl-json pavucontrol pulseaudio \
-    #    thunar network-manager-applet zathura-pdf-mupdf ttf-inconsolata \
+    #    thunar network-manager-applet mupdf ttf-inconsolata \
     #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
     #    x86-video-intel mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit
     #
