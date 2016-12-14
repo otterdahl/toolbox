@@ -3,7 +3,6 @@
 # Targets support for: Ubuntu 16.04, Arch Linux and Raspbian
 
 set -e
-# TODO: tellstick, PCTV nanoStick T2 290e
 
 # Install essential applications
 function install-essential () {
@@ -13,10 +12,11 @@ function install-essential () {
          curl opus-tools irssi bitlbee-libpurple
 
     # Arch Linux
-    # sudo pacman -S git vim cron syncthing task screen ghostdriver imagemagick \
+    # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
     # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
-    # bluez-cups
+    # bluez-cups openssh ntp rfkill flashplugin
     #
+    # systemctl enable ntpd.service
     # systemctl enable NetworkManager
 
     # Desktop
@@ -25,9 +25,11 @@ function install-essential () {
         libjson-perl pavucontrol
 
     # Arch Linux
-    # sudo pacman -S lightdm i3-wm i3status dmenu rxvt-unicode mpv feh vlc firefox \
-    #    perl-json pavucontrol pulseaudio thunar network-manager-applet zathura-pdf-mupdf \
-    #    ttf-inconsolata ttf-liberation xorg-xrdb xorg-modmap arandr
+    # sudo pacman -S lightdm lightdm-gtk-greeter i3 dmenu \
+    #    rxvt-unicode mpv feh vlc firefox perl-json pavucontrol pulseaudio \
+    #    thunar network-manager-applet zathura-pdf-mupdf ttf-inconsolata \
+    #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
+    #    x86-video-intel mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit
     #
     # AUR makepkg -sri
     # pdftk (testing)
@@ -44,6 +46,7 @@ function install-essential () {
     # Arch Linux
     # sudo pacman -S mutt procmail offlineimap
     # AUR makepkg -sri davmail
+    mkdir -p ~/log
 
     # Maildirproc
     sudo apt-get install python3-3to2
@@ -60,6 +63,53 @@ function install-essential () {
         sudo apt-get -y install svtplay-dl
     fi
 }
+
+# --- Example installation
+# loadkeys sv-latin1
+# iw dev
+# wifi-menu -o wlo1
+# timedatectl set-ntp true
+# lsblk
+# parted /dev/sdb print
+# parted /dev/sdb
+# mklabel gpt
+# mkpart ESP fat32 1MiB 513MiB
+# set 1 boot on
+# mkpart primary linux-swap 513MiB 4.5GiB
+# mkpart primary ext4 4.5GiB 100%
+# quit
+# lsblk /dev/sdb
+# mkfs.ext4 /dev/sdb3
+# mkswap /dev/sdb2
+# swapon /dev/sdb2
+# mount /dev/sdb3 /mnt
+# mkdir -p /mnt/boot
+# mkfs.fat -F32 /dev/sdb1
+# mount /dev/sdb1 /mnt/boot
+# pacstrap -i /mnt base base-devel
+# genfstab -U /mnt > /mnt/etc/fstab
+# arch-chroot /mnt /bin/bash
+# vi /etc/locale.gen # Uncomment english and sv_SE.UTF8
+# local-gen
+# echo LANG=sv_SE.UTF-8 > /etc/locale.conf
+# echo KEYMAP=sv-latin1 > /etc/vconsole.conf
+# tzselect
+# ln -s /etc/share/zoneinfo/Europe/Stockholm /etc/localtime
+# hwclock --sysohc --utc
+# bootctl install
+# cp /usr/share/systemd/bootctl/arch.conf /boot/loader/entries 
+# pacman -S intel-ucode
+# ----- # Add PARTUUID and initrd /intel-ucode.img to /boot/loader/entries/arch.conf
+# blkid -s PARTUUID -o value /dev/sdb3 >> /boot/loader/entries/arch.conf
+# vi /boot/loader/entries/arch.conf
+# vi /boot/loader/loader.conf
+# vi /etc/hostname
+# vi /etc/hosts
+# pacman -S iw wpa_supplicant dialog
+# passwd
+# exit
+# umount -R /mnt
+# reboot
 
 # Install macbookpro 8,2 Arch Linux
 # 1, Follow beginners guide https://wiki.archlinux.org/index.php/beginners'_guide
@@ -223,6 +273,9 @@ END
     mkdir -p ~/.config/mpv
     ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
 
+    # Configure lynx
+    ln -f -s ~/config/lynxrc ~/.lynxrc
+
     # Add group wheel (wpa_supplicant) and add current user to it
     if [ ! -n "$(grep wheel /etc/group)" ]; then 
         sudo groupadd wheel
@@ -283,9 +336,6 @@ function uninstall-edimax () {
 }
 
 # Scanner driver for Canon P-150
-# Arch Linux http://github.com/otterdahl/cnjfilter-ip100.git
-# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
-# sudo lpoptions -d canon-ip100
 function install-canon-p150 () {
     cd $INSTALLDIR
 
@@ -364,39 +414,21 @@ function uninstall-canon-p150 () {
     sudo dpkg -r cndrvsane-p150
 }
 
-# Printer driver Canon Pixma iP100
-# NOTE: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
-#       for additional Canon drivers (ppa:michael-gruz/canon)
-#
 function install-canon-pixma-ip100 () {
-    cd $INSTALLDIR
-
-    # For Ubuntu 14.04: Driver depends on libtiff4, but it is needs manual installation
-    wget http://old-releases.ubuntu.com/ubuntu/pool/universe/t/tiff3/libtiff4_3.9.7-2ubuntu1_amd64.deb
-    sudo dpkg -i libtiff4_3.9.7-2ubuntu1_amd64.deb
-    rm libtiff4_3.9.7-2ubuntu1_amd64.deb
-
-    # Taken from
-    # http://www.canon-europe.com/Support/Consumer_Products/products/printers/InkJet/PIXMA_iP_series/iP100.aspx?type=download&language=&os=Linux
-    wget http://gdlp01.c-wss.com/gds/0/0100001190/02/cnijfilter-ip100series-3.70-1-deb.tar.gz
-    tar xzf cnijfilter-ip100series-3.70-1-deb.tar.gz
-    rm cnijfilter-ip100series-3.70-1-deb.tar.gz
-    cd cnijfilter-ip100series-3.70-1-deb
-    sudo yes "Q" | ./install.sh
-    cd ..
-    rm -rf cnijfilter-ip100series-3.70-1-deb
     cat >/dev/stdout<<END
 
-    # Arch Linux
-    # wget -o ... download link
-    tar xzf cnijfilter-ip100series-3.70-1.tar.gz
-    cd cnijfilter-ip100series-3.70-1.tar.gz
+Ubuntu/debian/steamos: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
+for additional Canon drivers (ppa:michael-gruz/canon)
+
+Arch Linux: AUR: https://github.com/otterdahl/cnijfilter-ip100
 
 =======================================================
 NOTE: It is possible to use the printer over bluetooth.
  1. Add the printer as a bluetooth device
  2. Add printer. Use driver "iP100 Ver.3.70" (Canon)
 =======================================================
+# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
+# sudo lpoptions -d canon-ip100
 END
 }
 
@@ -404,6 +436,8 @@ END
 # Arch Linux: Exists in AUR. Needs fix keyboard mapping
 # git clone https://aur.archlinux.org/icaclient.git
 function install-citrix () {
+    # Arch linux; Exists in AUR. Needs EULA fix + keyboard mapping
+
     cd $INSTALLDIR
     sudo dpkg --add-architecture i386 # only needed once
     sudo apt-get update
@@ -435,7 +469,8 @@ function install-citrix () {
 }
 
 # Citrix Receiver 12.1
-# NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics. The problem is only visible on servers running older Citrix versions
+# NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics.
+# The problem is only visible on servers running older Citrix versions
 function install-citrix12 () {
     cd $INSTALLDIR
     sudo dpkg --add-architecture i386 # only needed once
@@ -509,6 +544,8 @@ function uninstall-spotify () {
 }
 
 function install-skype () {
+    # git clone https://aur.archlinux.org/skypeforlinux-bin.git
+    # makepkg -sri
     sudo apt-get install skype
 }
 
@@ -607,7 +644,8 @@ function install-spotifyripper () {
     mkdir -p $HOME/.spotify-ripper
     ln -fs $HOME/config/spotify_appkey.key $HOME/.spotify-ripper/spotify_appkey.key
 
-    sudo apt-get install -y lame build-essential libffi-dev python-dev python-pip
+    # sudo apt-get install -y lame build-essential libffi-dev python-dev python-pip
+    sudo pacman -S lame libffi python-pip
 
     # Pip has problems with international characters in $PWD
     cd $HOME
@@ -616,6 +654,7 @@ function install-spotifyripper () {
     echo "----------------------------------------------"
     echo "spotify-ripper installed in $HOME/spotifyripper"
     echo "usage: spotify-ripper [-u <username>] [settings] [spotify URI]"
+    echo "usage in Arch Linux: LD_PRELOAD='/usr/local/lib/libspotify.so.12' spotify-ripper"
 }
 
 function uninstall-spotifyripper () {
@@ -905,3 +944,5 @@ for cmd in "$1"; do
 done
 cd "$opwd"      # Restore path
 exit 0
+
+# vim:ts=4:sw=4:et:cc=80:

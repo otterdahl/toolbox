@@ -26,7 +26,7 @@ function view_result {
 
 AUTOCROP=0
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
-RESOLUTION="--resolution 300"
+RESOLUTION="--resolution 200"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
