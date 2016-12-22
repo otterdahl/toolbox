@@ -335,85 +335,6 @@ function uninstall-edimax () {
     rm -rf rtl8812AU_8821AU_linux
 }
 
-# Scanner driver for Canon P-150
-function install-canon-p150 () {
-    cd $INSTALLDIR
-
-    # Arch Linux
-    # pacman -S sane simple-scan
-    #
-    # Enable multilib. Driver is partly 32-bit
-    # pacman -S lib32-glibc lib32-gcc-libs
-    #
-    # Write udev rule:
-    # Add
-    # # Canon P-150
-    # ATTRS.... 1083, 162c
-    # to /lib/udev/rules.d/49-sane.rules
-
-    # Download driver
-    mkdir -p canon
-    cd canon
-    wget -q http://downloads.canon.com/cpr/software/scanners/150_LINUX_V10.zip
-    SHA1=`sha1sum 150_LINUX_V10.zip | awk '{print $1}'`
-    if [ ! "$SHA1" == "8adac963b318ce28d536c8681aed0e5da70a6d41" ]; then
-        echo "Checksum missmatch"
-        cd $INSTALLDIR
-        rm -rf $INSTALLDIR/canon
-        exit 1;
-    fi
-
-    unzip -q 150_LINUX_V10.zip
-    rm 150_LINUX_V10.zip
-
-    # taken from: http://lowerstrata.blogspot.se/2010/07/canon-p-150-and-linux.html
-
-    # Ubuntu Linux
-    sudo apt-get install libusb-dev
-
-    # Arch Linux
-    # pacman -S libusb-compat
-
-    sudo apt-get install libusb-dev
-    tar xfz cndrvsane-p150-1.00-0.2.tar.gz
-    wget -q https://alioth.debian.org/frs/download.php/file/2318/sane-backends-1.0.19.tar.gz
-    tar xfz sane-backends-1.0.19.tar.gz
-    cd sane-backends-1.0.19
-    ./configure
-    make
-    cd ../cndrvsane-p150-1.00-0.2
-
-    # Ubuntu Linux
-    fakeroot make -f debian/rules binary
-    cd ..
-    sudo dpkg -i cndrvsane-p150_1.00-0.2_amd64.deb
-    sudo ln -s /opt/Canon/lib/canondr /usr/local/lib/canondr
-
-	# Arch Linux
-	# autoreconf -i
-    # ./configure --prefix=/opt/Canon --docdir=/usr/share
-	# make
-	# sudo make install
-    # cd ..
-	# sudo ln -sf /opt/Canon/etc/sane.d/canondr.conf /etc/sane.d
-	# if [ -n "`grep '#[[:space:]]*canondr' /etc/sane.d/dll.conf`" ];then
-	#	sudo sed -i 's,#[[:space:]]*\canondr\),\1,' /etc/sane.d/dll.conf
-	# elif [ -z "`grep canondr /etc/sane.d/dll.conf`" ]; then
-	#	echo canondr | sudo tee -a /etc/sane.d/dll.conf
-	# fi
-	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane
-	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane/libsane-canondr.so.1
-	# sudo ln -sf /opt/Canon/lib/sane/libsane-canondr.so.1.0.0 /usr/lib/sane/libsane-canondr.so
-
-    cd ..
-    rm -rf $INSTALLDIR/canon
-}
-
-function uninstall-canon-p150 () {
-    sudo rm /usr/local/lib/canondr
-    sudo dpkg -r cndrvsane-p150
-}
-
 function install-canon-pixma-ip100 () {
     cat >/dev/stdout<<END
 
@@ -803,7 +724,6 @@ $0 [option]
     --install-private-conf
     --install-pipelight             | --uninstall-pipelight
     --install-edimax                | --uninstall-edimax
-    --install-canon-p150            | --uninstall-canon-p150
     --install-canon-pixma-ip100
     --install-citrix                | --uninstall-citrix
     --install-citrix12              | --uninstall-citrix12
@@ -848,12 +768,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-edimax)
       uninstall-edimax
-      ;;
-    --install-canon-p150)
-      install-canon-p150
-      ;;
-    --uninstall-canon-p150)
-      uninstall-canon-p150
       ;;
     --install-canon-pixma-ip100)
       install-canon-pixma-ip100
