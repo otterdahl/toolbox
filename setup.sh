@@ -354,7 +354,8 @@ END
 }
 
 # Citrix Receiver 13.3.0
-# https://aur.archlinux.org/icaclient.git
+# Arch Linux: Exists in AUR. Needs fix keyboard mapping
+# git clone https://aur.archlinux.org/icaclient.git
 function install-citrix () {
     # Arch linux; Exists in AUR. Needs EULA fix + keyboard mapping
 
