@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 16.04, Arch Linux and Raspbian
+# Targets support for: Ubuntu 16.10, Arch Linux and Raspbian
 
 set -e
 
@@ -21,7 +21,7 @@ function install-essential () {
 
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
-        gnome-icon-theme-full scrot xscreensaver autocutsel rxvt-unicode-256color \
+        scrot xscreensaver autocutsel rxvt-unicode-256color \
         libjson-perl pavucontrol
 
     # Arch Linux
