@@ -25,19 +25,21 @@ function view_result {
 }
 
 AUTOCROP=0
+FIRST=0
+DEVICE_NAME="-d dsseries:usb:0x04F9:0x60E0"
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
 RESOLUTION="--resolution 200"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
-USAGE="usage: `basename $0` [-d|--duplex] [-a|--append] [-c|--crop] [-o|--output <filename>]"
+USAGE="usage: `basename $0` [-d|--duplex] [-1|--first] [-a|--append] [-c|--crop] [-o|--output <filename>]"
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo $USAGE
     exit 1
 fi
 
-TEMP=`getopt -o o:dac --long output:,duplex,append,crop -n 'scan.sh' -- "$@"`
+TEMP=`getopt -o o:d1ac --long output:,duplex,first,append,crop -n 'scan.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
@@ -55,6 +57,10 @@ while true; do
             ;;
         -d|--duplex)
             DUPLEX="--ScanMode Duplex"
+            shift
+            ;;
+        -1|--first)
+            FIRST=1
             shift
             ;;
         -a|--append)
@@ -76,7 +82,7 @@ if [ -a "$FILENAME" ] && [ -z $APPEND ]; then
 fi
 
 # Scan
-scanimage $PAPER_SIZE $DUPLEX $RESOLUTION $MODE --format=tiff --batch="out%04d.tiff" || echo "Scan complete"
+scanimage $DEVICE_NAME $PAPER_SIZE $DUPLEX $RESOLUTION $MODE --format=tiff --batch="out%04d.tiff" || echo "Scan complete"
 
 # Quit if no pages has been made scanned
 if [ ! -e out0001.tiff ]; then
@@ -90,6 +96,13 @@ if [ $AUTOCROP -eq 1 ]; then
         /usr/bin/convert $fil -crop `convert $fil -virtual-pixel edge -fuzz 15% -trim -format '%wx%h%O' info:` +repage c$fil
         mv c$fil $fil
     done
+fi
+
+# Only save first page
+if [ $FIRST -eq 1 ]; then
+    mv out0001.tiff temp.tiff
+    rm out*.tiff
+    mv temp.tiff out0001.tiff
 fi
 
 # Convert
