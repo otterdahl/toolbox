@@ -5,7 +5,7 @@
 # - Autocrop
 # - Duplex or simplex mode
 # - Merging to existing pdf
-# Tested with Canon imageFORMULA P-150
+# Tested with Canon imageFORMULA P-150 and Brother DSMobile 720D
 # Requires SANE, imagemagick, pdftk
 
 set -e
@@ -24,22 +24,28 @@ function view_result {
     $VIEWAPP "$FILENAME"
 }
 
-AUTOCROP=0
-FIRST=0
+# Set FEEDER=1 if scanner has a document feeder (e.g. Canon P-150)
+# - Canon P-150 has a document feeder and scans both sides only if ScanMode=Duplex is set
+# - Brother 720D scans each side to separate pages
+FEEDER=0
+
+# Set device name
 DEVICE_NAME="-d dsseries:usb:0x04F9:0x60E0"
+
+AUTOCROP=0
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
 RESOLUTION="--resolution 200"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
-USAGE="usage: `basename $0` [-d|--duplex] [-1|--first] [-a|--append] [-c|--crop] [-o|--output <filename>]"
+USAGE="usage: `basename $0` [-d|--duplex] [-a|--append] [-c|--crop] [-o|--output <filename>]"
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo $USAGE
     exit 1
 fi
 
-TEMP=`getopt -o o:d1ac --long output:,duplex,first,append,crop -n 'scan.sh' -- "$@"`
+TEMP=`getopt -o o:dac --long output:,duplex,append,crop -n 'scan.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
@@ -57,10 +63,6 @@ while true; do
             ;;
         -d|--duplex)
             DUPLEX="--ScanMode Duplex"
-            shift
-            ;;
-        -1|--first)
-            FIRST=1
             shift
             ;;
         -a|--append)
@@ -98,8 +100,8 @@ if [ $AUTOCROP -eq 1 ]; then
     done
 fi
 
-# Only save first page
-if [ $FIRST -eq 1 ]; then
+# Only save first page if scanner has no feeder and duplex mode has not been set
+if [ $FEEDER -eq 0 ] && [ -z $DUPLEX ]; then
     mv out0001.tiff temp.tiff
     rm out*.tiff
     mv temp.tiff out0001.tiff
