@@ -25,7 +25,8 @@ function view_result {
 }
 
 # Set FEEDER=1 if scanner has a document feeder (e.g. Canon P-150)
-# - Canon P-150 has a document feeder and scans both sides only if ScanMode=Duplex is set
+# - Canon P-150 has a document feeder and scans both sides only if
+#   ScanMode=Duplex is set
 # - Brother 720D scans each side to separate pages
 FEEDER=0
 
@@ -62,7 +63,11 @@ while true; do
             esac
             ;;
         -d|--duplex)
-            DUPLEX="--ScanMode Duplex"
+            DUPLEX=1
+            # Only use ScanMode Duplex if scanner supports it
+            if [ $FEEDER -eq 1 ] ; then
+                OPTIONS=$OPTIONS" --ScanMode Duplex "
+            fi
             shift
             ;;
         -a|--append)
@@ -84,7 +89,7 @@ if [ -a "$FILENAME" ] && [ -z $APPEND ]; then
 fi
 
 # Scan
-scanimage $DEVICE_NAME $PAPER_SIZE $DUPLEX $RESOLUTION $MODE --format=tiff --batch="out%04d.tiff" || echo "Scan complete"
+scanimage $DEVICE_NAME $PAPER_SIZE $OPTIONS $RESOLUTION $MODE --format=tiff --batch="out%04d.tiff" || echo "Scan complete"
 
 # Quit if no pages has been made scanned
 if [ ! -e out0001.tiff ]; then
@@ -100,8 +105,8 @@ if [ $AUTOCROP -eq 1 ]; then
     done
 fi
 
-# Only save first page if scanner has no feeder and duplex mode has not been set
-if [ $FEEDER -eq 0 ] && [ -z $DUPLEX ]; then
+# Only save first page
+if [ $FEEDER -eq 0 ] && [ -z $DUPLEX ] ; then
     mv out0001.tiff temp.tiff
     rm out*.tiff
     mv temp.tiff out0001.tiff
