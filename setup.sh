@@ -336,12 +336,63 @@ function uninstall-edimax () {
 }
 
 function install-canon-pixma-ip100 () {
+    # Arch Linux: AUR: https://github.com/otterdahl/cnijfilter-ip100
+
+    sudo apt install autoconf libtool-bin automake make gcc libcups2-dev libpopt-dev libgtk2.0-dev
+    sudo apt-get remove cnjifilter-common || true
+    cd $INSTALLDIR
+    wget http://gdlp01.c-wss.com/gds/8/0100004118/01/cnijfilter-source-3.70-1.tar.gz
+    tar zxf cnijfilter-source-3.70-1.tar.gz
+    cd cnijfilter-source-3.70-1
+    wget https://raw.githubusercontent.com/otterdahl/cnijfilter-ip100/master/cnij.patch
+    wget https://raw.githubusercontent.com/otterdahl/cnijfilter-ip100/master/cups.patch
+    wget https://raw.githubusercontent.com/otterdahl/cnijfilter-ip100/master/grayscale.patch
+    wget https://raw.githubusercontent.com/otterdahl/cnijfilter-ip100/master/libpng15.patch
+    patch -p1 -i cups.patch
+    patch -p1 -i libpng15.patch
+    patch -p1 -i cnij.patch
+    cd ppd
+    patch -p0 < ../grayscale.patch
+    cd ../libs
+    ./autogen.sh --prefix=/usr --program-suffix=ip100
+    make
+    sudo make install
+    cd ..
+
+    for _dir in cngpij cnijfilter pstocanonij lgmon backend backendnet cngpijmon/cnijnpr
+    do 
+        cd ${_dir}
+        ./autogen.sh --prefix=/usr --program-suffix=ip100 --enable-progpath=/usr/bin
+        make LIBS=-ldl
+        sudo make install
+        cd ..
+    done
+
+    cd ../ppd
+    ./autogen.sh --prefix=/usr --program-suffix=ip100
+    make
+    sudo make install
+    cd ..
+
+    LNGBITS=`getconf LONG_BIT`
+    if [ $LNGBITS -eq 32 ]; then
+      _arc=32
+    else
+      _arc=64
+    fi
+    sudo install -d /usr/lib/bjlib
+    sudo install -m 755 303/database/* /usr/lib/bjlib
+    sudo install -s -m 755 303/libs_bin${_arc}/*.so.* /usr/lib
+    sudo install -s -m 755 com/libs_bin${_arc}/*.so.* /usr/lib
+    sudo install -D LICENSE-cnijfilter-3.70EN.txt /usr/share/licenses/cnijfilter-ip100$/LICENSE-cnijfilter-3.70EN.txt
+    sudo ln -s /usr/lib/cups/filter/pstocanonijip100 /usr/lib/cups/filter/pstocanonij
+    sudo ldconfig
+
+    cd ..
+    rm -rf cnijfilter-source-3.70-1
+    rm -rf cnijfilter-source-3.70-1.tar.gz
+
     cat >/dev/stdout<<END
-
-Ubuntu/debian/steamos: See http://www.iheartubuntu.com/2012/02/install-canon-printer-for-ubuntu-linux.html
-for additional Canon drivers (ppa:michael-gruz/canon)
-
-Arch Linux: AUR: https://github.com/otterdahl/cnijfilter-ip100
 
 =======================================================
 NOTE: It is possible to use the printer over bluetooth.
