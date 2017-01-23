@@ -203,8 +203,8 @@ function install-private-conf () {
     ln -f -s ~/config/channels.conf ~/.tzap/channels.conf
 
     # Transparent encrypted editing in vim
-    gpg --import ~/config/public.key || echo "Key already added"
-    gpg --import ~/config/secret.key || echo "Key already added"
+    gpg --import ~/config/gpg/public_gmail.key || echo "Key already added"
+    gpg --import ~/config/gpg/private_gmail.key || echo "Key already added"
     mkdir -p ~/.vim/plugin
     ln -f -s ~/config/gnupg.vim ~/.vim/plugin/gnupg.vim
     if grep -q GPG_TTY ~/.bashrc; then
