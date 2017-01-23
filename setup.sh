@@ -404,38 +404,15 @@ NOTE: It is possible to use the printer over bluetooth.
 END
 }
 
-# Citrix Receiver 13.3.0
-# Arch Linux: Exists in AUR. Needs fix keyboard mapping
-# git clone https://aur.archlinux.org/icaclient.git
-function install-citrix () {
-    # Arch linux; Exists in AUR. Needs EULA fix + keyboard mapping
-
-    cd $INSTALLDIR
-    sudo dpkg --add-architecture i386 # only needed once
-    sudo apt-get update
-
-    # From https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
-    wget `curl https://www.citrix.com/downloads/citrix-receiver/linux/receiver-for-linux-latest.html |
-    grep "icaclient_13.3.0.344519_amd64.deb?__gda__" |
-    sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_13.3.0_amd64.deb
-
-    sudo dpkg -i icaclient_13.3.0_amd64.deb || true
-    sudo apt-get -fy install
-    rm icaclient_13.3.0_amd64.deb
-
-    # NOTE: Citrix Receiver 13.3.0 might fail to launch due to missing EULA file
-    echo missing eula | sudo tee /opt/Citrix/ICAClient//nls/en/eula.txt
+# Fix Citrix Receiver 13.X
+function fix-citrix () {
 
     # Symlink certificates from Firefox
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
 
     # Workaround for wrong keyboard mapping. Need Swedish mapping
-    if [ -d $HOME/.ICAClient ]; then
-        sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
-    else
-        sudo sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" /opt/Citrix/ICAClient/config/wfclient.ini
-    fi
+    sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
 
     echo "In Firefox, go to Tools -> Add-ons -> Plugins, and make sure the 'Citrix Receiver for Linux' plugin is set to 'Always Activate'. "
 }
@@ -777,8 +754,8 @@ $0 [option]
     --install-pipelight             | --uninstall-pipelight
     --install-edimax                | --uninstall-edimax
     --install-canon-pixma-ip100
-    --install-citrix                | --uninstall-citrix
-    --install-citrix12              | --uninstall-citrix12
+    --fix-citrix
+    --install-citrix12              | --uninstall-citrix
     --install-spotify               | --uninstall-spotify
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
@@ -824,16 +801,13 @@ for cmd in "$1"; do
     --install-canon-pixma-ip100)
       install-canon-pixma-ip100
       ;;
-    --install-citrix)
-      install-citrix
+    --fix-citrix)
+      fix-citrix
       ;;
     --install-citrix12)
       install-citrix12
       ;;
     --uninstall-citrix)
-      uninstall-citrix
-      ;;
-    --uninstall-citrix12)
       uninstall-citrix
       ;;
     --install-spotify)
