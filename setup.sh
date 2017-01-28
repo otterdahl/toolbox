@@ -11,6 +11,9 @@ function install-essential () {
          bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
          curl opus-tools irssi bitlbee-libpurple
 
+    # Ubuntu 17.04
+    sudo apt install khal vdirsyncer davmail
+
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
     # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
@@ -255,6 +258,14 @@ END
 
     # Configure offlineimap
     ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
+
+    # Configure vdirsyncer
+    mkdir -p ~/.config/vdirsyncer
+    ln -f -s ~/config/vdirsyncerrc ~/.config/vdirsyncer/config
+
+    # Configure khal
+    mkdir -p ~/.config/khal
+    ln -f -s ~/config/khalrc ~/.config/khal/config
 
     # Set irssi config
     ln -f -s ~/config/irssi ~/.irssi
