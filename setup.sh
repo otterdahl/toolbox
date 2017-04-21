@@ -9,10 +9,8 @@ function install-essential () {
     # Ubuntu
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
          bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
-         curl opus-tools irssi bitlbee-libpurple
-
-    # Ubuntu 17.04
-    sudo apt install khal vdirsyncer davmail
+         curl opus-tools irssi bitlbee-libpurple gptfdisk util-linux \
+         exfat-utils khal vdirsyncer davmail
 
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
@@ -24,15 +22,15 @@ function install-essential () {
 
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
-        scrot xscreensaver autocutsel rxvt-unicode-256color \
-        libjson-perl pavucontrol
+        scrot xscreensaver autocutsel  libjson-perl pavucontrol
 
     # Arch Linux
     # sudo pacman -S lightdm lightdm-gtk-greeter i3 dmenu \
-    #    rxvt-unicode mpv feh vlc firefox perl-json pavucontrol pulseaudio \
+    #    mpv feh vlc firefox perl-json pavucontrol pulseaudio \
     #    thunar network-manager-applet mupdf ttf-inconsolata \
     #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
-    #    x86-video-intel mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit
+    #    x86-video-intel mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit \
+    #    gnome-terminal
     #
     # AUR makepkg -sri
     # pdftk (testing)
@@ -245,12 +243,8 @@ END
     # Used for appending $PATH to use with dmenu (bashrc won't do)
     ln -f -s ~/config/xsessionrc ~/.xsessionrc
 
-    # Configure Xresources
-    # Used for adding colors to urxvt (in i3)
-    ln -f -s ~/config/Xresources ~/.Xresources
-
     # Configure profile
-    # Used for urxvt to read .bashrc which sets colors and bash_aliases
+    # Used for reading .bashrc which sets colors and bash_aliases
     ln -f -s ~/config/profile ~/.profile
 
     # Configure bashrc
@@ -418,7 +412,17 @@ END
 # Fix Citrix Receiver 13.X
 function fix-citrix () {
 
+    # * Notes for Arch Linux *
+    # Only Citrix 13.3 has been successfully tested
+    # $ git checkout 1fc614fe0feeb9d1feb40f406b132fe30af3c8e8
+    # $ makepkg -sri
+
     # Symlink certificates from Firefox
+    # New style. TODO: Verify
+    # sudo *ln -f -s /usr/share/ca-certificates/trust-source/* /opt/Citrix/ICAClient/keystore/cacerts/
+    # sudo trust extract-compat
+
+    # Old style. No longer working properly in Arch. TODO: Verify
     sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
     sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
 
@@ -895,4 +899,4 @@ done
 cd "$opwd"      # Restore path
 exit 0
 
-# vim:ts=4:sw=4:et:cc=80:
+# vim:ts=4:sw=4:et:cc=80:sts=4
