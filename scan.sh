@@ -35,7 +35,7 @@ DEVICE_NAME="-d dsseries:usb:0x04F9:0x60E0"
 
 AUTOCROP=0
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
-RESOLUTION="--resolution 200"
+RESOLUTION="--resolution 300"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
@@ -139,4 +139,4 @@ rm out*.pdf
 rm out*.jpg
 
 # View result
-view_result "$FILENAME"
+view_result
