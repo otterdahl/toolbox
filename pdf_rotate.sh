@@ -3,8 +3,6 @@
 #        range: e.g. "2-3". Commas are not supported
 #        angle, e.g. "-90", "90", "180"
 # Basically a wrapper around pdftk for common rotate operations
-# TODO: doesn't deal with spaces in file names
-# TODO: Check input better. e.g. 1,2 is not supported, -r is required
 
 set -e
 
@@ -78,7 +76,12 @@ while true; do
     esac
 done
 
-NUMPAGES=`pdftk $INPUT dump_data | grep NumberOfPages | awk '{print $2}'`
+# if no range is defined, set RANGE=1
+if [ -z $RANGE ]; then
+    RANGE="1"
+fi
+
+NUMPAGES=`pdftk "$INPUT" dump_data | grep NumberOfPages | awk '{print $2}'`
 START=`echo $RANGE | awk -F"-" '{print $1} '`
 END=`echo $RANGE | awk -F"-" '{print $2} '`
 
@@ -97,8 +100,8 @@ if [ "$NUMPAGES" -gt "$END" ]; then
 fi
 
 OUTPUT=temp.pdf
-pdftk $INPUT cat $PRE $RANGE$ANGLE $POST output $OUTPUT
-mv -f $OUTPUT $INPUT
+pdftk "$INPUT" cat $PRE $RANGE$ANGLE $POST output "$OUTPUT"
+mv -f "$OUTPUT" "$INPUT"
 
 # View result
 view_result
