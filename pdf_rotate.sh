@@ -9,7 +9,19 @@
 set -e
 
 USAGE="usage: pdf_rotate.sh [-r|--range <range, e.g. 1-3>] [-a|--angle [-90,0,90,180] [-f|--file <filename>]"
-VIEWAPP=`grep 'application/pdf' /etc/mailcap | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
+function view_result {
+    if [ -f $HOME/.mailcap ]; then
+        MAILCAP=$HOME/.mailcap
+    else
+        if [ -f /etc/mailcap ]; then
+            MAILCAP=/etc/mailcap
+        else
+            return
+        fi
+    fi
+    VIEWAPP=`grep 'application/pdf' $MAILCAP | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
+    $VIEWAPP "$INPUT"
+}
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo $USAGE
@@ -87,4 +99,6 @@ fi
 OUTPUT=temp.pdf
 pdftk $INPUT cat $PRE $RANGE$ANGLE $POST output $OUTPUT
 mv -f $OUTPUT $INPUT
-$VIEWAPP "$INPUT"
+
+# View result
+view_result
