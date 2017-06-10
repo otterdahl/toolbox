@@ -260,6 +260,7 @@ END
     # Configure khal
     mkdir -p ~/.config/khal
     ln -f -s ~/config/khalrc ~/.config/khal/config
+    ln -f -s ~/config/khalrc ~/.config/khal/khal.conf # khal 0.8.4
 
     # Set irssi config
     ln -f -s ~/config/irssi ~/.irssi
