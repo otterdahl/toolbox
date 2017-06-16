@@ -76,6 +76,12 @@ while true; do
     esac
 done
 
+# if -f option not used, exit
+if [ -z $INPUT ]; then
+    echo $USAGE
+    exit 1
+fi
+
 # if no range is defined, set RANGE=1
 if [ -z $RANGE ]; then
     RANGE="1"
