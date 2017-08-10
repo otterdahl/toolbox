@@ -33,13 +33,16 @@ FEEDER=0
 # Set device name
 DEVICE_NAME="-d dsseries:usb:0x04F9:0x60E0"
 
+# Autocrop fuzz in percent
+FUZZ=15
+
 AUTOCROP=0
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
 RESOLUTION="--resolution 300"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
-USAGE="usage: `basename $0` [-d|--duplex] [-a|--append] [-c|--crop] [-o|--output <filename>]"
+USAGE="usage: `basename $0` [-d|--duplex] [-a|--append] [-c|--crop] [-z|--fuzz <0-100>] [-o|--output <filename>]"
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo $USAGE
@@ -78,6 +81,17 @@ while true; do
             AUTOCROP=1
             shift
             ;;
+	-z|--fuzz)
+            case "$2" in
+                "")
+                    shift 2
+	            ;;
+                *)
+	            FUZZ="$2"
+                    shift 2
+                    ;;
+            esac
+            ;;
         --) shift ; break ;;
     esac
 done
@@ -100,7 +114,7 @@ fi
 if [ $AUTOCROP -eq 1 ]; then
     for fil in out*.tiff
     do
-        /usr/bin/convert $fil -crop `convert $fil -virtual-pixel edge -fuzz 15% -trim -format '%wx%h%O' info:` +repage c$fil
+        /usr/bin/convert $fil -crop `convert $fil -virtual-pixel edge -fuzz $FUZZ% -trim -format '%wx%h%O' info:` +repage c$fil
         mv c$fil $fil
     done
 fi
