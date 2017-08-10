@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 16.10, Arch Linux and Raspbian
+# Targets support for: Ubuntu 17.04, Arch Linux and Raspbian
 
 set -e
 
@@ -10,7 +10,7 @@ function install-essential () {
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
          bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
          curl opus-tools irssi bitlbee-libpurple gptfdisk util-linux \
-         exfat-utils khal vdirsyncer davmail
+         exfat-utils
 
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
@@ -22,7 +22,7 @@ function install-essential () {
 
     # Desktop
     sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
-        scrot xscreensaver autocutsel  libjson-perl pavucontrol
+        scrot xscreensaver autocutsel libjson-perl pavucontrol
 
     # Arch Linux
     # sudo pacman -S lightdm lightdm-gtk-greeter i3 dmenu \
@@ -42,11 +42,10 @@ function install-essential () {
     # sudo systemctl enable mbpfan.service
 
     # Email
-    sudo apt-get install mutt procmail offlineimap msmtp
+    sudo apt-get install mutt procmail
 
     # Arch Linux
-    # sudo pacman -S mutt procmail offlineimap
-    # AUR makepkg -sri davmail
+    # sudo pacman -S mutt procmail
     mkdir -p ~/log
 
     # Maildirproc
@@ -250,17 +249,6 @@ END
 
     # Configure bashrc
     ln -f -s ~/config/bashrc ~/.bashrc
-
-    # Configure offlineimap
-    ln -f -s ~/config/offlineimaprc ~/.offlineimaprc
-
-    # Configure vdirsyncer
-    mkdir -p ~/.config/vdirsyncer
-    ln -f -s ~/config/vdirsyncerrc ~/.config/vdirsyncer/config
-
-    # Configure khal
-    mkdir -p ~/.config/khal
-    ln -f -s ~/config/khalrc ~/.config/khal/config
 
     # Set irssi config
     ln -f -s ~/config/irssi ~/.irssi
