@@ -29,7 +29,7 @@ function install-essential () {
     #    mpv feh vlc firefox perl-json pavucontrol pulseaudio \
     #    thunar network-manager-applet mupdf ttf-inconsolata \
     #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
-    #    x86-video-intel mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit \
+    #    mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit \
     #    gnome-terminal
     #
     # AUR makepkg -sri
