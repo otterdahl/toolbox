@@ -421,52 +421,6 @@ function fix-citrix () {
     echo "In Firefox, go to Tools -> Add-ons -> Plugins, and make sure the 'Citrix Receiver for Linux' plugin is set to 'Always Activate'. "
 }
 
-# Citrix Receiver 12.1
-# NOTE: Citrix Receiver 13.x has sometimes problems with tearing graphics.
-# The problem is only visible on servers running older Citrix versions
-function install-citrix12 () {
-    cd $INSTALLDIR
-    sudo dpkg --add-architecture i386 # only needed once
-
-    # As of Ubuntu 15.10, the libxp6:i386 package needs to be installed separately
-    wget -q http://se.archive.ubuntu.com/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_i386.deb
-    sudo dpkg -i libxp6_1.0.2-1ubuntu1_i386.deb
-
-    sudo apt-get update
-    sudo apt-get -y install libmotif4:i386 nspluginwrapper lib32z1 libc6-i386 libxpm4:i386 libasound2:i386
-
-    # From https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html
-    wget `curl https://www.citrix.com/downloads/citrix-receiver/legacy-receiver-for-linux/receiver-for-linux-121.html |
-    grep "icaclient_12.1.0_amd64.deb?__gda__" |
-    sed -e 's/.*rel=\"\(.*\)\" id.*/http:\1/p' | uniq` -O icaclient_12.1.0_amd64.deb
-
-    # The .deb package is broken, and needs fixing
-    mkdir ica_temp
-    dpkg-deb -x icaclient_12.1.0_amd64.deb ica_temp
-    dpkg-deb --control icaclient_12.1.0_amd64.deb ica_temp/DEBIAN
-    sed -i 's/Depends:.*/Depends: libc6-i386 (>= 2.7-1), lib32z1, nspluginwrapper, libxp6:i386, libxpm4:i386/' ica_temp/DEBIAN/control
-    sed -i 's/\"i\[0-9\]86/-E \"i\[0-9\]86\|x86_64/' ica_temp/DEBIAN/postinst
-    dpkg -b ica_temp icaclient-modified.deb
-    sudo dpkg -i icaclient-modified.deb
-    rm icaclient-modified.deb
-    rm icaclient_12.1.0_amd64.deb
-    rm -rf ica_temp
-
-    # Symlink certificates from Firefox
-    sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
-    sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
-
-    # Workaround for wrong keyboard mapping. Need Swedish mapping
-    if [ -d $HOME/.ICAClient ]; then
-        sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
-    else
-        sudo sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" /opt/Citrix/ICAClient/config/wfclient.ini
-    fi
-
-    # Fix "Lockdown requirements not satisfied (SETLEDPos)" error message
-    sudo sed -i "s/SucConnTimeout=/SucConnTimeout=\nSETLEDPos=*/" /opt/Citrix/ICAClient/config/All_Regions.ini
-}
-
 function uninstall-citrix () {
     sudo rm -rf /opt/Citrix/ICAClient/keystore/cacerts
     sudo apt-get -y remove --purge icaclient || echo "icaclient already removed"
@@ -758,8 +712,7 @@ $0 [option]
     --install-pipelight             | --uninstall-pipelight
     --install-edimax                | --uninstall-edimax
     --install-canon-pixma-ip100
-    --fix-citrix
-    --install-citrix12              | --uninstall-citrix
+    --fix-citrix                    | --uninstall-citrix
     --install-spotify               | --uninstall-spotify
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
@@ -807,9 +760,6 @@ for cmd in "$1"; do
       ;;
     --fix-citrix)
       fix-citrix
-      ;;
-    --install-citrix12)
-      install-citrix12
       ;;
     --uninstall-citrix)
       uninstall-citrix
