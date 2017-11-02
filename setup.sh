@@ -400,12 +400,6 @@ END
 
 # Fix Citrix Receiver 13.X
 function fix-citrix () {
-
-    # * Notes for Arch Linux *
-    # Only Citrix 13.3 has been successfully tested
-    # $ git checkout 1fc614fe0feeb9d1feb40f406b132fe30af3c8e8
-    # $ makepkg -sri
-
     # Symlink certificates from Firefox
     # New style. TODO: Verify
     # sudo *ln -f -s /usr/share/ca-certificates/trust-source/* /opt/Citrix/ICAClient/keystore/cacerts/
