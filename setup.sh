@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 17.04, Arch Linux and Raspbian
+# Targets support for: Ubuntu 17.10, Arch Linux and Raspbian
 
 set -e
 
@@ -614,48 +614,6 @@ function install-screencast () {
     sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
 }
 
-# Experimental Pulseaudio with Airplay support
-function install-raop2 () {
-    sudo apt-get install build-essential paprefs git pulseaudio-module-raop intltool libjack0
-    sudo apt-get build-dep pulseaudio
-    cd $INSTALLDIR
-    if [ ! -d pulseaudio-raop2 ]; then
-        git clone https://github.com/hfujita/pulseaudio-raop2.git
-        cd pulseaudio-raop2
-    else
-        cd pulseaudio-raop2
-        git pull
-    fi
-    ./autogen.sh
-    CFLAGS="-ggdb3 -O0" LDFLAGS="-ggdb3" ./configure --prefix=$HOME --enable-x11 --disable-hal-compat
-    make
-}
-
-function uninstall-raop2 () {
-    disable-raop2
-    cd $INSTALLDIR
-    rm -rf pulseaudio-raop2
-}
-
-function enable-raop2 () {
-    zenity --info --text zenity --info --text "Turn on 'Make discoverable Apple AirTunes sound devices available locally'"
-    paprefs
-
-    mkdir -p ~/.pulse
-    echo "autospawn=no" > ~/.pulse/client.conf
-    pulseaudio -k || true
-    cd $INSTALLDIR/pulseaudio-raop2
-    ./src/pulseaudio -n -F src/default.pa -p $(pwd)/src/ --log-time=1 -vvvv 2>&1 | tee pulse.log
-}
-
-function disable-raop2 () {
-    # Reenable original pulseaudio
-    pulseaudio -D
-    if [ -e ~/.pulse/client.conf ]; then
-        sed -i "s/autospawn=no//" ~/.pulse/client.conf
-    fi
-}
-
 function fix-steam-ubuntu1504 () {
     # Fix steam on Ubuntu 15.04
     MACHINE_TYPE=`uname -m`
@@ -715,9 +673,6 @@ $0 [option]
     --install-youtube-dl            | --uninstall-youtube-dl
     --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
-    --install-raop2                 | --uninstall-raop2
-    --enable-raop2
-    --disable-raop2
     --fix-steam-ubuntu1504
     --pair-apple-bluetooth-keyboard 
 END
@@ -805,18 +760,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-screencast)
       uninstall-screencast
-      ;;
-    --install-raop2)
-      install-raop2
-      ;;
-    --uninstall-raop2)
-      uninstall-raop2
-      ;;
-    --enable-raop2)
-      enable-raop2
-      ;;
-    --disable-raop2)
-      disable-raop2
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
