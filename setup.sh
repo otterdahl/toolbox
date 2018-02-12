@@ -398,21 +398,12 @@ NOTE: It is possible to use the printer over bluetooth.
 END
 }
 
-# Fix Citrix Receiver 13.X
+# Fix Citrix Receiver 13.4 keyboard mapping
+# icaclient version >13.4 may have problems with "SSL Error 4"
+# https://aur.archlinux.org/packages/icaclient-old
 function fix-citrix () {
-    # Symlink certificates from Firefox
-    # New style. TODO: Verify
-    # sudo *ln -f -s /usr/share/ca-certificates/trust-source/* /opt/Citrix/ICAClient/keystore/cacerts/
-    # sudo trust extract-compat
-
-    # Old style. No longer working properly in Arch. TODO: Verify
-    sudo ln -f -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
-    sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts
-
     # Workaround for wrong keyboard mapping. Need Swedish mapping
     sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
-
-    echo "In Firefox, go to Tools -> Add-ons -> Plugins, and make sure the 'Citrix Receiver for Linux' plugin is set to 'Always Activate'. "
 }
 
 function uninstall-citrix () {
