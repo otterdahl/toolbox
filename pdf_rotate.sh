@@ -77,7 +77,7 @@ while true; do
 done
 
 # if -f option not used, exit
-if [ -z $INPUT ]; then
+if [ -z "$INPUT" ]; then
     echo $USAGE
     exit 1
 fi
