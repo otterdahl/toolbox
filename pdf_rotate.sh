@@ -70,6 +70,12 @@ while true; do
     esac
 done
 
+# Exit if no input files
+if [ -z "$1" ]; then
+    echo $USAGE
+    exit 1
+fi
+
 # Add input files
 while [ -n "$1" ]; do
 	INPUT+=($1)
