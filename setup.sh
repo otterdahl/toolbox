@@ -565,7 +565,6 @@ function uninstall-spotifyripper () {
     fi
 }
 
-
 function install-youtube-dl () {
     sudo apt-get remove youtube-dl
     sudo wget https://yt-dl.org/downloads/2014.09.29.2/youtube-dl -O /usr/local/bin/youtube-dl
@@ -616,25 +615,6 @@ function fix-steam-ubuntu1504 () {
     mv libstdc++.so.6 libstdc++.so.6.bak
 }
 
-# Pair Apple bluetooth keyboard
-# NOTE: Untested
-function pair-apple-bluetooth-keyboard () {
-    # Put the keyboard in pair-mode
-    hcitool scan
-    #Scanning ...
-    #    60:C5:47:19:5F:55   Apple Wireless Keyboard
-
-    # bluez-simple-agent hci0 60:C5:47:19:5F:55
-    # Enter PIN Code: 0000
-    # -> Enter Pin code at keyboard and press enter
-    # bluez-test-device trusted 60:C5:47:19:5F:55 yes
-    # bluez-test-input connect 60:C5:47:19:5F:55
-
-    # NOTE: Numlock: fn+F6
-    # NOTE: Bluetooth pairing problems:
-    # https://wiki.archlinux.org/index.php/MacBook_Pro_8,1_/_8,2_/_8,3_%282011%29#Bluetooth
-}
-
 # Find suitable installation dir
 function setdir () {
     if [ -d "$HOME/Hämtningar" ]; then
@@ -665,7 +645,6 @@ $0 [option]
     --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
     --fix-steam-ubuntu1504
-    --pair-apple-bluetooth-keyboard 
 END
 }
 
@@ -754,9 +733,6 @@ for cmd in "$1"; do
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
-      ;;
-    --pair-apple-bluetooth-keyboard)
-      pair-apple-bluetooth-keyboard 
       ;;
     *)
       usage
