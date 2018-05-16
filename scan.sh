@@ -37,19 +37,20 @@ DEVICE_NAME="-d dsseries:usb:0x04F9:0x60E0"
 FUZZ=15
 
 AUTOCROP=0
+RAW=0
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
 RESOLUTION="--resolution 300"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
-USAGE="usage: `basename $0` [-d|--duplex] [-a|--append] [-c|--crop] [-z|--fuzz <0-100>] [-o|--output <filename>]"
+USAGE="usage: `basename $0` [-d|--duplex] [-a|--append] [-c|--crop] [-z|--fuzz <0-100>] [-r|--raw] [-o|--output <filename>]"
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo $USAGE
     exit 1
 fi
 
-TEMP=`getopt -o o:dac --long output:,duplex,append,crop -n 'scan.sh' -- "$@"`
+TEMP=`getopt -o o:daczr --long output:,duplex,append,crop,fuzz,raw -n 'scan.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
@@ -92,6 +93,10 @@ while true; do
                     ;;
             esac
             ;;
+	 -r|--raw)
+	    RAW=1
+	    shift
+	    ;;
         --) shift ; break ;;
     esac
 done
@@ -107,6 +112,11 @@ scanimage $DEVICE_NAME $PAPER_SIZE $OPTIONS $RESOLUTION $MODE --format=tiff --ba
 
 # Quit if no pages has been made scanned
 if [ ! -e out0001.tiff ]; then
+    exit
+fi
+
+# Quit with a tiff file if RAW selected
+if [ $RAW -eq 1 ]; then
     exit
 fi
 
