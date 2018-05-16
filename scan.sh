@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: scan.sh [-d|--duplex] [-a|--append] [-c|--crop] [-o|--output <filename>]
+# usage: scan.sh [-d|--duplex] [-a|--append] [-c|--crop] [-z|--fuzz <0-100>] [-o|--output <filename>]
 # Scans a set of pages and saves to pdf
 # Features:
 # - Autocrop
@@ -50,7 +50,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     exit 1
 fi
 
-TEMP=`getopt -o o:daczr --long output:,duplex,append,crop,fuzz,raw -n 'scan.sh' -- "$@"`
+TEMP=`getopt -o o:dacz:r --long output:,duplex,append,crop,fuzz:,raw -n 'scan.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
