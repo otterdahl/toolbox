@@ -1,12 +1,14 @@
 #!/bin/bash
-# usage: pdf_rotate.sh [-r|--range <range>] [-a|--angle [-90,0,90,180] [-f|--file <filename>]
+# usage: pdf_rotate.sh [-r|--range <range>] [-a|--angle [-90,0,90,180] [<filenames>]
 #        range: e.g. "2-3". Commas are not supported
 #        angle, e.g. "-90", "90", "180"
 # Basically a wrapper around pdftk for common rotate operations
 
 set -e
 
-USAGE="usage: pdf_rotate.sh [-r|--range <range, e.g. 1-3>] [-a|--angle [-90,0,90,180] [-f|--file <filename>]"
+USAGE="usage: pdf_rotate.sh [-r|--range <range, e.g. 1-3>] [-a|--angle [-90,0,90,180] [<filenames>]"
+INPUT=()
+
 function view_result {
     if [ -f $HOME/.mailcap ]; then
         MAILCAP=$HOME/.mailcap
@@ -18,7 +20,10 @@ function view_result {
         fi
     fi
     VIEWAPP=`grep 'application/pdf' $MAILCAP | awk -F\;  '{ print $2 }' | awk -F\  '{ print $1 }' | head -1`
-    $VIEWAPP "$INPUT"
+    for ITEM in ${INPUT[*]}
+    do
+    	$VIEWAPP "$ITEM"
+    done
 }
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
@@ -26,7 +31,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     exit 1
 fi
 
-TEMP=`getopt -o r:a:f: --long range:,angle:,file: -n 'pdf_rotate.sh' -- "$@"`
+TEMP=`getopt -o r:a: --long range:,angle: -n 'pdf_rotate.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
@@ -61,26 +66,15 @@ while true; do
                     ;;
             esac
             ;;
-        -f|--file)
-            case "$2" in
-                "")
-                    shift 2
-                    ;;
-                *)
-                    INPUT="$2"
-                    shift 2
-                    ;;
-            esac
-            ;;
         --) shift ; break ;;
     esac
 done
 
-# if -f option not used, exit
-if [ -z "$INPUT" ]; then
-    echo $USAGE
-    exit 1
-fi
+# Add input files
+while [ -n "$1" ]; do
+	INPUT+=($1)
+	shift;
+done
 
 # if no range is defined, set RANGE=1
 if [ -z $RANGE ]; then
@@ -106,8 +100,11 @@ if [ "$NUMPAGES" -gt "$END" ]; then
 fi
 
 OUTPUT=temp.pdf
-pdftk "$INPUT" cat $PRE $RANGE$ANGLE $POST output "$OUTPUT"
-mv -f "$OUTPUT" "$INPUT"
+for ITEM in ${INPUT[*]}
+do
+    pdftk "$ITEM" cat $PRE $RANGE$ANGLE $POST output "$OUTPUT"
+    mv -f "$OUTPUT" "$ITEM"
+done
 
 # View result
 view_result
