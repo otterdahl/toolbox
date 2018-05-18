@@ -622,6 +622,14 @@ function install-opencbm () {
     sudo ldconfig
 }
 
+# Install amitools
+function install-amitools () {
+    cd ~/build-repos
+    sudo apt install cython
+    git clone https://github.com/cnvogelg/amitools
+    sudo python setup.py install
+}
+
 # Fix steam on Ubuntu 15.04
 function fix-steam-ubuntu1504 () {
     MACHINE_TYPE=`uname -m`
@@ -664,6 +672,7 @@ $0 [option]
     --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
     --install-opencbm
+    --install-amitools
     --fix-steam-ubuntu1504
 END
 }
@@ -753,6 +762,9 @@ for cmd in "$1"; do
       ;;
     --install-opencbm)
       install-opencbm
+      ;;
+    --install-amitools)
+      install-amitools
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
