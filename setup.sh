@@ -604,8 +604,26 @@ function install-screencast () {
     sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
 }
 
+# Install opencbm
+function install-opencbm () {
+
+    cd ~/build-repos
+    git clone https://github.com/cc65/cc65.git
+    cd cc65
+    make
+    sudo make install PREFIX=/usr
+
+    cd ~/build-repos
+    sudo apt-get install libusb-dev libncurses5-dev
+    git clone https://github.com/zyonee/opencbm.git
+    cd opencbm
+    make -f LINUX/Makefile opencbm plugin-xum1541
+    sudo make -f LINUX/Makefile install install-plugin-xum1541
+    sudo ldconfig
+}
+
+# Fix steam on Ubuntu 15.04
 function fix-steam-ubuntu1504 () {
-    # Fix steam on Ubuntu 15.04
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
         cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
@@ -614,6 +632,7 @@ function fix-steam-ubuntu1504 () {
     fi
     mv libstdc++.so.6 libstdc++.so.6.bak
 }
+
 
 # Find suitable installation dir
 function setdir () {
@@ -644,6 +663,7 @@ $0 [option]
     --install-youtube-dl            | --uninstall-youtube-dl
     --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
+    --install-opencbm
     --fix-steam-ubuntu1504
 END
 }
@@ -730,6 +750,9 @@ for cmd in "$1"; do
       ;;
     --uninstall-screencast)
       uninstall-screencast
+      ;;
+    --install-opencbm)
+      install-opencbm
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
