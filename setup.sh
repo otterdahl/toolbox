@@ -585,13 +585,13 @@ function install-screencast () {
 # Install opencbm
 function install-opencbm () {
 
-    cd ~/build-repos
+    cd $INSTALLDIR
     git clone https://github.com/cc65/cc65.git
     cd cc65
     make
     sudo make install PREFIX=/usr
 
-    cd ~/build-repos
+    cd $INSTALLDIR
     sudo apt-get install libusb-dev libncurses5-dev
     git clone https://github.com/zyonee/opencbm.git
     cd opencbm
@@ -614,12 +614,9 @@ function fix-steam-ubuntu1504 () {
 
 # Find suitable installation dir
 function setdir () {
-    if [ -d "$HOME/Hämtningar" ]; then
-        INSTALLDIR="$HOME/Hämtningar"
-    elif [ -d "$HOME/Downloads" ]; then
-        INSTALLDIR="$HOME/Downloads"
-    else
-        INSTALLDIR="$HOME"
+    INSTALLDIR="$HOME/build-repos
+    if [ ! -d "$INSTALLDIR" ]; then
+        mkdir "$INSTALLDIR"
     fi
 }
 
