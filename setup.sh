@@ -56,12 +56,6 @@ function install-essential () {
     sudo python3 setup.py install
     cd ..
     rm -rf maildirproc
-
-    # Ubuntu 15.04+ adds svtplay-dl (still not present on raspbian)
-    UBUNTU_VER=`lsb_release -r | tr '.' ' ' | awk '{print $2}'`
-    if [ "$UBUNTU_VER" -ge 15 ]; then
-        sudo apt-get -y install svtplay-dl
-    fi
 }
 
 # --- Example installation
@@ -583,8 +577,8 @@ function install-screencast () {
 }
 
 # Install opencbm
+# Tested on raspbian, ubuntu
 function install-opencbm () {
-
     cd $INSTALLDIR
     git clone https://github.com/cc65/cc65.git
     cd cc65
@@ -609,17 +603,6 @@ function fix-wine-archlinux () {
     curl -O http://otterdahl.org/~i0davla/oleaut32/oleaut32.dll.so.32
     sudo mv oleaut32.dll.so.64 /usr/lib/wine/oleaut32.dll.so
     sudo mv oleaut32.dll.so.32 /usr/lib32/wine/oleaut32.dll.so
-}
-
-# Fix steam on Ubuntu 15.04
-function fix-steam-ubuntu1504 () {
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
-    else
-        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
-    fi
-    mv libstdc++.so.6 libstdc++.so.6.bak
 }
 
 # Find suitable installation dir
@@ -648,7 +631,6 @@ $0 [option]
     --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
     --install-opencbm
-    --fix-steam-ubuntu1504
     --fix-wine-archlinux
 END
 }
@@ -732,9 +714,6 @@ for cmd in "$1"; do
       ;;
     --install-opencbm)
       install-opencbm
-      ;;
-    --fix-steam-ubuntu1504)
-      fix-steam-ubuntu1504
       ;;
     --fix-wine-archlinux)
       fix-wine-archlinux
