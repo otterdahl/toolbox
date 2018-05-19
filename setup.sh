@@ -413,28 +413,6 @@ function uninstall-citrix () {
     sudo rm -rf $HOME/.ICAClient
 }
 
-function install-spotify () {
-    if grep -q repository.spotify.com /etc/apt/sources.list; then
-        :
-    else
-        echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
-        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D2C19886
-        sudo apt-get update
-    fi
-    sudo apt-get install spotify-client
-
-    # Missing libgcrypt11 in Ubuntu 15.04
-    wget http://security.ubuntu.com/ubuntu/pool/main/libg/libgcrypt11/libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-    sudo dpkg -i libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-    rm libgcrypt11_1.5.4-2ubuntu1.1_amd64.deb
-}
-
-function uninstall-spotify () {
-    sudo apt-get remove spotify-client
-    sudo rm /etc/apt/sources.list.d/spotify.list
-    sudo apt-get update
-}
-
 function install-skype () {
     # git clone https://aur.archlinux.org/skypeforlinux-bin.git
     # makepkg -sri
@@ -655,7 +633,6 @@ $0 [option]
     --install-edimax                | --uninstall-edimax
     --install-canon-pixma-ip100
     --fix-citrix                    | --uninstall-citrix
-    --install-spotify               | --uninstall-spotify
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
@@ -702,12 +679,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-citrix)
       uninstall-citrix
-      ;;
-    --install-spotify)
-      install-spotify
-      ;;
-    --uninstall-spotify)
-      uninstall-spotify
       ;;
     --install-skype)
       install-skype
