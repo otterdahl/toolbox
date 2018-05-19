@@ -600,6 +600,17 @@ function install-opencbm () {
     sudo ldconfig
 }
 
+# Fix oleaut32.dll.so for Wine in Arch Linux
+# oleaut32.dll.so causes crash in Office 2007
+# Copy it from Ubuntu 17.10 which is know to work
+function fix-wine-archlinux () {
+    cd $INSTALLDIR
+    curl -O http://otterdahl.org/~i0davla/oleaut32/oleaut32.dll.so.64
+    curl -O http://otterdahl.org/~i0davla/oleaut32/oleaut32.dll.so.32
+    sudo mv oleaut32.dll.so.64 /usr/lib/wine/oleaut32.dll.so
+    sudo mv oleaut32.dll.so.32 /usr/lib32/wine/oleaut32.dll.so
+}
+
 # Fix steam on Ubuntu 15.04
 function fix-steam-ubuntu1504 () {
     MACHINE_TYPE=`uname -m`
@@ -611,10 +622,9 @@ function fix-steam-ubuntu1504 () {
     mv libstdc++.so.6 libstdc++.so.6.bak
 }
 
-
 # Find suitable installation dir
 function setdir () {
-    INSTALLDIR="$HOME/build-repos
+    INSTALLDIR="$HOME/build-repos"
     if [ ! -d "$INSTALLDIR" ]; then
         mkdir "$INSTALLDIR"
     fi
@@ -639,6 +649,7 @@ $0 [option]
     --install-screencast            | --uninstall-screencast
     --install-opencbm
     --fix-steam-ubuntu1504
+    --fix-wine-archlinux
 END
 }
 
@@ -724,6 +735,9 @@ for cmd in "$1"; do
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
+      ;;
+    --fix-wine-archlinux)
+      fix-wine-archlinux
       ;;
     *)
       usage
