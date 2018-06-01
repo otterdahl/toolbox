@@ -70,6 +70,10 @@ while true; do
     esac
 done
 
+# Deal with spaces in filenames
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+
 # Exit if no input files
 if [ -z "$1" ]; then
     echo $USAGE
@@ -114,3 +118,6 @@ done
 
 # View result
 view_result
+
+# Restore IFS
+IFS=$SAVEIFS
