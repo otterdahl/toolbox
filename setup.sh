@@ -741,6 +741,7 @@ for cmd in "$1"; do
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
+      ;;
     --fix-wine-archlinux)
       fix-wine-archlinux
       ;;
