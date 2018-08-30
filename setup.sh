@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 17.10, Arch Linux and Raspbian
+# Targets support for: Ubuntu 18.04, Arch Linux and Raspbian
 
 set -e
 
@@ -613,17 +613,6 @@ function fix-steam-ubuntu1504 () {
     mv libstdc++.so.6 libstdc++.so.6.bak
 }
 
-# Fix oleaut32.dll.so for Wine in Arch Linux
-# oleaut32.dll.so causes crash in Office 2007
-# Copy it from Ubuntu 17.10 which is know to work
-function fix-wine-archlinux () {
-    cd $INSTALLDIR
-    curl -O http://otterdahl.org/~i0davla/oleaut32/oleaut32.dll.so.64
-    curl -O http://otterdahl.org/~i0davla/oleaut32/oleaut32.dll.so.32
-    sudo mv oleaut32.dll.so.64 /usr/lib/wine/oleaut32.dll.so
-    sudo mv oleaut32.dll.so.32 /usr/lib32/wine/oleaut32.dll.so
-}
-
 # Find suitable installation dir
 function setdir () {
     INSTALLDIR="$HOME/build-repos"
@@ -652,7 +641,6 @@ $0 [option]
     --install-opencbm
     --install-amitools
     --fix-steam-ubuntu1504
-    --fix-wine-archlinux
 END
 }
 
@@ -741,9 +729,6 @@ for cmd in "$1"; do
       ;;
     --fix-steam-ubuntu1504)
       fix-steam-ubuntu1504
-      ;;
-    --fix-wine-archlinux)
-      fix-wine-archlinux
       ;;
     *)
       usage
