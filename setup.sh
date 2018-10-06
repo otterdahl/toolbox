@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 17.10, Arch Linux and Raspbian
+# Targets support for: Ubuntu 18.04 and Raspbian
 
 set -e
 
@@ -21,12 +21,11 @@ function install-essential () {
     # systemctl enable NetworkManager
 
     # Desktop
-    sudo apt-get install virt-manager i3 feh rdesktop mpv mplayer2 vlc thunar \
-        scrot xscreensaver autocutsel libjson-perl pavucontrol
+    sudo apt-get install virt-manager feh mpv mplayer2 vlc thunar \
+        scrot libjson-perl pavucontrol
 
     # Arch Linux
-    # sudo pacman -S lightdm lightdm-gtk-greeter i3 dmenu \
-    #    mpv feh vlc firefox perl-json pavucontrol pulseaudio \
+    # sudo pacman -S mpv feh vlc firefox perl-json pavucontrol pulseaudio \
     #    thunar network-manager-applet mupdf ttf-inconsolata \
     #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
     #    mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit \
@@ -225,14 +224,6 @@ END
     # Configure taskwarrior
     ln -f -s ~/config/taskrc ~/.taskrc
 
-    # Configure i3-wm
-    mkdir -p ~/.i3/
-    ln -f -s ~/config/i3config ~/.i3/config
-
-    # Configure i3status
-    # Used for custom i3 status with my_i3status.pl
-    ln -f -s ~/config/i3status.conf ~/.i3status.conf
-
     # Configure xsessionrc
     # Used for appending $PATH to use with dmenu (bashrc won't do)
     ln -f -s ~/config/xsessionrc ~/.xsessionrc
@@ -253,10 +244,6 @@ END
     # Configure crontab
     crontab ~/config/crontab
 
-    # Configure dunst
-    mkdir -p ~/.config/dunst
-    ln -f -s ~/config/dunstrc ~/.config/dunst/dunstrc
-
     # Configure mpv
     mkdir -p ~/.config/mpv
     ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
@@ -264,11 +251,6 @@ END
     # Configure lynx
     ln -f -s ~/config/lynxrc ~/.lynxrc
 
-    # Add group wheel (wpa_supplicant) and add current user to it
-    if [ ! -n "$(grep wheel /etc/group)" ]; then 
-        sudo groupadd wheel
-        sudo usermod -a -G  wheel $USER
-    fi
 }
 
 # Pipelight. To watch HBO Nordic in firefox
