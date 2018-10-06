@@ -572,6 +572,7 @@ function install-opencbm () {
     git clone https://github.com/zyonee/opencbm.git
     cd opencbm
     make -f LINUX/Makefile opencbm plugin-xum1541
+    git revert -n d951d8cce614241b28c5684ce03bc510ec561a62
     sudo make -f LINUX/Makefile install install-plugin-xum1541
     sudo ldconfig
 }
