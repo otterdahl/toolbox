@@ -380,6 +380,9 @@ END
 function fix-citrix () {
     # Workaround for wrong keyboard mapping. Need Swedish mapping
     sed -i "s/^KeyboardLayout.*/KeyboardLayout = Swedish/" $HOME/.ICAClient/wfclient.ini
+    # Fix certificates
+    sudo -f /opt/Citrix/ICAClient/keystore/cacerts
+    sudo ln -s /etc/ssl/certs /opt/Citrix/ICAClient/keystore/cacerts
 }
 
 function uninstall-citrix () {
