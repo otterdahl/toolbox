@@ -10,7 +10,7 @@ function install-essential () {
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
          bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
          curl opus-tools irssi bitlbee-libpurple gptfdisk util-linux \
-         exfat-utils
+         exfat-utils tnef
 
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
