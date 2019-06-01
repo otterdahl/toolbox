@@ -588,17 +588,6 @@ function install-amitools () {
     sudo python setup.py install
 }
 
-# Fix steam on Ubuntu 15.04
-function fix-steam-ubuntu1504 () {
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu
-    else
-        cd $HOME/.steam/steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu
-    fi
-    mv libstdc++.so.6 libstdc++.so.6.bak
-}
-
 # Find suitable installation dir
 function setdir () {
     INSTALLDIR="$HOME/build-repos"
@@ -626,7 +615,6 @@ $0 [option]
     --install-screencast            | --uninstall-screencast
     --install-opencbm
     --install-amitools
-    --fix-steam-ubuntu1504
 END
 }
 
@@ -712,9 +700,6 @@ for cmd in "$1"; do
       ;;
     --install-amitools)
       install-amitools
-      ;;
-    --fix-steam-ubuntu1504)
-      fix-steam-ubuntu1504
       ;;
     *)
       usage
