@@ -533,17 +533,6 @@ function uninstall-youtube-dl () {
     sudo -rf /usr/local/bin/youtube-dl
 }
 
-function install-dropbox () {
-    DEB=dropbox_2015.02.12_amd64.deb
-    wget https://www.dropbox.com/download?dl=packages/ubuntu/$DEB -O $DEB
-    sudo dpkg -i $DEB
-    rm $DEB
-}
-
-function uninstall-dropbox () {
-    sudo apt-get remove dropbox*
-}
-
 # Install simple screencast tool
 function install-screencast () {
     cd $INSTALLDIR
@@ -611,7 +600,6 @@ $0 [option]
     --install-xbindkeys             | --uninstall-xbindkeys
     --install-spotifyripper         | --uninstall-spotifyripper
     --install-youtube-dl            | --uninstall-youtube-dl
-    --install-dropbox               | --uninstall-dropbox
     --install-screencast            | --uninstall-screencast
     --install-opencbm
     --install-amitools
@@ -682,12 +670,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-youtube-dl)
       uninstall-youtube-dl
-      ;;
-    --install-dropbox)
-      install-dropbox
-      ;;
-    --uninstall-dropbox)
-      uninstall-dropbox
       ;;
     --install-screencast)
       install-screencast
