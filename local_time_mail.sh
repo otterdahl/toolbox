@@ -1,6 +1,9 @@
 #!/bin/bash
-# converts the Date of emails to the system's local time
+# converts the date of emails to the system's local time
 # Requires procmail
+#
+# On MacOS using homebrew:
+# $ brew install coreutils procmail
 # 
 # Q:
 # When I view a message in the pager mutt displays the time in the Date
@@ -37,8 +40,14 @@ TMPFILE=$(mktemp)
 cat - >"$TMPFILE"
 # extract the date header
 DATE=$( formail -xDate: < "$TMPFILE" )
+
 # convert to the current timezone (defined by TZ)
-DATE=$( date -R -d "$DATE" )
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	DATE=$( gdate -R -d "$DATE" )
+else
+	DATE=$( date -R -d "$DATE" )
+fi
+
 # output the modified message
 echo "Date: $DATE"
 formail -fI Date < "$TMPFILE"
