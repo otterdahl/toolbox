@@ -104,30 +104,6 @@ function install-essential () {
 # umount -R /mnt
 # reboot
 
-# Install macbookpro 8,2 Arch Linux
-# 1, Follow beginners guide https://wiki.archlinux.org/index.php/beginners'_guide
-# 2, Use UEFI/GPT bootloader, systemd-boot.
-# 3, Use kernel options to turn off dedicated graphics. Hold space and then
-#    press `e` during boot and add `radeon.modeset=0 i915.modeset=1 i915.lvds_channel_mode=2`
-#    To make permanent, example config in /boot/loader/entries:
-#    title   Arch Linux
-#    linux   /vmlinuz-linux
-#    initrd  /intel-ucode.img
-#    initrd  /initramfs-linux.img
-#    options root=PARTUUID=03b57a03-85a9-4d29-879c-5973cb0186be rw radeon.modeset=0 i915.modeset=1 i915.lvds_channel_mode=2
-# 4, In order to start xorg you need to switch gpu
-#    Use https://github.com/0xbb/gpu-switch
-#    gpu-switch -i
-# TODO: Accelerated graphics did not work with the setup above.
-#       How to get it to work:
-#       Install grub & and refind. Refind is needed in order to start grub
-#       No special settings has been set in grub, gpu-switch has been set to -i. More testing needed
-# 5, keyboard in x11:
-#    setxkbmap -model pc104 -layout se
-#    ~/.xinitrc
-# 6, F1-F12 instead of meta keys
-#    # echo options hid_apple fnmode=2 > /etc/modprobe.d/fn_switch.conf
-
 function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
     sudo apt-get install macfanctld
