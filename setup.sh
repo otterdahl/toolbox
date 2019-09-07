@@ -419,61 +419,6 @@ function uninstall-xbindkeys () {
     sudo apt-get uninstall xbindkeys
 }
 
-function install-spotifyripper () {
-    cd $INSTALLDIR
-
-    # libspotify from spotify
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        wget https://developer.spotify.com/download/libspotify/libspotify-12.1.51-Linux-x86_64-release.tar.gz
-        tar xfz libspotify-12.1.51-Linux-x86_64-release.tar.gz
-        cd libspotify-12.1.51-Linux-x86_64-release
-        sudo make install
-        cd ..
-        rm libspotify-12.1.51-Linux-x86_64-release.tar.gz
-    elif [ ${MACHINE_TYPE} == 'armv6l' ]; then
-	wget https://developer.spotify.com/download/libspotify/libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release.tar.gz
-        tar xfz libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release.tar.gz
-        cd libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release
-        sudo make install
-        cd ..
-        rm libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release.tar.gz
-    else
-        echo "libspotify: unsupported platform $MACHINE_TYPE"
-        exit 1
-    fi
-    mkdir -p $HOME/.spotify-ripper
-    ln -fs $HOME/config/spotify_appkey.key $HOME/.spotify-ripper/spotify_appkey.key
-
-    # sudo apt-get install -y lame build-essential libffi-dev python-dev python-pip
-    sudo pacman -S lame libffi python-pip
-
-    # Pip has problems with international characters in $PWD
-    cd $HOME
-    # cffi > 1.0.0 required. Problem with Rasbian
-    sudo pip install -U spotify-ripper
-    echo "----------------------------------------------"
-    echo "spotify-ripper installed in $HOME/spotifyripper"
-    echo "usage: spotify-ripper [-u <username>] [settings] [spotify URI]"
-    echo "usage in Arch Linux: LD_PRELOAD='/usr/local/lib/libspotify.so.12' spotify-ripper"
-}
-
-function uninstall-spotifyripper () {
-    cd $INSTALLDIR
-    MACHINE_TYPE=`uname -m`
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        cd libspotify-12.1.51-Linux-x86_64-release
-        sudo make uninstall
-        cd ..
-        rm -rf libspotify-12.1.51-Linux-x86_64-release
-    elif [ ${MACHINE_TYPE} == 'armv6l' ]; then
-        cd libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release
-        sudo make uninstall
-        cd ..
-        rm -rf libspotify-12.1.103-Linux-armv6-bcm2708hardfp-release
-    fi
-}
-
 function install-youtube-dl () {
     sudo apt-get remove youtube-dl
     sudo wget https://yt-dl.org/downloads/2014.09.29.2/youtube-dl -O /usr/local/bin/youtube-dl
@@ -549,7 +494,6 @@ $0 [option]
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
-    --install-spotifyripper         | --uninstall-spotifyripper
     --install-youtube-dl            | --uninstall-youtube-dl
     --install-screencast            | --uninstall-screencast
     --install-opencbm
@@ -603,12 +547,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-xbindkeys)
       uninstall-xbindkeys
-      ;;
-    --install-spotifyripper)
-      install-spotifyripper
-      ;;
-    --uninstall-spotifyripper)
-      uninstall-spotifyripper
       ;;
     --install-youtube-dl)
       install-youtube-dl
