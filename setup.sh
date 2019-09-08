@@ -458,10 +458,10 @@ function install-opencbm () {
 
     cd $INSTALLDIR
     sudo apt-get install libusb-dev libncurses5-dev
-    git clone https://github.com/zyonee/opencbm.git
-    cd opencbm
+    git clone https://github.com/OpenCBM/OpenCBM.git
+    cd OpenCBM
+    git checkout v0.4.99.99a
     make -f LINUX/Makefile opencbm plugin-xum1541
-    git revert -n d951d8cce614241b28c5684ce03bc510ec561a62
     sudo make -f LINUX/Makefile install install-plugin-xum1541
     sudo ldconfig
 }
