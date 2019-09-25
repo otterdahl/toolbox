@@ -7,6 +7,10 @@
 # - Merging to existing pdf
 # Tested with Canon imageFORMULA P-150 and Brother DSMobile 720D
 # Requires SANE, imagemagick, pdftk
+# Arch linux
+# 	pacman -S sane imagemagick
+# 	git clone https://aur.archlinux.org/libsane-dsseries.git
+# 	git clone https://aur.archlinux.org/pdftk-bin.git
 
 set -e
 
