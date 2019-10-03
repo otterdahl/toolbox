@@ -360,7 +360,6 @@ function install-mpd () {
     mkdir -p ~/.ncmpcpp
     touch ~/.config/mpd/pid
     touch ~/.config/mpd/tag_cache
-    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/bindings
 
     # On Raspbian. Uses ~/.mpdconf
     # On Ubuntu 14.04. Uses ~/.config/mpd/mpd.conf
