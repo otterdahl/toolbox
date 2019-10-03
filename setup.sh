@@ -8,8 +8,8 @@ set -e
 function install-essential () {
     # Ubuntu
     sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
-         bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
-         curl opus-tools irssi bitlbee-libpurple gptfdisk util-linux \
+         bridge-utils pdftk libav-tools at imagemagick curl opus-tools irssi \
+	 bitlbee-libpurple gptfdisk util-linux \
          exfat-utils tnef
 
     # Arch Linux
