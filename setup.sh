@@ -391,7 +391,7 @@ function install-mpd () {
     sudo sed -i "s/START_MPD=true/START_MPD=false/" /etc/default/mpd
 
     echo "-----------------------------------------------------------"
-    echo "Add music to $HOME/Musik. Then start listening using ncmpcc"
+    echo "Add music to $HOME/Musik. Then start listening using ncmpcpp"
 }
 
 function uninstall-mpd () {
