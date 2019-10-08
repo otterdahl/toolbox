@@ -7,15 +7,15 @@ set -e
 # Install essential applications
 function install-essential () {
     # Ubuntu
-    sudo apt-get install task vim lynx cifs-utils git screen catdoc powertop \
+    sudo apt-get install task vim w3m cifs-utils git screen catdoc powertop \
          bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
          curl opus-tools irssi bitlbee-libpurple gptfdisk util-linux \
          exfat-utils tnef
 
     # Arch Linux
-    # sudo pacman -S git vim cron syncthing task screen ghostscript imagemagick \
-    # lynx wget unzip networkmanager cups foomatic-db gsfonts bluez bluez-utils \
-    # bluez-cups openssh ntp rfkill flashplugin
+    # sudo pacman -S git vim cron syncthing task screen ghostscript \
+    # imagemagick w3m wget unzip networkmanager cups foomatic-db gsfonts \
+    # bluez bluez-utils bluez-cups openssh ntp rfkill flashplugin
     #
     # systemctl enable ntpd.service
     # systemctl enable NetworkManager
