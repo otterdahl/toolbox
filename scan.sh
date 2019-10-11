@@ -38,7 +38,7 @@ FEEDER=0
 DEVICE_NAME="-d dsseries:usb:0x04F9:0x60E0"
 
 # Autocrop fuzz in percent
-FUZZ=15
+FUZZ=50
 
 AUTOCROP=0
 RAW=0
