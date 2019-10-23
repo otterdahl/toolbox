@@ -360,7 +360,6 @@ function install-mpd () {
     mkdir -p ~/.ncmpcpp
     touch ~/.config/mpd/pid
     touch ~/.config/mpd/tag_cache
-    ln -fs ~/config/ncmpcpp_keys ~/.ncmpcpp/bindings
 
     # On Raspbian. Uses ~/.mpdconf
     # On Ubuntu 14.04. Uses ~/.config/mpd/mpd.conf
@@ -382,16 +381,6 @@ function install-mpd () {
     sudo systemctl disable mpd.service
     sudo systemctl stop mpd.socket
     sudo systemctl disable mpd.socket
-    
-    # old style
-    sudo update-rc.d -f mpd remove
-    if ! grep -q START_MPD /etc/default/mpd; then
-        echo START_MPD=false | sudo tee -a /etc/default/mpd
-    fi
-    sudo sed -i "s/START_MPD=true/START_MPD=false/" /etc/default/mpd
-
-    echo "-----------------------------------------------------------"
-    echo "Add music to $HOME/Musik. Then start listening using ncmpcc"
 }
 
 function uninstall-mpd () {

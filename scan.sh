@@ -38,11 +38,12 @@ FEEDER=0
 DEVICE_NAME="-d dsseries:usb:0x04F9:0x60E0"
 
 # Autocrop fuzz in percent
-FUZZ=15
+FUZZ=50
 
 AUTOCROP=0
 RAW=0
-PAPER_SIZE="-l 0 -t 0 -x 215 -y 297"
+# PAPER SIZE for A4 is 215 x 297
+PAPER_SIZE="-l 0 -t 0 -x 215 -y 350"
 RESOLUTION="--resolution 300"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
