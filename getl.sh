@@ -4,7 +4,7 @@ USAGE="usage: `basename $0` [-t|--type <type>] <URL>]"
 
 # macOS & homebrew compatibility
 if [[ "$OSTYPE" == "darwin"* ]]; then
-	GETOPT=/usr/local/opt/gnu-getopt/bin/getopt
+	GETOPT=$(brew --prefix gnu-getopt)/bin/getopt
 else
 	GETOPT=getopt
 fi
