@@ -1,14 +1,20 @@
 #!/bin/bash
 set -e
-
 USAGE="usage: `basename $0` [-t|--type <type>] <URL>]"
+
+# macOS & homebrew compatibility
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	GETOPT=/usr/local/opt/gnu-getopt/bin/getopt
+else
+	GETOPT=getopt
+fi
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo $USAGE
     exit 1
 fi
 
-TEMP=`getopt -o t: --long type: -n 'getl.sh' -- "$@"`
+TEMP=`$GETOPT -o t: --long type: -n 'getl.sh' -- "$@"`
 eval set -- "$TEMP"
 
 while true; do
