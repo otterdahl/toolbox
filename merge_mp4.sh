@@ -3,7 +3,7 @@
 # See also https://trac.ffmpeg.org/wiki/Concatenate
 set -e
 
-USAGE="usage: merge_mp4.sh [-o|--output <filename>] <input file(s)>"
+USAGE="usage: `basename $0` [-o|--output <filename>] <input file(s)>"
 INPUT=()
 
 # Default output name

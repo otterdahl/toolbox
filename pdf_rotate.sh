@@ -6,7 +6,7 @@
 
 set -e
 
-USAGE="usage: pdf_rotate.sh [-r|--range <range, e.g. 1-3>] [-a|--angle [-90,0,90,180] [<filenames>]"
+USAGE="usage: `basename $0` [-r|--range <range, e.g. 1-3>] [-a|--angle [-90,0,90,180] [<filenames>]"
 INPUT=()
 
 function view_result {
