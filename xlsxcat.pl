@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# xlsxcat [--col (cols)] [filename]
+# xlsxcat [--col (cols)] [--sep (separator)] [filename]
 # where 'cols' is a comma separated list of colums
 #
 # Return contens of selected column(s), from all sheets
@@ -13,13 +13,17 @@ use Spreadsheet::XLSX;
 use Getopt::Long;
 
 my %opt;
-GetOptions(\%opt, "col|c=s");
+GetOptions(\%opt, "col|c=s", "sep|s=s");
 
 my $filename = shift;
 my $separator = "\t";
 my $value;
 my $col_nr;
 my $workbook = Spreadsheet::XLSX->new($filename);
+
+if(exists($opt{sep})) {
+	$separator = $opt{sep}
+}
 
 my @cols = split(/,/, $opt{col});
 
