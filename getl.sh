@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-USAGE="usage: `basename $0` [-t|--type <type>] <URL>]"
+USAGE="usage: `basename $0` [-t|--type <type>] <URL>"
 
 # macOS & homebrew compatibility
 if [[ "$OSTYPE" == "darwin"* ]]; then

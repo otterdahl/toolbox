@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: pdf_rotate.sh [-r|--range <range>] [-a|--angle [-90,0,90,180] [<filenames>]
+# usage: pdf_rotate.sh [-r|--range <range>] [-a|--angle <-90,0,90,180>] <filenames>
 #        range: e.g. "2-3". Commas are not supported
 #        angle, e.g. "-90", "90", "180"
 # Basically a wrapper around pdftk for common rotate operations
