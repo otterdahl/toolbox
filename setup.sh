@@ -7,10 +7,8 @@ set -e
 # Install essential applications
 function install-essential () {
     # Ubuntu
-    sudo apt-get install task vim w3m cifs-utils git screen catdoc powertop \
-         bridge-utils pdftk dvb-apps w-scan libav-tools at imagemagick \
-         curl opus-tools irssi bitlbee-libpurple gptfdisk util-linux \
-         exfat-utils tnef
+    sudo apt-get install taskwarrior vim w3m cifs-utils git screen catdoc \
+         imagemagick curl opus-tools util-linux exfat-utils tnef
 
     # Arch Linux
     # sudo pacman -S git vim cron syncthing task screen ghostscript \
@@ -21,8 +19,7 @@ function install-essential () {
     # systemctl enable NetworkManager
 
     # Desktop
-    sudo apt-get install virt-manager feh mpv mplayer2 vlc thunar \
-        scrot libjson-perl pavucontrol
+    sudo apt-get install virt-manager feh mpv vlc
 
     # Arch Linux
     # sudo pacman -S mpv feh vlc firefox perl-json pavucontrol pulseaudio \
@@ -45,16 +42,16 @@ function install-essential () {
 
     # Arch Linux
     # sudo pacman -S mutt procmail
-    mkdir -p ~/log
+    # mkdir -p ~/log
 
     # Maildirproc
-    sudo apt-get install python3-3to2
-    git clone http://github.com/jrosdahl/maildirproc.git
-    cd maildirproc
-    make
-    sudo python3 setup.py install
-    cd ..
-    rm -rf maildirproc
+    #sudo apt-get install python3-3to2
+    #git clone http://github.com/jrosdahl/maildirproc.git
+    #cd maildirproc
+    #make
+    #sudo python3 setup.py install
+    #cd ..
+    #rm -rf maildirproc
 }
 
 # --- Example installation
