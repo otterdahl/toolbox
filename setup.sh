@@ -153,23 +153,11 @@ function install-macbook () {
 
 # Install private conf
 function install-private-conf () {
-    if [ ! -d ~/config ]; then
-        git clone otterdahl.org:~/config.git ~/config
-    else
-        cd ~/config
-        git pull
-        cd $INSTALLDIR
-    fi
-
     # Add symlinks to common apps
     ln -f -s ~/config/bash_aliases ~/.bash_aliases
     ln -f -s ~/config/vimrc ~/.vimrc
     ln -f -s ~/config/muttrc ~/.muttrc
     source ~/.bash_aliases
-
-    # Tv channels
-    mkdir -p ~/.tzap
-    ln -f -s ~/config/channels.conf ~/.tzap/channels.conf
 
     # Vim config
     ln -s ~/config/vim ~/.vim
@@ -200,10 +188,6 @@ END
     # Configure taskwarrior
     ln -f -s ~/config/taskrc ~/.taskrc
 
-    # Configure xsessionrc
-    # Used for appending $PATH to use with dmenu (bashrc won't do)
-    ln -f -s ~/config/xsessionrc ~/.xsessionrc
-
     # Configure profile
     # Used for reading .bashrc which sets colors and bash_aliases
     ln -f -s ~/config/profile ~/.profile
@@ -217,16 +201,9 @@ END
     # Set mailcap
     ln -f -s ~/config/mailcap ~/.mailcap
 
-    # Configure crontab
-    crontab ~/config/crontab
-
     # Configure mpv
     mkdir -p ~/.config/mpv
     ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
-
-    # Configure lynx
-    ln -f -s ~/config/lynxrc ~/.lynxrc
-
 }
 
 # Wifi drivers for Edimax AC-1200 (7392:a822) and Zyxel NWD6505
