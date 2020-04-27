@@ -378,17 +378,6 @@ function uninstall-xbindkeys () {
     sudo apt-get uninstall xbindkeys
 }
 
-function install-youtube-dl () {
-    sudo apt-get remove youtube-dl
-    sudo wget https://yt-dl.org/downloads/2014.09.29.2/youtube-dl -O /usr/local/bin/youtube-dl
-    sudo chmod a+x /usr/local/bin/youtube-dl
-}
-
-function uninstall-youtube-dl () {
-    sudo apt-get remove youtube-dl
-    sudo -rf /usr/local/bin/youtube-dl
-}
-
 # Install simple screencast tool
 function install-screencast () {
     cd $INSTALLDIR
@@ -453,7 +442,6 @@ $0 [option]
     --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
-    --install-youtube-dl            | --uninstall-youtube-dl
     --install-screencast            | --uninstall-screencast
     --install-opencbm
     --install-amitools
@@ -506,12 +494,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-xbindkeys)
       uninstall-xbindkeys
-      ;;
-    --install-youtube-dl)
-      install-youtube-dl
-      ;;
-    --uninstall-youtube-dl)
-      uninstall-youtube-dl
       ;;
     --install-screencast)
       install-screencast
