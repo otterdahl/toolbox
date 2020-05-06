@@ -244,9 +244,11 @@ function install-canon-pixma-ip100 () {
     wget https://raw.githubusercontent.com/otterdahl/cnijfilter-ip100/master/cups.patch
     wget https://raw.githubusercontent.com/otterdahl/cnijfilter-ip100/master/grayscale.patch
     wget https://raw.githubusercontent.com/otterdahl/cnijfilter-ip100/master/libpng15.patch
+    wget "https://aur.archlinux.org/cgit/aur.git/plain/mychanges.patch?h=cnijfilter-common" -O mychanges.patch
     patch -p1 -i cups.patch
     patch -p1 -i libpng15.patch
     patch -p1 -i cnij.patch
+    patch -p1 -f -i mychanges.patch || true
     cd ppd
     patch -p0 < ../grayscale.patch
     cd ../libs
