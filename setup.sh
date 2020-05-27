@@ -441,8 +441,10 @@ function install-telldus-core () {
 
 function install-taskd () {
     cd $INSTALLDIR
-    sudo apt-get -y install libgnutls28-dev
-    git clone --recursive https://github.com/GothenburgBitFactory/taskserver.git
+    sudo apt-get -y install libgnutls28-dev cmake
+    if [ -d "taskserver" ]
+        git clone --recursive https://github.com/GothenburgBitFactory/taskserver.git
+    fi
     cd taskserver
     git checkout -b origin/1.2.0
     cmake -DCMAKE_BUILD_TYPE=release .
