@@ -439,6 +439,17 @@ function install-telldus-core () {
     sudo make install
 }
 
+function install-taskd () {
+    cd $INSTALLDIR
+    sudo apt-get -y install libgnutls28-dev
+    git clone --recursive https://github.com/GothenburgBitFactory/taskserver.git
+    cd taskserver
+    git checkout -b origin/1.2.0
+    cmake -DCMAKE_BUILD_TYPE=release .
+    make
+    sudo make install
+}
+
 # Find suitable installation dir
 function setdir () {
     INSTALLDIR="$HOME/build-repos"
@@ -531,6 +542,9 @@ for cmd in "$1"; do
       ;;
     --install-telldus-core)
       install-telldus-core
+      ;;
+    --install-taskd)
+      install-taskd
       ;;
     *)
       usage
