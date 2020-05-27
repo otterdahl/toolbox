@@ -446,7 +446,7 @@ function install-taskd () {
         git clone --recursive https://github.com/GothenburgBitFactory/taskserver.git
     fi
     cd taskserver
-    git checkout -b origin/1.2.0
+    git checkout 1.2.0
     cmake -DCMAKE_BUILD_TYPE=release .
     make
     sudo make install
