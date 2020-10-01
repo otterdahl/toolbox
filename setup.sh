@@ -424,21 +424,6 @@ function install-amitools () {
     sudo python setup.py install
 }
 
-function install-telldus-core () {
-    cd $INSTALLDIR
-    TAR=telldus-core-2.1.2.tar.gz
-    sudo apt-get -y install cmake libftdi-dev libconfuse-dev
-    wget http://download.telldus.com/TellStick/Software/telldus-core/$TAR
-    tar xzf $TAR
-    rm $TAR
-    cd telldus-core-2.1.2
-    export CXXFLAGS="${CXXFLAGS} -Wno-narrowing -pthread"
-    export CFLAGS="-pthread"
-    cmake .
-    make
-    sudo make install
-}
-
 function install-taskd () {
     cd $INSTALLDIR
     sudo apt-get -y install libgnutls28-dev cmake
@@ -475,7 +460,6 @@ $0 [option]
     --install-screencast            | --uninstall-screencast
     --install-opencbm
     --install-amitools
-    --install-telldus-core
     --install-taskd
 END
 }
@@ -541,9 +525,6 @@ for cmd in "$1"; do
       ;;
     --install-amitools)
       install-amitools
-      ;;
-    --install-telldus-core)
-      install-telldus-core
       ;;
     --install-taskd)
       install-taskd
