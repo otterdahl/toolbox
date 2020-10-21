@@ -297,7 +297,7 @@ NOTE: It is possible to use the printer over bluetooth.
  1. Add the printer as a bluetooth device
  2. Add printer. Use driver "iP100 Ver.3.70" (Canon)
 =======================================================
-# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/canon/canonip100.ppd
+# sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/model/canonip100.ppd
 # sudo lpoptions -d canon-ip100
 END
 }
