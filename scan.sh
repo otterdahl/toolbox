@@ -15,6 +15,12 @@
 # Driver for Brother DSMobile 720D
 #	Ubuntu: Download and install driver from https://support.brother.com
 #	Arch Linux AUR: git clone https://aur.archlinux.org/libsane-dsseries.git
+#
+# Tweak imagemagick security policy
+# Add
+#	<policy domain="coder" rights="read | write" pattern="PDF" />
+# just before </policymap> in /etc/ImageMagick-6/policy.xml
+
 
 set -e
 
