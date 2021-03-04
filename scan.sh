@@ -54,7 +54,7 @@ AUTOCROP=0
 RAW=0
 # PAPER SIZE for A4 is 215 x 297
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 350"
-RESOLUTION="--resolution 300"
+RESOLUTION="--resolution 150"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
