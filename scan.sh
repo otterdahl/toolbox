@@ -5,12 +5,22 @@
 # - Autocrop
 # - Duplex or simplex mode
 # - Merging to existing pdf
-# Tested with Canon imageFORMULA P-150 and Brother DSMobile 720D
 # Requires SANE, imagemagick, pdftk
+# Ubuntu
+#	sudo apt install sane imagemagick pdftk
 # Arch linux
 # 	pacman -S sane imagemagick
-# 	git clone https://aur.archlinux.org/libsane-dsseries.git
 # 	git clone https://aur.archlinux.org/pdftk-bin.git
+
+# Driver for Brother DSMobile 720D
+#	Ubuntu: Download and install driver from https://support.brother.com
+#	Arch Linux AUR: git clone https://aur.archlinux.org/libsane-dsseries.git
+#
+# Tweak imagemagick security policy
+# Add
+#	<policy domain="coder" rights="read | write" pattern="PDF" />
+# just before </policymap> in /etc/ImageMagick-6/policy.xml
+
 
 set -e
 
@@ -44,7 +54,7 @@ AUTOCROP=0
 RAW=0
 # PAPER SIZE for A4 is 215 x 297
 PAPER_SIZE="-l 0 -t 0 -x 215 -y 350"
-RESOLUTION="--resolution 300"
+RESOLUTION="--resolution 150"
 MODE="--mode Color"
 DATE="`date +'%F_%T'`"
 FILENAME="$DATE.pdf"
