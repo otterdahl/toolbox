@@ -285,7 +285,7 @@ function install-canon-pixma-ip100 () {
     sudo install -s -m 755 303/libs_bin${_arc}/*.so.* /usr/lib
     sudo install -s -m 755 com/libs_bin${_arc}/*.so.* /usr/lib
     sudo install -D LICENSE-cnijfilter-3.70EN.txt /usr/share/licenses/cnijfilter-ip100$/LICENSE-cnijfilter-3.70EN.txt
-    sudo ln -s /usr/lib/cups/filter/pstocanonijip100 /usr/lib/cups/filter/pstocanonij
+    sudo ln -fs /usr/lib/cups/filter/pstocanonijip100 /usr/lib/cups/filter/pstocanonij
     sudo ldconfig
 
     cd ..
