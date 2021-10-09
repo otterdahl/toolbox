@@ -10,39 +10,11 @@ function install-essential () {
     sudo apt-get install taskwarrior vim w3m cifs-utils git screen catdoc \
          imagemagick curl opus-tools util-linux exfat-utils tnef
 
-    # Arch Linux
-    # sudo pacman -S git vim cron syncthing task screen ghostscript \
-    # imagemagick w3m wget unzip networkmanager cups foomatic-db gsfonts \
-    # bluez bluez-utils bluez-cups openssh ntp rfkill flashplugin
-    #
-    # systemctl enable ntpd.service
-    # systemctl enable NetworkManager
-
     # Desktop
     sudo apt-get install virt-manager feh mpv vlc
 
-    # Arch Linux
-    # sudo pacman -S mpv feh vlc firefox perl-json pavucontrol pulseaudio \
-    #    thunar network-manager-applet mupdf ttf-inconsolata \
-    #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
-    #    mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit \
-    #    gnome-terminal
-    #
-    # AUR makepkg -sri
-    # pdftk (testing)
-    # kpcli
-    # spotify
-    # steam
-    # xf86-input-mtrack
-    # mbpfan-git
-    # sudo systemctl enable mbpfan.service
-
     # Email
     sudo apt-get install mutt procmail
-
-    # Arch Linux
-    # sudo pacman -S mutt procmail
-    # mkdir -p ~/log
 
     # Maildirproc
     #sudo apt-get install python3-3to2
@@ -54,52 +26,6 @@ function install-essential () {
     #rm -rf maildirproc
 }
 
-# --- Example installation
-# loadkeys sv-latin1
-# iw dev
-# wifi-menu -o wlo1
-# timedatectl set-ntp true
-# lsblk
-# parted /dev/sdb print
-# parted /dev/sdb
-# mklabel gpt
-# mkpart ESP fat32 1MiB 513MiB
-# set 1 boot on
-# mkpart primary linux-swap 513MiB 4.5GiB
-# mkpart primary ext4 4.5GiB 100%
-# quit
-# lsblk /dev/sdb
-# mkfs.ext4 /dev/sdb3
-# mkswap /dev/sdb2
-# swapon /dev/sdb2
-# mount /dev/sdb3 /mnt
-# mkdir -p /mnt/boot
-# mkfs.fat -F32 /dev/sdb1
-# mount /dev/sdb1 /mnt/boot
-# pacstrap -i /mnt base base-devel
-# genfstab -U /mnt > /mnt/etc/fstab
-# arch-chroot /mnt /bin/bash
-# vi /etc/locale.gen # Uncomment english and sv_SE.UTF8
-# local-gen
-# echo LANG=sv_SE.UTF-8 > /etc/locale.conf
-# echo KEYMAP=sv-latin1 > /etc/vconsole.conf
-# tzselect
-# ln -s /etc/share/zoneinfo/Europe/Stockholm /etc/localtime
-# hwclock --sysohc --utc
-# bootctl install
-# cp /usr/share/systemd/bootctl/arch.conf /boot/loader/entries 
-# pacman -S intel-ucode
-# ----- # Add PARTUUID and initrd /intel-ucode.img to /boot/loader/entries/arch.conf
-# blkid -s PARTUUID -o value /dev/sdb3 >> /boot/loader/entries/arch.conf
-# vi /boot/loader/entries/arch.conf
-# vi /boot/loader/loader.conf
-# vi /etc/hostname
-# vi /etc/hosts
-# pacman -S iw wpa_supplicant dialog
-# passwd
-# exit
-# umount -R /mnt
-# reboot
 
 function install-macbook () {
     # fan control daemon for Apple MacBook / MacBook Pro computers
