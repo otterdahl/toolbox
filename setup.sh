@@ -26,54 +26,6 @@ function install-essential () {
     #rm -rf maildirproc
 }
 
-
-function install-macbook () {
-    # fan control daemon for Apple MacBook / MacBook Pro computers
-    sudo apt-get install macfanctld
-
-    # GPU Switching for pre-retina MacBook Pro
-    # Tested with MacbookPro 8,2
-    # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
-    # Update 2016-02-12: This manual switching will hopefully be unnecessary
-    # with linux 4.6+. See http://www.phoronix.com/scan.php?page=news_item&px=Apple-GMUX-VGA-Switcher-4.6
-    MODEL=`sudo dmidecode -s system-product-name`
-    if [ $MODEL == 'MacBookPro8,2' ]; then
-        # How to boot
-        # -----------
-        # # On GRUB edit the entry for Ubuntu; add the following after
-        # # insmod ext2
-        # outb 0x728 1 # Switch select
-        # outb 0x710 2 # Switch display
-        # outb 0x740 2 # Switch DDC
-        # outb 0x750 0 # Power down discrete graphics
-        # # Add after quiet splash - 
-        # quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0
-        # This will disable the radeon card and only use the integrated card. 
-
-        # Permanent installation
-        # ----------------------
-        # NOTE: untested
-        # /etc/grub.d/10_linux (before insmod gzio)
-        # echo "    outb 0x728 1" | sed "s/^/$submenu_indentation/"
-        # echo "    outb 0x710 2" | sed "s/^/$submenu_indentation/"
-        # echo "    outb 0x740 2" | sed "s/^/$submenu_indentation/"
-        # echo "    outb 0x750 0" | sed "s/^/$submenu_indentation/"
-
-        # /etc/default/grub
-        # NOTE: untested
-        sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT.*/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0\/" /etc/default/grub
-        sudo update-grub
-
-        # Refind (for selecting between Intel and AMD graphics)
-        sudo apt-get install refind
-        sudo /usr/share/refind/install.sh
-
-        echo "On boot:"
-        echo " 1, first choice is for booting with integrated card (intel)"
-        echo " 2, second choice is for booting with dedicated card (radeon)"
-    fi
-}
-
 # Install private conf
 function install-private-conf () {
     # Add symlinks to common apps
@@ -377,7 +329,6 @@ function usage () {
     cat >/dev/stdout<<END
 $0 [option]
     --install-essential
-    --install-macbook
     --install-private-conf
     --install-edimax                | --uninstall-edimax
     --install-canon-pixma-ip100
@@ -399,9 +350,6 @@ for cmd in "$1"; do
   case "$cmd" in
     --install-essential)
       install-essential
-      ;;
-    --install-macbook)
-      install-macbook
       ;;
     --install-private-conf)
       install-private-conf
