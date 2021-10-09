@@ -7,8 +7,8 @@ set -e
 # Install essential applications
 function install-essential () {
     # Ubuntu
-    sudo apt-get install taskwarrior vim w3m cifs-utils git screen catdoc \
-         imagemagick curl opus-tools util-linux exfat-utils tnef
+    sudo apt-get install taskwarrior vim cifs-utils git screen catdoc \
+         imagemagick curl util-linux exfat-utils tnef
 
     # Desktop
     sudo apt-get install virt-manager feh mpv vlc
@@ -69,9 +69,6 @@ END
 
     # Configure bashrc
     ln -f -s ~/config/bashrc ~/.bashrc
-
-    # Set irssi config
-    ln -f -s ~/config/irssi ~/.irssi
 
     # Set mailcap
     ln -f -s ~/config/mailcap ~/.mailcap
