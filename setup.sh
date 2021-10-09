@@ -81,34 +81,6 @@ END
     ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
 }
 
-# Wifi drivers for Edimax AC-1200 (7392:a822) and Zyxel NWD6505
-function install-edimax () {
-
-    # ARCH
-    # pacman -S linux-headers
-
-    cd $INSTALLDIR
-    if [ ! -d rtl8812AU_8821AU_linux ]; then
-        git clone https://github.com/abperiasamy/rtl8812AU_8821AU_linux.git
-        cd rtl8812AU_8821AU_linux
-    else
-        cd rtl8812AU_8821AU_linux
-        #git pull
-    fi
-    make
-    sudo make install
-    sudo modprobe 8812au
-    echo "NOTE: Leaving $INSTALLDIR/rtl8812AU_8821AU_linux. It is needed for uninstallation"
-}
-
-function uninstall-edimax () {
-    sudo modprobe -r 8812au
-    cd $INSTALLDIR/rtl8812AU_8821AU_linux
-    sudo make uninstall
-    cd ..
-    rm -rf rtl8812AU_8821AU_linux
-}
-
 function install-canon-pixma-ip100 () {
     # Arch Linux: AUR: https://github.com/otterdahl/cnijfilter-ip100
 
@@ -330,7 +302,6 @@ function usage () {
 $0 [option]
     --install-essential
     --install-private-conf
-    --install-edimax                | --uninstall-edimax
     --install-canon-pixma-ip100
     --fix-citrix                    | --uninstall-citrix
     --install-skype                 | --uninstall-skype
@@ -353,12 +324,6 @@ for cmd in "$1"; do
       ;;
     --install-private-conf)
       install-private-conf
-      ;;
-    --install-edimax)
-      install-edimax
-      ;;
-    --uninstall-edimax)
-      uninstall-edimax
       ;;
     --install-canon-pixma-ip100)
       install-canon-pixma-ip100
