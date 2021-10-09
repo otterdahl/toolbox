@@ -168,16 +168,6 @@ function uninstall-citrix () {
     sudo rm -rf $HOME/.ICAClient
 }
 
-function install-skype () {
-    # git clone https://aur.archlinux.org/skypeforlinux-bin.git
-    # makepkg -sri
-    sudo apt-get install skype
-}
-
-function uninstall-skype () {
-    sudo apt-get remove skype
-}
-
 function install-mpd () {
     sudo apt-get -y install mpd mpc ncmpcpp
     mkdir -p ~/.config/mpd/playlists
@@ -304,7 +294,6 @@ $0 [option]
     --install-private-conf
     --install-canon-pixma-ip100
     --fix-citrix                    | --uninstall-citrix
-    --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
     --install-screencast            | --uninstall-screencast
@@ -333,12 +322,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-citrix)
       uninstall-citrix
-      ;;
-    --install-skype)
-      install-skype
-      ;;
-    --uninstall-skype)
-      uninstall-skype
       ;;
     --install-mpd)
       install-mpd
