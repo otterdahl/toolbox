@@ -7,42 +7,14 @@ set -e
 # Install essential applications
 function install-essential () {
     # Ubuntu
-    sudo apt-get install taskwarrior vim w3m cifs-utils git screen catdoc \
-         imagemagick curl opus-tools util-linux exfat-utils tnef
-
-    # Arch Linux
-    # sudo pacman -S git vim cron syncthing task screen ghostscript \
-    # imagemagick w3m wget unzip networkmanager cups foomatic-db gsfonts \
-    # bluez bluez-utils bluez-cups openssh ntp rfkill flashplugin
-    #
-    # systemctl enable ntpd.service
-    # systemctl enable NetworkManager
+    sudo apt-get install taskwarrior vim cifs-utils git screen catdoc \
+         imagemagick curl util-linux exfat-utils tnef
 
     # Desktop
     sudo apt-get install virt-manager feh mpv vlc
 
-    # Arch Linux
-    # sudo pacman -S mpv feh vlc firefox perl-json pavucontrol pulseaudio \
-    #    thunar network-manager-applet mupdf ttf-inconsolata \
-    #    ttf-liberation xorg-xrdb xorg-xmodmap arandr xorg-server \
-    #    mesa-libgl xorg-xauth xorg-xmodmap xorg-xinit \
-    #    gnome-terminal
-    #
-    # AUR makepkg -sri
-    # pdftk (testing)
-    # kpcli
-    # spotify
-    # steam
-    # xf86-input-mtrack
-    # mbpfan-git
-    # sudo systemctl enable mbpfan.service
-
     # Email
     sudo apt-get install mutt procmail
-
-    # Arch Linux
-    # sudo pacman -S mutt procmail
-    # mkdir -p ~/log
 
     # Maildirproc
     #sudo apt-get install python3-3to2
@@ -52,100 +24,6 @@ function install-essential () {
     #sudo python3 setup.py install
     #cd ..
     #rm -rf maildirproc
-}
-
-# --- Example installation
-# loadkeys sv-latin1
-# iw dev
-# wifi-menu -o wlo1
-# timedatectl set-ntp true
-# lsblk
-# parted /dev/sdb print
-# parted /dev/sdb
-# mklabel gpt
-# mkpart ESP fat32 1MiB 513MiB
-# set 1 boot on
-# mkpart primary linux-swap 513MiB 4.5GiB
-# mkpart primary ext4 4.5GiB 100%
-# quit
-# lsblk /dev/sdb
-# mkfs.ext4 /dev/sdb3
-# mkswap /dev/sdb2
-# swapon /dev/sdb2
-# mount /dev/sdb3 /mnt
-# mkdir -p /mnt/boot
-# mkfs.fat -F32 /dev/sdb1
-# mount /dev/sdb1 /mnt/boot
-# pacstrap -i /mnt base base-devel
-# genfstab -U /mnt > /mnt/etc/fstab
-# arch-chroot /mnt /bin/bash
-# vi /etc/locale.gen # Uncomment english and sv_SE.UTF8
-# local-gen
-# echo LANG=sv_SE.UTF-8 > /etc/locale.conf
-# echo KEYMAP=sv-latin1 > /etc/vconsole.conf
-# tzselect
-# ln -s /etc/share/zoneinfo/Europe/Stockholm /etc/localtime
-# hwclock --sysohc --utc
-# bootctl install
-# cp /usr/share/systemd/bootctl/arch.conf /boot/loader/entries 
-# pacman -S intel-ucode
-# ----- # Add PARTUUID and initrd /intel-ucode.img to /boot/loader/entries/arch.conf
-# blkid -s PARTUUID -o value /dev/sdb3 >> /boot/loader/entries/arch.conf
-# vi /boot/loader/entries/arch.conf
-# vi /boot/loader/loader.conf
-# vi /etc/hostname
-# vi /etc/hosts
-# pacman -S iw wpa_supplicant dialog
-# passwd
-# exit
-# umount -R /mnt
-# reboot
-
-function install-macbook () {
-    # fan control daemon for Apple MacBook / MacBook Pro computers
-    sudo apt-get install macfanctld
-
-    # GPU Switching for pre-retina MacBook Pro
-    # Tested with MacbookPro 8,2
-    # See https://help.ubuntu.com/community/MacBookPro8-2/Raring
-    # Update 2016-02-12: This manual switching will hopefully be unnecessary
-    # with linux 4.6+. See http://www.phoronix.com/scan.php?page=news_item&px=Apple-GMUX-VGA-Switcher-4.6
-    MODEL=`sudo dmidecode -s system-product-name`
-    if [ $MODEL == 'MacBookPro8,2' ]; then
-        # How to boot
-        # -----------
-        # # On GRUB edit the entry for Ubuntu; add the following after
-        # # insmod ext2
-        # outb 0x728 1 # Switch select
-        # outb 0x710 2 # Switch display
-        # outb 0x740 2 # Switch DDC
-        # outb 0x750 0 # Power down discrete graphics
-        # # Add after quiet splash - 
-        # quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0
-        # This will disable the radeon card and only use the integrated card. 
-
-        # Permanent installation
-        # ----------------------
-        # NOTE: untested
-        # /etc/grub.d/10_linux (before insmod gzio)
-        # echo "    outb 0x728 1" | sed "s/^/$submenu_indentation/"
-        # echo "    outb 0x710 2" | sed "s/^/$submenu_indentation/"
-        # echo "    outb 0x740 2" | sed "s/^/$submenu_indentation/"
-        # echo "    outb 0x750 0" | sed "s/^/$submenu_indentation/"
-
-        # /etc/default/grub
-        # NOTE: untested
-        sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT.*/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash i915.lvds_channel_mode=2 i915.modeset=1 i915.lvds_use_ssc=0\/" /etc/default/grub
-        sudo update-grub
-
-        # Refind (for selecting between Intel and AMD graphics)
-        sudo apt-get install refind
-        sudo /usr/share/refind/install.sh
-
-        echo "On boot:"
-        echo " 1, first choice is for booting with integrated card (intel)"
-        echo " 2, second choice is for booting with dedicated card (radeon)"
-    fi
 }
 
 # Install private conf
@@ -192,43 +70,12 @@ END
     # Configure bashrc
     ln -f -s ~/config/bashrc ~/.bashrc
 
-    # Set irssi config
-    ln -f -s ~/config/irssi ~/.irssi
-
     # Set mailcap
     ln -f -s ~/config/mailcap ~/.mailcap
 
     # Configure mpv
     mkdir -p ~/.config/mpv
     ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
-}
-
-# Wifi drivers for Edimax AC-1200 (7392:a822) and Zyxel NWD6505
-function install-edimax () {
-
-    # ARCH
-    # pacman -S linux-headers
-
-    cd $INSTALLDIR
-    if [ ! -d rtl8812AU_8821AU_linux ]; then
-        git clone https://github.com/abperiasamy/rtl8812AU_8821AU_linux.git
-        cd rtl8812AU_8821AU_linux
-    else
-        cd rtl8812AU_8821AU_linux
-        #git pull
-    fi
-    make
-    sudo make install
-    sudo modprobe 8812au
-    echo "NOTE: Leaving $INSTALLDIR/rtl8812AU_8821AU_linux. It is needed for uninstallation"
-}
-
-function uninstall-edimax () {
-    sudo modprobe -r 8812au
-    cd $INSTALLDIR/rtl8812AU_8821AU_linux
-    sudo make uninstall
-    cd ..
-    rm -rf rtl8812AU_8821AU_linux
 }
 
 function install-canon-pixma-ip100 () {
@@ -316,16 +163,6 @@ function uninstall-citrix () {
     sudo apt-get -y remove --purge icaclient || echo "icaclient already removed"
     sudo apt-get -y autoremove
     sudo rm -rf $HOME/.ICAClient
-}
-
-function install-skype () {
-    # git clone https://aur.archlinux.org/skypeforlinux-bin.git
-    # makepkg -sri
-    sudo apt-get install skype
-}
-
-function uninstall-skype () {
-    sudo apt-get remove skype
 }
 
 function install-mpd () {
@@ -451,12 +288,9 @@ function usage () {
     cat >/dev/stdout<<END
 $0 [option]
     --install-essential
-    --install-macbook
     --install-private-conf
-    --install-edimax                | --uninstall-edimax
     --install-canon-pixma-ip100
     --fix-citrix                    | --uninstall-citrix
-    --install-skype                 | --uninstall-skype
     --install-mpd                   | --uninstall-mpd
     --install-xbindkeys             | --uninstall-xbindkeys
     --install-screencast            | --uninstall-screencast
@@ -474,17 +308,8 @@ for cmd in "$1"; do
     --install-essential)
       install-essential
       ;;
-    --install-macbook)
-      install-macbook
-      ;;
     --install-private-conf)
       install-private-conf
-      ;;
-    --install-edimax)
-      install-edimax
-      ;;
-    --uninstall-edimax)
-      uninstall-edimax
       ;;
     --install-canon-pixma-ip100)
       install-canon-pixma-ip100
@@ -494,12 +319,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-citrix)
       uninstall-citrix
-      ;;
-    --install-skype)
-      install-skype
-      ;;
-    --uninstall-skype)
-      uninstall-skype
       ;;
     --install-mpd)
       install-mpd
