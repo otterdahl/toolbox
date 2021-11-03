@@ -1,0 +1,52 @@
+#!/bin/bash
+# Thin wrapper for gnupod
+
+set -e
+case "$1" in
+  init)
+    gnupod_INIT
+    ;;
+  add)
+    shift
+    gnupod_addsong --decode=mp3 "$@"
+    ;;
+  ls)
+    gnupod_search
+    ;;
+  search)
+    shift
+    gnupod_search "$@"
+    ;;
+  rm)
+    shift
+    gnupod_search "$@" -d
+    ;;
+  commit)
+    mktunes
+    ;;
+  mount)
+    mount $IPOD_MOUNTPOINT
+    ;;
+  umount)
+    umount $IPOD_MOUNTPOINT
+    ;;
+  *)
+    cat >/dev/stdout<<END
+Thin wrapper for gnupod
+usage: ipod [arguments]
+   ipod init             - gnupod_INIT
+   ipod add <path>       - gnupod_addsong <path>
+   ipod ls               - gnupod_search
+   ipod search <options> - gnupod_search <options>
+   ipod rm <options>     - gnupod.search <options> -d
+   ipod commit           - mktunes
+   ipod mount            - mount $IPOD_MOUNTPOINT
+   ipod umount           - umount $IPOD_MOUNTPOINT
+search/rm options
+   --artist=[artist]
+   --album=[album]
+   --title=[title]
+   --id=[id]
+END
+    ;;
+esac
