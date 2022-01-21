@@ -29,7 +29,8 @@ function install-essential () {
 # Install private conf
 function install-private-conf () {
     # Add symlinks to common apps
-    ln -f -s ~/config/bash_aliases ~/.bash_aliases
+    ln -f -s ~/config/aliases ~/.bash_aliases
+    ln -f -s ~/config/aliases ~/.zshrc
     ln -f -s ~/config/vimrc ~/.vimrc
     ln -f -s ~/config/muttrc ~/.muttrc
     source ~/.bash_aliases
