@@ -14,7 +14,7 @@ function install-essential () {
     sudo apt-get install virt-manager feh mpv vlc
 
     # Email
-    sudo apt-get install mutt procmail
+    sudo apt-get install mutt procmail isync
 
     # Maildirproc
     #sudo apt-get install python3-3to2
@@ -33,6 +33,7 @@ function install-private-conf () {
     ln -f -s ~/config/aliases ~/.zshrc
     ln -f -s ~/config/vimrc ~/.vimrc
     ln -f -s ~/config/muttrc ~/.muttrc
+    ln -f -s ~/config/mbsyncrc ~/.mbsyncrc
     source ~/.bash_aliases
 
     # Vim config

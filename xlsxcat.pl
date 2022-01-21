@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 # xlsxcat [--col (cols)] [--sep (separator)] [filename]
-# where 'cols' is a comma separated list of colums
+# where 'cols' is a comma separated list of columns
 #
 # Return contens of selected column(s), from all sheets
 # 
