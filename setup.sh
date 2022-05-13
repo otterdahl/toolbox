@@ -173,6 +173,7 @@ function install-mpd () {
     sudo apt-get -y install mpd mpc ncmpcpp
     mkdir -p ~/.config/mpd/playlists
     mkdir -p ~/.ncmpcpp
+    ln -s ~/.ncmpcpp/bindings ~/config/ncmpcpp_bindings
     touch ~/.config/mpd/pid
     touch ~/.config/mpd/tag_cache
 
