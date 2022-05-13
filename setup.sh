@@ -146,6 +146,8 @@ function install-canon-pixma-ip100 () {
 =======================================================
 NOTE: It is possible to use the printer over bluetooth.
  1. Add the printer as a bluetooth device
+    Use URI with format bluetooth://.... where ....
+    is the bluetooth address without colons
  2. Add printer. Use driver "iP100 Ver.3.70" (Canon)
 =======================================================
 # sudo lpadmin -p canon-ip100 -E -v "bluetooth://...." -P /usr/share/cups/model/canonip100.ppd
