@@ -1,6 +1,5 @@
 #!/bin/bash
 # setup.sh: Install essential apps and config files
-# Targets support for: Ubuntu 18.04 and Raspbian
 
 set -e
 
@@ -39,28 +38,6 @@ function install-private-conf () {
     # Vim config
     ln -s ~/config/vim ~/.vim
 
-    # Transparent encrypted editing in vim
-    gpg --import ~/config/gpg/public_gmail.key || echo "Key already added"
-    gpg --import ~/config/gpg/private_gmail.key || echo "Key already added"
-    if grep -q GPG_TTY ~/.bashrc; then
-        :
-    else
-        cat >>~/.bashrc<<END
-GPG_TTY=\`tty\`
-export GPG_TTY 
-END
-    fi
-
-    # Configure git
-    if [ -z $(git config user.email) ]; then
-        echo "Configuring git"
-        echo -n "Enter full name: "; read FULLNAME
-        echo -n "Enter e-mail address: "; read EMAIL
-        git config --global --replace-all user.name "$FULLNAME"
-        git config --global user.email $EMAIL
-        git config --global core.editor vim
-        git config --global push.default simple
-    fi
 
     # Configure taskwarrior
     ln -f -s ~/config/taskrc ~/.taskrc
