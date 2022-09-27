@@ -11,18 +11,6 @@ function install-essential () {
 
     # Desktop
     sudo apt-get install virt-manager feh mpv vlc
-
-    # Email
-    sudo apt-get install mutt procmail isync
-
-    # Maildirproc
-    #sudo apt-get install python3-3to2
-    #git clone http://github.com/jrosdahl/maildirproc.git
-    #cd maildirproc
-    #make
-    #sudo python3 setup.py install
-    #cd ..
-    #rm -rf maildirproc
 }
 
 # Install private conf
@@ -31,13 +19,10 @@ function install-private-conf () {
     ln -f -s ~/config/aliases ~/.bash_aliases
     ln -f -s ~/config/aliases ~/.zshrc
     ln -f -s ~/config/vimrc ~/.vimrc
-    ln -f -s ~/config/muttrc ~/.muttrc
-    ln -f -s ~/config/mbsyncrc ~/.mbsyncrc
     source ~/.bash_aliases
 
     # Vim config
     ln -s ~/config/vim ~/.vim
-
 
     # Configure taskwarrior
     ln -f -s ~/config/taskrc ~/.taskrc
@@ -48,9 +33,6 @@ function install-private-conf () {
 
     # Configure bashrc
     ln -f -s ~/config/bashrc ~/.bashrc
-
-    # Set mailcap
-    ln -f -s ~/config/mailcap ~/.mailcap
 
     # Configure mpv
     mkdir -p ~/.config/mpv
