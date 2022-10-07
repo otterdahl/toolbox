@@ -126,27 +126,6 @@ function uninstall-mpd () {
     sudo apt-get remove mpd mpc ncmpcpp
 }
 
-function install-xbindkeys () {
-    # Bind media keys
-    # NOTE: These interferes with keybindings for spotify
-    #       If you're using Ubuntu, use built in tools
-    sudo apt-get -y install xbindkeys
-    xbindkeys --defaults > ~/.xbindkeysrc || true
-    cat >> ~/.xbindkeysrc<<END
-
-"mpc toggle"
-    m:0x0 + c:172
-"mpc prev"
-    m:0x0 + c:173
-"mpc next"
-    m:0x0 + c:171
-END
-}
-
-function uninstall-xbindkeys () {
-    sudo apt-get uninstall xbindkeys
-}
-
 # Install simple screencast tool
 function install-screencast () {
     cd $INSTALLDIR
@@ -218,7 +197,6 @@ $0 [option]
     --install-canon-pixma-ip100
     --fix-citrix                    | --uninstall-citrix
     --install-mpd                   | --uninstall-mpd
-    --install-xbindkeys             | --uninstall-xbindkeys
     --install-screencast            | --uninstall-screencast
     --install-opencbm
     --install-amitools
@@ -245,12 +223,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-mpd)
       uninstall-mpd
-      ;;
-    --install-xbindkeys)
-      install-xbindkeys
-      ;;
-    --uninstall-xbindkeys)
-      uninstall-xbindkeys
       ;;
     --install-screencast)
       install-screencast
