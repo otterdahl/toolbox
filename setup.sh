@@ -6,8 +6,7 @@ set -e
 # Install essential applications
 function install-essential () {
     # Ubuntu
-    sudo apt-get install taskwarrior vim cifs-utils git screen catdoc \
-         imagemagick curl util-linux exfat-utils tnef
+    sudo apt-get install vim cifs-utils git screen catdoc imagemagick curl util-linux exfat-utils tnef
 
     # Desktop
     sudo apt-get install virt-manager feh mpv vlc
@@ -23,9 +22,6 @@ function install-private-conf () {
 
     # Vim config
     ln -s ~/config/vim ~/.vim
-
-    # Configure taskwarrior
-    ln -f -s ~/config/taskrc ~/.taskrc
 
     # Configure profile
     # Used for reading .bashrc which sets colors and bash_aliases
