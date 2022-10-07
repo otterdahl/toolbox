@@ -1,35 +1,7 @@
 #!/bin/bash
-# setup.sh: Install essential apps and config files
+# setup.sh: Install scripts
 
 set -e
-
-# Install essential applications
-function install-essential () {
-    # Ubuntu
-    sudo apt-get install cifs-utils git screen catdoc imagemagick curl util-linux exfat-utils tnef
-
-    # Desktop
-    sudo apt-get install virt-manager feh mpv vlc
-}
-
-# Install private conf
-function install-private-conf () {
-    # Add symlinks to common apps
-    ln -f -s ~/config/aliases ~/.bash_aliases
-    ln -f -s ~/config/aliases ~/.zshrc
-    source ~/.bash_aliases
-
-    # Configure profile
-    # Used for reading .bashrc which sets colors and bash_aliases
-    ln -f -s ~/config/profile ~/.profile
-
-    # Configure bashrc
-    ln -f -s ~/config/bashrc ~/.bashrc
-
-    # Configure mpv
-    mkdir -p ~/.config/mpv
-    ln -f -s ~/config/mpv.conf ~/.config/mpv/mpv.conf
-}
 
 function install-canon-pixma-ip100 () {
     # Arch Linux: AUR: https://github.com/otterdahl/cnijfilter-ip100
@@ -243,8 +215,6 @@ function setdir () {
 function usage () {
     cat >/dev/stdout<<END
 $0 [option]
-    --install-essential
-    --install-private-conf
     --install-canon-pixma-ip100
     --fix-citrix                    | --uninstall-citrix
     --install-mpd                   | --uninstall-mpd
@@ -261,12 +231,6 @@ setdir
 
 for cmd in "$1"; do
   case "$cmd" in
-    --install-essential)
-      install-essential
-      ;;
-    --install-private-conf)
-      install-private-conf
-      ;;
     --install-canon-pixma-ip100)
       install-canon-pixma-ip100
       ;;
