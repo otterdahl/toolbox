@@ -126,23 +126,6 @@ function uninstall-mpd () {
     sudo apt-get remove mpd mpc ncmpcpp
 }
 
-# Install simple screencast tool
-function install-screencast () {
-    cd $INSTALLDIR
-    git clone --recursive https://github.com/lolilolicon/FFcast.git
-    cd FFcast
-    ./bootstrap
-    ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
-    make
-    sudo make install
-    cd ..
-    rm -rf FFcast
-
-    # Patch FFcast subcommands
-    # Adds support for screencast with sound (no aac)
-    sudo cp ~/toolbox/ffcast_subcmd /usr/lib/ffcast/subcmd
-}
-
 # Install opencbm
 # Tested on raspbian, ubuntu
 function install-opencbm () {
@@ -197,7 +180,6 @@ $0 [option]
     --install-canon-pixma-ip100
     --fix-citrix                    | --uninstall-citrix
     --install-mpd                   | --uninstall-mpd
-    --install-screencast            | --uninstall-screencast
     --install-opencbm
     --install-amitools
     --install-taskd
@@ -223,12 +205,6 @@ for cmd in "$1"; do
       ;;
     --uninstall-mpd)
       uninstall-mpd
-      ;;
-    --install-screencast)
-      install-screencast
-      ;;
-    --uninstall-screencast)
-      uninstall-screencast
       ;;
     --install-opencbm)
       install-opencbm
