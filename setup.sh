@@ -6,7 +6,7 @@ set -e
 # Install essential applications
 function install-essential () {
     # Ubuntu
-    sudo apt-get install vim cifs-utils git screen catdoc imagemagick curl util-linux exfat-utils tnef
+    sudo apt-get install cifs-utils git screen catdoc imagemagick curl util-linux exfat-utils tnef
 
     # Desktop
     sudo apt-get install virt-manager feh mpv vlc
@@ -17,11 +17,7 @@ function install-private-conf () {
     # Add symlinks to common apps
     ln -f -s ~/config/aliases ~/.bash_aliases
     ln -f -s ~/config/aliases ~/.zshrc
-    ln -f -s ~/config/vimrc ~/.vimrc
     source ~/.bash_aliases
-
-    # Vim config
-    ln -s ~/config/vim ~/.vim
 
     # Configure profile
     # Used for reading .bashrc which sets colors and bash_aliases
