@@ -78,19 +78,6 @@ function install-amitools () {
     sudo python setup.py install
 }
 
-function install-taskd () {
-    cd $INSTALLDIR
-    sudo apt-get -y install libgnutls28-dev cmake
-    if [ ! -d "taskserver" ]; then
-        git clone --recursive https://github.com/GothenburgBitFactory/taskserver.git
-    fi
-    cd taskserver
-    git checkout 1.2.0
-    cmake -DCMAKE_BUILD_TYPE=release .
-    make
-    sudo make install
-}
-
 # Find suitable installation dir
 function setdir () {
     INSTALLDIR="$HOME/build-repos"
@@ -106,7 +93,6 @@ $0 [option]
     --install-mpd                   | --uninstall-mpd
     --install-opencbm
     --install-amitools
-    --install-taskd
 END
 }
 
@@ -135,9 +121,6 @@ for cmd in "$1"; do
       ;;
     --install-amitools)
       install-amitools
-      ;;
-    --install-taskd)
-      install-taskd
       ;;
     *)
       usage
