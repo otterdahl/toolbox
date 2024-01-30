@@ -3,20 +3,6 @@
 
 set -e
 
-# Fix Citrix certificates
-function fix-citrix () {
-    # Fix certificates
-    sudo rm -rf /opt/Citrix/ICAClient/keystore/cacerts
-    sudo ln -s /etc/ssl/certs /opt/Citrix/ICAClient/keystore/cacerts
-}
-
-function uninstall-citrix () {
-    sudo rm -rf /opt/Citrix/ICAClient/keystore/cacerts
-    sudo apt-get -y remove --purge icaclient || echo "icaclient already removed"
-    sudo apt-get -y autoremove
-    sudo rm -rf $HOME/.ICAClient
-}
-
 function install-mpd () {
     sudo apt-get -y install mpd mpc ncmpcpp
     mkdir -p ~/.config/mpd/playlists
@@ -89,7 +75,6 @@ function setdir () {
 function usage () {
     cat >/dev/stdout<<END
 $0 [option]
-    --fix-citrix                    | --uninstall-citrix
     --install-mpd                   | --uninstall-mpd
     --install-opencbm
     --install-amitools
@@ -101,12 +86,6 @@ setdir
 
 for cmd in "$1"; do
   case "$cmd" in
-    --fix-citrix)
-      fix-citrix
-      ;;
-    --uninstall-citrix)
-      uninstall-citrix
-      ;;
     --install-mpd)
       install-mpd
       ;;
